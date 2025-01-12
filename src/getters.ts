@@ -1,17 +1,22 @@
-type Callable = (...args: any[]) => any
+type Callable = (...args: any[]) => any;
 
 function isCallable(maybeFunc: unknown): maybeFunc is Callable {
   return typeof maybeFunc === "function";
 }
 
-export function get<Getter extends Callable>(getter: Getter | ReturnType<Getter>, params: Parameters<Getter>) {
+export function get<Getter extends Callable>(
+  getter: Getter | ReturnType<Getter>,
+  params: Parameters<Getter>
+) {
   if (isCallable(getter)) {
     return getter(...params);
   }
   return getter;
 }
 
-export type GetterOrValue<Getter extends Callable = Callable> = Getter | ReturnType<Getter>;
+export type GetterOrValue<Getter extends Callable = Callable> =
+  | Getter
+  | ReturnType<Getter>;
 
 export type Computed<T extends object, Keys extends keyof T = never> = {
   [K in keyof T]: K extends Keys
@@ -21,11 +26,15 @@ export type Computed<T extends object, Keys extends keyof T = never> = {
     : T[K];
 };
 
-export function compute<T extends object, Keys extends keyof T>(obj: T, keys: Keys[], context: any): Computed<T, Keys> {
+export function compute<T extends object, Keys extends keyof T>(
+  obj: T,
+  keys: Keys[],
+  context: any
+): Computed<T, Keys> {
   let computed = { ...obj };
 
   for (const [key, value] of Object.entries(obj)) {
-    if (!keys.includes(<Keys> key)) continue;
+    if (!keys.includes(<Keys>key)) continue;
     if (!isCallable(value)) continue;
 
     computed[key] = get(value, context);
