@@ -1,26 +1,51 @@
-import { Player } from "@minecraft/server";
-import { compute, Computed, GetterOrValue } from "./getters";
+import { ChatSendBeforeEvent, Player } from "@minecraft/server";
 
-export interface Command {
-  name?: string;
-  description?: GetterOrValue<CommandInvocationCallback<string>>;
-  execute?: CommandInvocationCallback;
+import { CommandManager } from "./command-manager";
+import { TokenStream } from "./parser";
+import { Resolvable } from "./resolvers";
+import { Parameter } from "./parameters/parameter";
+import { bound } from "./utils/decorators";
+
+export class Command {
+  parent?: Command | CommandManager;
+
+  name: string;
+  description?: Resolvable<(player: Player) => string>;
+  checks: Resolvable<(player: Player) => boolean>[] = [];
+  overloads: Parameter[][] = [];
+  subcommands: Command[] = [];
+
+  @bound accessor execute: (ctx: Invocation) => void = () => {};
+
+  get fullName(): string | undefined {
+    if (this.parent instanceof CommandManager) {
+      return this.parent.prefix + this.name;
+    }
+
+    if (this.parent instanceof Command) {
+      return this.parent.fullName + " " + this.name;
+    }
+  }
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  parse(stream: TokenStream): void {
+    // TODO!
+  }
 }
 
-export interface CommandInvocationContext {
-  player: Player;
-  message: string;
-}
+export class Invocation {
+  readonly player: Player;
+  readonly message: string;
 
-export type CommandInvocationCallback<Return = void> = (
-  context: CommandInvocationContext
-) => Return;
+  constructor(player: Player, message: string) {
+    this.player = player;
+    this.message = message;
+  }
 
-export type ComputedCommand = Computed<Command, "description">;
-
-export function computeCommand(
-  command: Command,
-  context: CommandInvocationContext
-): ComputedCommand {
-  return compute(command, ["description"], context);
+  static fromChatEvent(event: ChatSendBeforeEvent): Invocation {
+    return new Invocation(event.sender, event.message);
+  }
 }

@@ -1,15 +1,15 @@
 export abstract class Builder<State> {
-  public $state: State;
+  public $state = {} as Partial<State>;
 
   constructor(state: State) {
-    this.$state = state;
+    this.$set(state);
   }
 
-  protected add(object: Partial<State>) {
+  protected $set(object: Partial<State>) {
     this.$state = {
       ...this.$state,
-      ...object
-    }
+      ...object,
+    };
     return this;
   }
 }
