@@ -1,12 +1,12 @@
 import { Parameter, ParameterParseContext } from "./parameter";
 
-export class IntegerParameter extends Parameter<number> {
+export class NumberParameter extends Parameter<number> {
   acceptNaN = false;
   acceptInf = false;
 
   parse(ctx: ParameterParseContext): number {
     const token = ctx.stream.pop();
-    const value = parseInt(token);
+    const value = parseFloat(token);
 
     if (Number.isNaN(value) && !this.acceptNaN) {
       throw new Error(`Expected integer, got ${token}`);
