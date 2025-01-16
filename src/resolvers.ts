@@ -1,4 +1,4 @@
-import { Callable, isCallable } from "./utils/callable";
+import { Callable, isCallable } from "./utils/types";
 
 export function resolve<Resolver extends Callable>(
   resolver: Resolver | ReturnType<Resolver>,

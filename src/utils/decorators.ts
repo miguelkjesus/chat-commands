@@ -1,4 +1,4 @@
-import { Callable } from "./callable";
+import { Callable } from "./types";
 
 export type Bound<This, Func extends Callable> = (
   this: This,

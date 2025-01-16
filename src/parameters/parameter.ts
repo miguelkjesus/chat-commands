@@ -1,7 +1,7 @@
 import { Player } from "@minecraft/server";
 import { Resolvable } from "../resolvers";
 import { TokenStream } from "../parser";
-import { isCallable } from "../utils/callable";
+import { isCallable } from "../utils/types";
 import { Invocation } from "../command";
 
 export abstract class Parameter<T = any> {
