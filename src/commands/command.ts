@@ -1,10 +1,11 @@
-import { ChatSendBeforeEvent, Player } from "@minecraft/server";
+import type { Player } from "@minecraft/server";
+import type { Invocation } from "./invocation";
+import type { Resolvable } from "../resolvers";
+import type { Parameter } from "../parameters/parameter";
+import type { TokenStream } from "../token-stream";
 
 import { CommandManager } from "./command-manager";
-import { Resolvable } from "./resolvers";
-import { Parameter } from "./parameters/parameter";
-import { bound } from "./utils/decorators";
-import { TokenStream } from "./token-stream";
+import { bound } from "../utils/decorators";
 
 export class Command {
   parent?: Command | CommandManager;
@@ -33,19 +34,5 @@ export class Command {
 
   parse(stream: TokenStream): void {
     // TODO!
-  }
-}
-
-export class Invocation {
-  readonly player: Player;
-  readonly message: string;
-
-  constructor(player: Player, message: string) {
-    this.player = player;
-    this.message = message;
-  }
-
-  static fromChatEvent(event: ChatSendBeforeEvent): Invocation {
-    return new Invocation(event.sender, event.message);
   }
 }

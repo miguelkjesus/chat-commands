@@ -1,4 +1,4 @@
-import { Parameter, ParameterParseContext } from "./parameter";
+import { Parameter, type ParameterParseContext } from "./parameter";
 
 export class StringParameter extends Parameter<string> {
   parse(ctx: ParameterParseContext): string {

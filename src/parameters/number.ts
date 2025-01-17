@@ -1,5 +1,5 @@
+import { Parameter, type ParameterParseContext } from "./parameter";
 import { NumberRange } from "../utils/range";
-import { Parameter, ParameterParseContext } from "./parameter";
 import { ParseError } from "./parse-error";
 
 export class NumberParameter extends Parameter<number> {
