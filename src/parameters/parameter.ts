@@ -17,17 +17,15 @@ export abstract class Parameter<T = any> {
   abstract parse(context: ParameterParseContext): T;
 
   toString() {
-    if (this.optional) {
-      if (this.optional.defaultValue) {
-        const defaultString = isCallable(this.optional.defaultValue)
-          ? "function"
-          : this.optional.defaultValue;
+    if (!this.optional) return this.name;
 
-        return `[${this.name} = ${defaultString}]`;
-      }
-      return `[${this.name}]`;
-    }
-    return this.name;
+    if (!this.optional.defaultValue) return `[${this.name}]`;
+
+    const defaultString = isCallable(this.optional.defaultValue)
+      ? "function"
+      : this.optional.defaultValue;
+
+    return `[${this.name} = ${defaultString}]`;
   }
 }
 
