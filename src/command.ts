@@ -1,10 +1,10 @@
 import { ChatSendBeforeEvent, Player } from "@minecraft/server";
 
 import { CommandManager } from "./command-manager";
-import { TokenStream } from "./parser";
 import { Resolvable } from "./resolvers";
 import { Parameter } from "./parameters/parameter";
 import { bound } from "./utils/decorators";
+import { TokenStream } from "./token-stream";
 
 export class Command {
   parent?: Command | CommandManager;

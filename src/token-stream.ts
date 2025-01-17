@@ -65,7 +65,7 @@ export class TokenStream {
   popRemaining(): string[] {
     let tokens = [];
     let token: string | undefined;
-    while ((token = this.peek())) {
+    while ((token = this.pop())) {
       tokens.push(token);
     }
     return tokens;

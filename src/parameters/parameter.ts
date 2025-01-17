@@ -1,8 +1,8 @@
 import { Player } from "@minecraft/server";
 import { Resolvable } from "../resolvers";
-import { TokenStream } from "../parser";
 import { isCallable } from "../utils/types";
 import { Invocation } from "../command";
+import { TokenStream } from "../token-stream";
 
 export abstract class Parameter<T = any> {
   name: string;
@@ -20,7 +20,7 @@ export abstract class Parameter<T = any> {
     if (this.optional) {
       if (this.optional.defaultValue) {
         const defaultString = isCallable(this.optional.defaultValue)
-          ? "?"
+          ? "function"
           : this.optional.defaultValue;
 
         return `[${this.name} = ${defaultString}]`;
