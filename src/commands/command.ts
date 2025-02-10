@@ -1,10 +1,10 @@
 import type { Player } from "@minecraft/server";
-import type { Invocation } from "./invocation";
-import type { Resolvable } from "../resolvers";
-import type { Parameter } from "../parameters/parameter";
-import { tokenize, type TokenStreamState } from "../token-stream/token-parser";
 
-import { bound } from "../utils/decorators";
+import type { Resolvable } from "~/resolvers";
+import type { Parameter } from "~/parameters";
+import { bound } from "~/utils/decorators";
+
+import type { Invocation } from "./invocation";
 
 export class Command {
   parent?: Command;

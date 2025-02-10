@@ -1,4 +1,4 @@
-import type { TokenParser } from "../token-parser";
+import type { TokenParser } from "./parser";
 
 export const text = function (unparsed: string) {
   unparsed = unparsed.trimStart();

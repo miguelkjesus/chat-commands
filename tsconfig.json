@@ -11,7 +11,12 @@
     "stripInternal": true,
 
     "forceConsistentCasingInFileNames": true,
-    "emitDecoratorMetadata": false
+    "emitDecoratorMetadata": false,
+
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["src/*"]
+    }
   },
   "exclude": ["node_modules"],
   "include": ["src"]

@@ -1,6 +1,6 @@
-import type { TokenParser } from "../token-parser";
+import type { TokenParser } from "./parser";
 
-export const text = function (unparsed: string) {
+export const all = function (unparsed: string) {
   return {
     unparsed: "",
     token: unparsed === "" ? undefined : unparsed,

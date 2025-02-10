@@ -1,7 +1,7 @@
-import type { Command } from "./command";
-
 import { world } from "@minecraft/server";
-import { tokenize, TokenStreamState } from "../token-stream/token-parser";
+
+import { TokenStream } from "~/tokens";
+import type { Command } from "./command";
 import { Invocation } from "./invocation";
 
 export class CommandManager {
@@ -16,9 +16,7 @@ export class CommandManager {
     world.beforeEvents.chatSend.subscribe((event) => {
       if (!event.message.startsWith(this.prefix)) return;
 
-      const stream = new TokenStreamState(
-        event.message.slice(this.prefix.length)
-      );
+      const stream = new TokenStream(event.message.slice(this.prefix.length));
       const command = this.getInvokedCommand(stream);
       if (!command) return;
 
@@ -27,7 +25,7 @@ export class CommandManager {
     });
   }
 
-  getInvokedCommand(stream: TokenStreamState): Command | undefined {
+  getInvokedCommand(stream: TokenStream): Command | undefined {
     let search = [...this.commands];
 
     let command: Command | undefined;

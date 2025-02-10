@@ -1,11 +1,12 @@
+import { all } from "~/tokens/parsers";
 import { Parameter, type ParameterParseContext } from "./parameter";
 
 export class StringParameter extends Parameter<string> {
-  parse(ctx: ParameterParseContext): string {
-    const isLast = ctx.params.indexOf(this) === ctx.params.length - 1;
+  parse({ tokens, params }: ParameterParseContext): string {
+    const isLast = params.indexOf(this) === params.length - 1;
     if (isLast) {
-      return ctx.stream.flush();
+      return tokens.pop(all);
     }
-    return ctx.stream.pop();
+    return tokens.pop();
   }
 }
