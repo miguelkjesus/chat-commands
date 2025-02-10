@@ -8,6 +8,7 @@
     "skipLibCheck": true,
     "outDir": "dist",
     "esModuleInterop": true,
+    "stripInternal": true,
 
     "forceConsistentCasingInFileNames": true,
     "emitDecoratorMetadata": false

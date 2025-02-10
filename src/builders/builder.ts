@@ -1,15 +1,16 @@
 export abstract class Builder<State> {
-  public $state = {} as Partial<State>;
+  /** @internal */
+  public __state = {} as Partial<State>;
 
   constructor(state: State) {
     this.$set(state);
   }
 
-  protected $set(object: Partial<State>) {
-    this.$state = {
-      ...this.$state,
+  protected $set<T>(object: Partial<State>): T {
+    this.__state = {
+      ...this.__state,
       ...object,
     };
-    return this;
+    return this as any as T;
   }
 }

@@ -1,7 +1,7 @@
 import { Player } from "@minecraft/server";
 import { Resolvable } from "../resolvers";
 import { isCallable } from "../utils/types";
-import { TokenStream } from "../token-stream";
+import { TokenStreamState } from "../token-stream/token-parser";
 import { Invocation } from "../commands/invocation";
 
 export abstract class Parameter<T = any> {
@@ -31,12 +31,12 @@ export abstract class Parameter<T = any> {
 
 export class ParameterParseContext {
   readonly invocation: Invocation;
-  readonly stream: TokenStream;
+  readonly stream: TokenStreamState;
   readonly params: Parameter[];
 
   constructor(invocation: Invocation, params: Parameter[]) {
     this.invocation = invocation;
-    this.stream = new TokenStream(invocation.message);
+    this.stream = new TokenStreamState(invocation.message);
     this.params = params;
   }
 }

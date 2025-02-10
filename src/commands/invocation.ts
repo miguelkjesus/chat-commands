@@ -5,13 +5,11 @@ export class Invocation {
   readonly manager: CommandManager;
   readonly player: Player;
   readonly message: string;
+  // TODO: args
 
-  constructor(player: Player, message: string) {
+  constructor(manager: CommandManager, player: Player, message: string) {
+    this.manager = manager;
     this.player = player;
     this.message = message;
-  }
-
-  static fromChatEvent(event: ChatSendBeforeEvent): Invocation {
-    return new Invocation(event.sender, event.message);
   }
 }

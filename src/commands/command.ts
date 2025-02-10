@@ -2,13 +2,12 @@ import type { Player } from "@minecraft/server";
 import type { Invocation } from "./invocation";
 import type { Resolvable } from "../resolvers";
 import type { Parameter } from "../parameters/parameter";
-import type { TokenStream } from "../token-stream";
+import { tokenize, type TokenStreamState } from "../token-stream/token-parser";
 
-import { CommandManager } from "./command-manager";
 import { bound } from "../utils/decorators";
 
 export class Command {
-  parent?: Command | CommandManager;
+  parent?: Command;
 
   name: string;
   description?: Resolvable<(player: Player) => string>;
@@ -18,21 +17,25 @@ export class Command {
 
   @bound accessor execute: (ctx: Invocation) => void = () => {};
 
-  get fullName(): string | undefined {
-    if (this.parent instanceof CommandManager) {
-      return this.parent.prefix + this.name;
-    }
-
-    if (this.parent instanceof Command) {
-      return this.parent.fullName + " " + this.name;
-    }
-  }
-
   constructor(name: string) {
     this.name = name;
   }
 
-  parse(stream: TokenStream): void {
-    // TODO!
+  get fullName(): string {
+    if (this.parent) {
+      return this.parent.fullName + " " + this.name;
+    }
+
+    return this.name;
+  }
+
+  *descendants() {
+    const queue = [...this.subcommands];
+
+    let command: Command | undefined;
+    while ((command = queue.shift())) {
+      yield command;
+      queue.push(...command.subcommands);
+    }
   }
 }
