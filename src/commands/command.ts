@@ -5,6 +5,7 @@ import type { Parameter } from "~/parameters";
 import { bound } from "~/utils/decorators";
 
 import type { Invocation } from "./invocation";
+import { CommandCollection } from "./command-collection";
 
 export class Command {
   parent?: Command;
@@ -14,7 +15,7 @@ export class Command {
   description?: Resolvable<(player: Player) => string>;
   checks: Resolvable<(player: Player) => boolean>[] = [];
   overloads: Parameter[][] = [];
-  subcommands: Command[] = [];
+  subcommands = new CommandCollection();
 
   @bound accessor execute: (ctx: Invocation) => void = () => {};
 

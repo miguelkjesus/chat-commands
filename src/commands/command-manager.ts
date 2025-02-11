@@ -1,12 +1,14 @@
 import { world } from "@minecraft/server";
 
 import { TokenStream } from "~/tokens";
+
 import type { Command } from "./command";
 import { Invocation } from "./invocation";
+import { CommandCollection } from "./command-collection";
 
 export class CommandManager {
   prefix: string;
-  commands: Command[] = [];
+  commands = new CommandCollection();
 
   constructor(prefix: string) {
     this.prefix = prefix;
@@ -25,7 +27,7 @@ export class CommandManager {
     });
   }
 
-  getInvokedCommand(stream: TokenStream): Command | undefined {
+  private getInvokedCommand(stream: TokenStream): Command | undefined {
     // things to consider:
     // command names may be multiple tokens.
     // maybe easier to transform a command "teleport to" to a command and subcommand "teleport" and "to"
