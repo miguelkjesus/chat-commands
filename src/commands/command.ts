@@ -10,6 +10,7 @@ export class Command {
   parent?: Command;
 
   name: string;
+  aliases: string[] = [];
   description?: Resolvable<(player: Player) => string>;
   checks: Resolvable<(player: Player) => boolean>[] = [];
   overloads: Parameter[][] = [];

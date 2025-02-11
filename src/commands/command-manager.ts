@@ -26,15 +26,9 @@ export class CommandManager {
   }
 
   getInvokedCommand(stream: TokenStream): Command | undefined {
-    let search = [...this.commands];
-
-    let command: Command | undefined;
-    while ((command = search.pop())) {
-      if (stream.match(command.nameTokens)) {
-        search = [...command.subcommands];
-      }
-    }
-
-    return command;
+    // things to consider:
+    // command names may be multiple tokens.
+    // maybe easier to transform a command "teleport to" to a command and subcommand "teleport" and "to"
+    return;
   }
 }
