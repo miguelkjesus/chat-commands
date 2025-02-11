@@ -1,6 +1,6 @@
 import type { Player } from "@minecraft/server";
 
-import type { Resolvable } from "~/resolvers";
+import type { Resolvable } from "~/utils/resolvers";
 import type { Parameter } from "~/parameters";
 import { bound } from "~/utils/decorators";
 

@@ -7,12 +7,8 @@ import { Invocation } from "./invocation";
 import { CommandCollection } from "./command-collection";
 
 export class CommandManager {
-  prefix: string;
+  prefix?: string;
   commands = new CommandCollection();
-
-  constructor(prefix: string) {
-    this.prefix = prefix;
-  }
 
   listen(): void {
     world.beforeEvents.chatSend.subscribe((event) => {
@@ -27,7 +23,7 @@ export class CommandManager {
     });
   }
 
-  private getInvokedCommand(stream: TokenStream): Command | undefined {
+  getInvokedCommand(stream: TokenStream): Command | undefined {
     // things to consider:
     // command names may be multiple tokens.
     // maybe easier to transform a command "teleport to" to a command and subcommand "teleport" and "to"

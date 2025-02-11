@@ -6,6 +6,7 @@ export abstract class Builder<State> {
     this.$set(state);
   }
 
+  /** @internal */
   protected $set<T>(object: Partial<State>): T {
     this.__state = {
       ...this.__state,

@@ -1,4 +1,4 @@
-import { Command } from "../commands/command";
+import { Command } from "~/commands";
 import { Builder } from "./builder";
 
 export class CommandBuilder extends Builder<Command> {
