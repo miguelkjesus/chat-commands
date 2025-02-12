@@ -14,7 +14,7 @@ export class Command<Parameters extends readonly Parameter[] = Parameter[]> {
   aliases: string[] = [];
   description?: Resolvable<(player: Player) => string>;
   checks: Resolvable<(player: Player) => boolean>[] = [];
-  parameters: Parameters; // TODO: Introduce behaviour for multiple overloads eventually
+  parameters: Parameters; // TODO: Introduce behaviour for multiple overloads
   subcommands = new CommandCollection();
 
   @bound accessor execute: (ctx: Invocation<KwArgs<Parameters>>) => void = () => {};
