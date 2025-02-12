@@ -20,8 +20,8 @@ export abstract class Builder<State> {
     return this;
   }
 
-  protected __modify(modify: (state: State) => void) {
-    modify(this.__state as State);
+  protected __modify(modify: (state: Partial<State>) => void) {
+    modify(this.__state);
     return this;
   }
 }
