@@ -2,7 +2,7 @@ import type { Parameter } from "~/parameters";
 import { Builder } from "../builder";
 
 export class ParameterBuilder<T extends Parameter> extends Builder<T> {
-  description(description: Parameter["description"]) {
+  description(description: T["description"]) {
     return this.__set({ description } as Partial<T>);
   }
 

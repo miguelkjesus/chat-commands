@@ -10,15 +10,15 @@ export class StringParameterBuilder extends ParameterBuilder<StringParameter> {
     });
   }
 
-  minLength(minLength: StringParameter["minLength"]) {
+  minLength(minLength: number) {
     return this.__set({ minLength });
   }
 
-  maxLength(maxLength: StringParameter["maxLength"]) {
+  maxLength(maxLength: number) {
     return this.__set({ maxLength });
   }
 
-  pattern(pattern: StringParameter["pattern"]) {
-    return this.__set({ pattern });
+  pattern(pattern: RegExp, failMessage?: string) {
+    return this.__set({ pattern: { value: pattern, failMessage } });
   }
 }

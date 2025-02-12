@@ -5,7 +5,10 @@ import { ParameterParseError } from "./parse-error";
 export class StringParameter extends Parameter<string> {
   minLength = 0;
   maxLength = Infinity;
-  pattern?: RegExp;
+  pattern?: {
+    value: RegExp;
+    failMessage?: string;
+  };
 
   parse({ tokens, params }: ParameterParseContext): string {
     const isLast = params.indexOf(this) === params.length - 1;
@@ -21,9 +24,10 @@ export class StringParameter extends Parameter<string> {
         `Expected string with length <= ${this.maxLength}`
       );
 
-    if (this.pattern && !this.pattern.test(value)) {
+    if (this.pattern && !this.pattern.value.test(value)) {
       throw new ParameterParseError(
-        `Expected string matching pattern ${this.pattern}` // TODO: custom error messages for patterns
+        this.pattern.failMessage ??
+          `Expected string matching pattern ${this.pattern}`
       );
     }
 
