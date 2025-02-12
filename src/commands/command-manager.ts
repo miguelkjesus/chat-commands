@@ -18,7 +18,7 @@ export class CommandManager {
       const command = this.getInvokedCommand(stream);
       if (!command) return;
 
-      const invocation = new Invocation(this, event.sender, event.message);
+      const invocation = new Invocation(this, event.sender, event.message, {});
       command.execute(invocation);
     });
   }

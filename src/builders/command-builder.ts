@@ -4,7 +4,7 @@ import { type Command, CommandCollection } from "~/commands";
 import type { ParameterBuilder } from "./parameters";
 import { Builder } from "./builder";
 
-export class CommandBuilder extends Builder<Command> {
+export class CommandBuilder<Parameters extends readonly Parameter[]> extends Builder<Command<Parameters>> {
   aliases(...aliases: string[]) {
     return this.__set({ aliases });
   }
@@ -13,22 +13,22 @@ export class CommandBuilder extends Builder<Command> {
     return this.__set({ description });
   }
 
-  execute(execute: Command["execute"]) {
+  execute(execute: Command<Parameters>["execute"]) {
     return this.__set({ execute });
   }
 
   subcommands(...subcommands: Command[]) {
     for (const subcommand of subcommands) {
-      subcommand.parent = this.__state as Command;
+      subcommand.parent = this.__state as Command<any>;
     }
     return this.__set({ subcommands: new CommandCollection(...subcommands) });
   }
 
-  parameters(...parameters: ParameterBuilder<any>[]) {
+  parameters<T extends readonly Parameter[]>(
+    ...parameters: { [K in keyof T]: ParameterBuilder<T[K]> }
+  ): CommandBuilder<T> {
     return this.__set({
-      parameters: parameters.map(
-        (builder) => builder.__state as Parameter<any>
-      ),
-    });
+      parameters: parameters.map((builder) => builder.__state) as any,
+    }) as any as CommandBuilder<T>;
   }
 }

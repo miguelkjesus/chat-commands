@@ -1,13 +1,12 @@
 import { StringParameter } from "~/parameters";
 import { ParameterBuilder } from "./parameter-builder";
 
-export class StringParameterBuilder extends ParameterBuilder<StringParameter> {
+export class StringParameterBuilder<Name extends string> extends ParameterBuilder<StringParameter<Name>> {
   notEmpty() {
-    return this.__transform(({ minLength }) => {
-      if (minLength === undefined || minLength < 1) {
-        return { minLength: 1 };
-      }
-    });
+    if (this.__state.minLength === undefined || this.__state.minLength < 1) {
+      return this.minLength(1);
+    }
+    return this;
   }
 
   minLength(minLength: number) {

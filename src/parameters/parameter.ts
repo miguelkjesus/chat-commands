@@ -1,15 +1,15 @@
-import { Player } from "@minecraft/server";
+import type { Player } from "@minecraft/server";
+import type { Invocation } from "~/commands";
 import { Resolvable } from "~/utils/resolvers";
 import { isCallable } from "~/utils/types";
-import { Invocation } from "~/commands";
 import { TokenStream } from "~/tokens";
 
-export abstract class Parameter<T = any> {
-  name: string;
+export abstract class Parameter<T = any, Name extends string = string> {
+  readonly name: Name;
   description?: Resolvable<(player: Player) => string>;
   optional?: { defaultValue?: T };
 
-  constructor(name: string) {
+  constructor(name: Name) {
     this.name = name;
   }
 
@@ -20,9 +20,7 @@ export abstract class Parameter<T = any> {
 
     if (!this.optional.defaultValue) return `[${this.name}]`;
 
-    const defaultString = isCallable(this.optional.defaultValue)
-      ? "function"
-      : this.optional.defaultValue;
+    const defaultString = isCallable(this.optional.defaultValue) ? "function" : this.optional.defaultValue;
 
     return `[${this.name} = ${defaultString}]`;
   }

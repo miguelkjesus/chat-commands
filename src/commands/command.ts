@@ -4,20 +4,20 @@ import type { Resolvable } from "~/utils/resolvers";
 import type { Parameter } from "~/parameters";
 import { bound } from "~/utils/decorators";
 
-import type { Invocation } from "./invocation";
+import type { Invocation, KwArgs } from "./invocation";
 import { CommandCollection } from "./command-collection";
 
-export class Command {
+export class Command<Parameters extends readonly Parameter[] = Parameter[]> {
   parent?: Command;
 
   name: string;
   aliases: string[] = [];
   description?: Resolvable<(player: Player) => string>;
   checks: Resolvable<(player: Player) => boolean>[] = [];
-  parameters: Parameter[] = []; // TODO: Introduce behaviour for multiple overloads eventually
+  parameters: Parameters; // TODO: Introduce behaviour for multiple overloads eventually
   subcommands = new CommandCollection();
 
-  @bound accessor execute: (ctx: Invocation) => void = () => {};
+  @bound accessor execute: (ctx: Invocation<KwArgs<Parameters>>) => void = () => {};
 
   constructor(name: string) {
     this.name = name;
