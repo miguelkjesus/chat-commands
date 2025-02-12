@@ -1,5 +1,5 @@
 import type { Player } from "@minecraft/server";
-import type { Invocation } from "~/commands";
+import type { CommandManager } from "~/commands";
 import { Resolvable } from "~/utils/resolvers";
 import { isCallable } from "~/utils/types";
 import { TokenStream } from "~/tokens";
@@ -26,14 +26,18 @@ export abstract class Parameter<T = any, Name extends string = string> {
   }
 }
 
-export class ParameterParseContext {
-  readonly invocation: Invocation;
+export class ParameterParseContext<Params extends readonly Parameter[] = Parameter[]> {
+  readonly manager: CommandManager;
+  readonly player: Player;
+  readonly message: string;
   readonly tokens: TokenStream;
-  readonly params: Parameter[];
+  readonly params: Params;
 
-  constructor(invocation: Invocation, params: Parameter[]) {
-    this.invocation = invocation;
-    this.tokens = new TokenStream(invocation.message);
+  constructor(manager: CommandManager, player: Player, message: string, tokens: TokenStream, params: Params) {
+    this.manager = manager;
+    this.player = player;
+    this.message = message;
+    this.tokens = tokens;
     this.params = params;
   }
 }
