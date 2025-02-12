@@ -21,15 +21,21 @@ export class CommandManager {
 
       const args = this.getArguments(command, event, tokens);
       const invocation = new Invocation(this, event.sender, event.message, args);
-      command.execute(invocation);
+      command?.execute(invocation);
     });
   }
 
   private getInvokedCommand(stream: TokenStream): Command | undefined {
-    // things to consider:
-    // command names may be multiple tokens.
-    // maybe easier to transform a command "teleport to" to a command and subcommand "teleport" and "to"
-    return;
+    let search = [...this.commands].filter((cmd) => cmd.parent === undefined);
+
+    let command: Command | undefined;
+    let token: string | undefined;
+    while ((token = stream.pop())) {
+      const match = search.find((cmd) => cmd.subname === token || cmd.aliases.includes(token));
+      if (!match) return command;
+      command = match;
+      search = [...command.subcommands];
+    }
   }
 
   private getArguments<T extends Command>(
