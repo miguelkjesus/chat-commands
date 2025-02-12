@@ -6,7 +6,6 @@ import { TokenStream } from "~/tokens";
 
 export abstract class Parameter<T = any> {
   name: string;
-  aliases: string[] = [];
   description?: Resolvable<(player: Player) => string>;
   optional?: { defaultValue?: T };
 

@@ -1,6 +1,8 @@
-import { Command, CommandCollection } from "~/commands";
+import type { Parameter } from "~/parameters";
+import { type Command, CommandCollection } from "~/commands";
+
+import type { ParameterBuilder } from "./parameters";
 import { Builder } from "./builder";
-import { Parameter } from "~/parameters";
 
 export class CommandBuilder extends Builder<Command> {
   aliases(...aliases: string[]) {
@@ -22,7 +24,11 @@ export class CommandBuilder extends Builder<Command> {
     return this.__set({ subcommands: new CommandCollection(...subcommands) });
   }
 
-  parameters(...parameters: Parameter[]) {
-    return this.__set({ parameters });
+  parameters(...parameters: ParameterBuilder<any>[]) {
+    return this.__set({
+      parameters: parameters.map(
+        (builder) => builder.__state as Parameter<any>
+      ),
+    });
   }
 }
