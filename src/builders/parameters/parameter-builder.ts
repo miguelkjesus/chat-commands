@@ -6,7 +6,7 @@ export class ParameterBuilder<T extends Parameter> extends Builder<T> {
     return this.__set({ description } as Partial<T>);
   }
 
-  optional(optional: boolean) {
+  optional(optional = true) {
     return this.__set({ optional: optional ? {} : undefined } as Partial<T>);
   }
 
