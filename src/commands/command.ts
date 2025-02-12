@@ -17,7 +17,7 @@ export class Command<Params extends readonly Parameter[] = Parameter[]> {
   parameters: Params; // TODO: Introduce behaviour for multiple overloads
   subcommands = new CommandCollection();
 
-  @bound accessor execute: (ctx: Invocation<KwArgs<Params>>) => void = () => {};
+  @bound accessor execute: (ctx: Invocation<KwArgs<Params>>) => void | undefined;
 
   constructor(subname: string) {
     this.subname = subname;
