@@ -3,6 +3,10 @@ import { Command } from "./command";
 export class CommandCollection {
   private commands = new Set<Command>();
 
+  constructor(...commands: Command[]) {
+    this.add(...commands);
+  }
+
   *[Symbol.iterator]() {
     yield* this.commands;
   }

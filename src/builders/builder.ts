@@ -1,17 +1,15 @@
 export abstract class Builder<State> {
-  /** @internal */
-  public __state = {} as Partial<State>;
+  // This must stay readonly for current functionality:
+  // A few things rely on passing the partial state for later use, and
+  // therefore assume that this state will be modified and not replaced.
+  readonly __state = {} as Partial<State>;
 
   constructor(state: State) {
-    this.$set(state);
+    this.__set(state);
   }
 
-  /** @internal */
-  protected $set<T>(object: Partial<State>): T {
-    this.__state = {
-      ...this.__state,
-      ...object,
-    };
-    return this as any as T;
+  protected __set(object: Partial<State>) {
+    Object.assign(this.__state, object);
+    return this;
   }
 }

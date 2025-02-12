@@ -14,7 +14,7 @@ export class Command {
   aliases: string[] = [];
   description?: Resolvable<(player: Player) => string>;
   checks: Resolvable<(player: Player) => boolean>[] = [];
-  overloads: Parameter[][] = [];
+  parameters: Parameter[] = []; // TODO: Introduce behaviour for multiple overloads eventually
   subcommands = new CommandCollection();
 
   @bound accessor execute: (ctx: Invocation) => void = () => {};
