@@ -14,28 +14,28 @@ export class NumberParameterBuilder extends ParameterBuilder<NumberParameter> {
 
   gt(gt: number) {
     this.__default({ range: new NumberRange({}) });
-    return this.__modify(
+    return this.__mutate(
       ({ range }) => (range.min = { inclusive: false, value: gt })
     );
   }
 
   gte(gte: number) {
     this.__default({ range: new NumberRange({}) });
-    return this.__modify(
+    return this.__mutate(
       ({ range }) => (range.min = { inclusive: true, value: gte })
     );
   }
 
   lt(lt: number) {
     this.__default({ range: new NumberRange({}) });
-    return this.__modify(
+    return this.__mutate(
       ({ range }) => (range.max = { inclusive: false, value: lt })
     );
   }
 
   lte(lte: number) {
     this.__default({ range: new NumberRange({}) });
-    return this.__modify(
+    return this.__mutate(
       ({ range }) => (range.max = { inclusive: true, value: lte })
     );
   }
