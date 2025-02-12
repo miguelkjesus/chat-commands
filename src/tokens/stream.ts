@@ -1,9 +1,8 @@
-import type { TokenParser } from "./parsers/parser";
-import { text as parseTextToken } from "./parsers";
+import { type TokenParser, text } from "./parsers";
 
 export class TokenStream {
   unparsed: string;
-  defaultParser: TokenParser = parseTextToken;
+  defaultParser: TokenParser = text;
 
   constructor(message: string) {
     this.unparsed = message;

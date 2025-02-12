@@ -1,8 +1,7 @@
 export abstract class Builder<State> {
-  // This must stay readonly for current functionality:
-  // A few things rely on passing the partial state for later use, and
-  // therefore assume that this state will be modified and not replaced.
-  readonly __state = {} as Partial<State>;
+  // This must stay readonly:
+  // Some things rely on this value being modified and not reassigned.
+  readonly __state = {} as State;
 
   constructor(state: State) {
     this.__set(state);

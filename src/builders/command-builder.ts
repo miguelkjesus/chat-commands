@@ -21,7 +21,9 @@ export class CommandBuilder<Params extends readonly Parameter[]> extends Builder
     for (const subcommand of subcommands) {
       subcommand.parent = this.__state as Command<any>;
     }
-    return this.__set({ subcommands: new CommandCollection(...subcommands) });
+
+    this.__default({ subcommands: new CommandCollection() });
+    return this.__mutate(({ subcommands }) => subcommands.add(...subcommands));
   }
 
   parameters<T extends readonly Parameter[]>(parameters: {

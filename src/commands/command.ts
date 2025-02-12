@@ -10,7 +10,7 @@ import { CommandCollection } from "./command-collection";
 export class Command<Params extends readonly Parameter[] = Parameter[]> {
   parent?: Command;
 
-  name: string;
+  subname: string;
   aliases: string[] = [];
   description?: Resolvable<(player: Player) => string>;
   checks: Resolvable<(player: Player) => boolean>[] = [];
@@ -19,16 +19,16 @@ export class Command<Params extends readonly Parameter[] = Parameter[]> {
 
   @bound accessor execute: (ctx: Invocation<KwArgs<Params>>) => void = () => {};
 
-  constructor(name: string) {
-    this.name = name;
+  constructor(subname: string) {
+    this.subname = subname;
   }
 
-  get fullName(): string {
+  get name(): string {
     if (this.parent) {
-      return this.parent.fullName + " " + this.name;
+      return this.parent.name + " " + this.subname;
     }
 
-    return this.name;
+    return this.subname;
   }
 
   *descendants() {
