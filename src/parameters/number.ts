@@ -3,10 +3,7 @@ import { NumberRange } from "~/utils/range";
 import { Parameter, type ParameterParseContext } from "./parameter";
 import { ParameterParseError } from "./parse-error";
 
-export class NumberParameter<Name extends string> extends Parameter<
-  number,
-  Name
-> {
+export class NumberParameter<Name extends string> extends Parameter<number, Name> {
   allowNaN = false;
   allowInf = false;
   range = new NumberRange({});
@@ -16,8 +13,7 @@ export class NumberParameter<Name extends string> extends Parameter<
     const value = parseFloat(token);
 
     if (Number.isNaN(value)) {
-      if (!this.allowNaN)
-        throw new ParameterParseError(`Expected integer, got ${token}`);
+      if (!this.allowNaN) throw new ParameterParseError(`Expected integer, got ${token}`);
       return value;
     }
 
@@ -26,9 +22,7 @@ export class NumberParameter<Name extends string> extends Parameter<
     }
 
     if (this.range?.contains(value)) {
-      throw new ParameterParseError(
-        `Expected number in range ${this.range}, got ${token}`
-      );
+      throw new ParameterParseError(`Expected number in range ${this.range}, got ${token}`);
     }
 
     return value;

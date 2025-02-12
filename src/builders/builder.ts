@@ -25,9 +25,7 @@ export abstract class Builder<State> {
     return this;
   }
 
-  protected __transform(
-    modify: (state: Partial<State>) => Partial<State> | undefined
-  ) {
+  protected __transform(modify: (state: Partial<State>) => Partial<State> | undefined) {
     Object.assign(this.__state, modify(this.__state) ?? {});
     return this;
   }

@@ -1,12 +1,9 @@
 import type { Callable } from "./types";
 
-export type Bound<This, Func extends Callable> = (
-  this: This,
-  ...args: Parameters<Func>
-) => ReturnType<Func>;
+export type Bound<This, Func extends Callable> = (this: This, ...args: Parameters<Func>) => ReturnType<Func>;
 
 export function bound<This, T extends Callable>(
-  accessor: ClassAccessorDecoratorTarget<This, T>
+  accessor: ClassAccessorDecoratorTarget<This, T>,
 ): ClassAccessorDecoratorResult<This, Bound<This, T>> {
   return {
     ...accessor,
@@ -26,7 +23,7 @@ export interface ConstantMethod<This, Args extends any[], Return> {
 }
 
 export function computeOnce<This, Args extends any[], Return>(
-  func: (this: This, ...args: Args) => Return
+  func: (this: This, ...args: Args) => Return,
 ): ConstantMethod<This, Args, Return> {
   const memoized = function (this: This, ...args: Args): Return {
     if (memoized.cache) {
