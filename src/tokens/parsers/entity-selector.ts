@@ -1,17 +1,18 @@
 import type { TokenParser } from "./parser";
+import { argument } from "./argument";
 
 export const entitySelector = function (unparsed: string) {
-  unparsed = unparsed.trimStart();
-  if (!unparsed) return undefined;
+  if (!unparsed.startsWith("@")) {
+    return argument(unparsed);
+  }
 
-  const quoteChars = ['"', "'"];
-
-  let token = "";
-  let newUnparsed = "";
-  let quote = undefined;
+  let inFilter = false;
   let escape = false;
 
-  for (let i = 0; i < unparsed.length; i++) {
+  let token = "@";
+  let newUnparsed = "";
+
+  for (let i = 1; i < unparsed.length; i++) {
     const ch = unparsed[i];
 
     if (escape) {
@@ -19,25 +20,11 @@ export const entitySelector = function (unparsed: string) {
       escape = false;
     } else if (ch === "\\") {
       escape = true;
-    } else if (ch === "@") {
-      const selectorMatch = unparsed.slice(i).match(/^@[a-z]\[[^\]]*\]/);
-      if (selectorMatch) {
-        token += selectorMatch[0];
-        newUnparsed = unparsed.slice(i + selectorMatch[0].length);
-        break;
-      } else {
-        token += ch;
-      }
-      escape = true;
-    } else if (quote) {
-      if (ch === quote) {
-        quote = undefined;
-      } else {
-        token += ch;
-      }
-    } else if (quoteChars.includes(ch)) {
-      quote = ch;
-    } else if (ch === " ") {
+    } else if (ch === "[") {
+      inFilter = true;
+    } else if (ch === "]") {
+      inFilter = false;
+    } else if (ch === " " && !inFilter) {
       newUnparsed = unparsed.slice(i + 1);
       break;
     } else {
