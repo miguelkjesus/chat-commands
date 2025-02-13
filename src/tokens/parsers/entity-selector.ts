@@ -1,6 +1,6 @@
 import type { TokenParser } from "./parser";
 
-export const argument = function (unparsed: string) {
+export const entitySelector = function (unparsed: string) {
   unparsed = unparsed.trimStart();
   if (!unparsed) return undefined;
 
@@ -18,6 +18,16 @@ export const argument = function (unparsed: string) {
       token += ch;
       escape = false;
     } else if (ch === "\\") {
+      escape = true;
+    } else if (ch === "@") {
+      const selectorMatch = unparsed.slice(i).match(/^@[a-z]\[[^\]]*\]/);
+      if (selectorMatch) {
+        token += selectorMatch[0];
+        newUnparsed = unparsed.slice(i + selectorMatch[0].length);
+        break;
+      } else {
+        token += ch;
+      }
       escape = true;
     } else if (quote) {
       if (ch === quote) {

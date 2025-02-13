@@ -1,4 +1,5 @@
 export * from "./parser";
 
-export * from "./argument";
 export * from "./all";
+export * from "./argument";
+export * from "./entity-selector";
