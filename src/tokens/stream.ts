@@ -18,6 +18,16 @@ export class TokenStream {
     return token;
   }
 
+  popSome(count: number, parse?: TokenParser): string[] {
+    const tokens: string[] = [];
+    for (let i = 0; i < count; i++) {
+      const token = this.pop(parse);
+      if (token === undefined) break;
+      tokens.push(token);
+    }
+    return tokens;
+  }
+
   *flush(parse = this.defaultParser): Generator<string, void, unknown> {
     let token: string | undefined;
     while ((token = this.pop(parse))) yield token;
