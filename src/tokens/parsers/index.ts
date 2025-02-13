@@ -1,4 +1,4 @@
 export * from "./parser";
 
-export * from "./text";
+export * from "./argument";
 export * from "./all";

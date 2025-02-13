@@ -1,6 +1,6 @@
 import type { TokenParser } from "./parser";
 
-export const text = function (unparsed: string) {
+export const argument = function (unparsed: string) {
   unparsed = unparsed.trimStart();
   if (!unparsed) return undefined;
 

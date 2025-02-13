@@ -1,8 +1,8 @@
-import { type TokenParser, text } from "./parsers";
+import { type TokenParser, argument } from "./parsers";
 
 export class TokenStream {
   unparsed: string;
-  defaultParser: TokenParser = text;
+  defaultParser: TokenParser = argument;
 
   constructor(message: string) {
     this.unparsed = message;
