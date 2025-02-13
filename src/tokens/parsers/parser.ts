@@ -1,6 +1,6 @@
-export type TokenParser = (unparsed: string) => TokenParserReturn;
+export type TokenParser<T> = (unparsed: string) => TokenParserReturn<T>;
 
-export interface TokenParserReturn {
+export interface TokenParserReturn<T = string> {
   unparsed: string;
-  token?: string;
+  token?: T;
 }

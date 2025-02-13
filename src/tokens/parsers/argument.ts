@@ -36,4 +36,4 @@ export const argument = function (unparsed: string) {
   }
 
   return { token, unparsed: newUnparsed };
-} satisfies TokenParser;
+} as TokenParser<string>;
