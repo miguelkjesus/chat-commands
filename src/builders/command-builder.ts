@@ -1,7 +1,9 @@
 import type { Parameter } from "~/parameters";
 import { type Command, CommandCollection } from "~/commands";
+import { Resolvable, resolve } from "~/utils/resolvers";
 
 import type { ParameterBuilder } from "./parameters";
+import { params } from "~/api";
 import { Builder } from "./builder";
 
 export class CommandBuilder<Params extends readonly Parameter[]> extends Builder<Command<Params>> {
@@ -26,11 +28,15 @@ export class CommandBuilder<Params extends readonly Parameter[]> extends Builder
     return this.__mutate(({ subcommands }) => subcommands.add(...subcommands));
   }
 
-  parameters<T extends readonly Parameter[]>(parameters: {
-    [K in keyof T]: ParameterBuilder<T[K]>;
-  }): CommandBuilder<T> {
+  parameters<T extends readonly Parameter[]>(
+    parameters: Resolvable<
+      (types: typeof params) => {
+        [K in keyof T]: ParameterBuilder<T[K]>;
+      }
+    >,
+  ): CommandBuilder<T> {
     return this.__set({
-      parameters: parameters.map((builder) => builder.__state) as any,
+      parameters: resolve(parameters, [params]).map((builder) => builder.__state) as any,
     }) as any as CommandBuilder<T>;
   }
 }
