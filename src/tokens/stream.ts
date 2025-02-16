@@ -45,6 +45,8 @@ export class TokenStream {
   }
 }
 
-export function tokenize<T>(message: string, parse: TokenParser<T>): T[] {
+export function tokenize(message: string): string[];
+export function tokenize<T>(message: string, parse: TokenParser<T>): T[];
+export function tokenize<T>(message: string, parse?: TokenParser<T>): T[] {
   return [...new TokenStream(message).flush(parse)];
 }
