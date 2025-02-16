@@ -5,4 +5,4 @@ export const all = function (unparsed: string) {
     unparsed: "",
     token: unparsed === "" ? undefined : unparsed,
   };
-} satisfies TokenParser;
+} as TokenParser<string>;
