@@ -1,9 +1,12 @@
-// TODO:
-//  - Introduce custom behaviours?
-//    - dimension selectors
-//    - allow lists for some selectors e.g. @a[tag=team_red, tag=team_blue]
-//  - Introduce compatibility with java edition selectors?
-//  -
+/* 
+TODO:
+
+- Introduce custom behaviours?
+  - dimension selectors
+  - allow lists for selectors that currently dont e.g. @a[tag=team_red, tag=team_blue]
+  - custom concise syntax? e.g. @a[tag=team_red | team_blue]
+  - compatibility with java edition selectors?
+*/
 
 import type { Entity } from "@minecraft/server";
 
