@@ -2,13 +2,13 @@ import type { TokenParser } from "./parser";
 
 export const argument = function (unparsed: string) {
   unparsed = unparsed.trimStart();
-  if (!unparsed) return undefined;
+  if (!unparsed) return { unparsed };
 
   const quoteChars = ['"', "'"];
 
   let token = "";
   let newUnparsed = "";
-  let quote = undefined;
+  let quote: string | undefined;
   let escape = false;
 
   for (let i = 0; i < unparsed.length; i++) {
@@ -36,4 +36,4 @@ export const argument = function (unparsed: string) {
   }
 
   return { token, unparsed: newUnparsed };
-} as TokenParser<string>;
+} as TokenParser<string | undefined>;

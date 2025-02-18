@@ -10,7 +10,7 @@ export class ParameterBuilder<T extends Parameter> extends Builder<T> {
     return this.__set({ optional: optional ? {} : undefined } as Partial<T>);
   }
 
-  defaultValue(defaultValue: T["optional"]["defaultValue"]) {
+  defaultValue(defaultValue: T extends Parameter<infer V> ? V : never) {
     return this.__set({ optional: { defaultValue } } as Partial<T>);
   }
 }

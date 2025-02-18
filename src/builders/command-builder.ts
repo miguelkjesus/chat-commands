@@ -1,4 +1,4 @@
-import type { Parameter } from "~/parameters";
+import { StringParameter, type Parameter } from "~/parameters";
 import { type Command, CommandCollection } from "~/commands";
 import { Resolvable, resolve } from "~/utils/resolvers";
 
@@ -16,16 +16,16 @@ export class CommandBuilder<Params extends readonly Parameter[]> extends Builder
   }
 
   execute(execute: Command<Params>["execute"]) {
-    return this.__set({ execute });
+    return this.__set({ execute: execute?.bind(this.__state) });
   }
 
-  subcommands(subcommands: Command[]) {
-    for (const subcommand of subcommands) {
+  subcommands(subcommands_: Command[]) {
+    for (const subcommand of subcommands_) {
       subcommand.parent = this.__state as Command<any>;
     }
 
     this.__default({ subcommands: new CommandCollection() });
-    return this.__mutate(({ subcommands }) => subcommands.add(...subcommands));
+    return this.__mutate(({ subcommands }) => subcommands!.add(...subcommands_));
   }
 
   parameters<T extends readonly Parameter[]>(

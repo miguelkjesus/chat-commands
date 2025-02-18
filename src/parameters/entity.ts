@@ -17,6 +17,7 @@ import { Parameter, type ParameterParseContext } from "./parameter";
 export class EntityParameter<Name extends string> extends Parameter<Entity[], Name> {
   parse({ tokens, player }: ParameterParseContext): Entity[] {
     const selector = tokens.pop(parsers.targetSelector);
+    if (selector === undefined) return [];
 
     if (typeof selector === "string") {
       return player.dimension.getPlayers({ name: selector });

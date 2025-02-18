@@ -41,7 +41,7 @@ export class FilterCriteria<T extends string | Filter = string | Filter> {
 
 // map criteria stuff
 
-export type FilterValueMapOptions = "none" | "single";
+export type FilterValueMapOptions = "none" | "single" | undefined;
 
 export type MappedFilterValue<T extends string | Filter, Option extends FilterValueMapOptions> = "none" extends Option
   ? undefined

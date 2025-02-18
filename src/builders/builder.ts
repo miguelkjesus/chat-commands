@@ -1,14 +1,17 @@
-export abstract class Builder<State> {
+export abstract class Builder<State extends object> {
   // This must stay readonly:
   // Some things rely on this value being modified and not reassigned.
-  readonly __state = {} as State;
+  /** @internal */
+  readonly __state: State;
 
   constructor(state: State) {
-    this.__set(state);
+    this.__state = state;
   }
 
   protected __set(object: Partial<State>) {
-    Object.assign(this.__state, object);
+    for (const [key, value] of Object.entries(object)) {
+      this.__state[key] = value;
+    }
     return this;
   }
 

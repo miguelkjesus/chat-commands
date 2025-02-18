@@ -14,21 +14,21 @@ export class NumberParameterBuilder<Name extends string> extends ParameterBuilde
 
   gt(gt: number) {
     this.__default({ range: new NumberRange({}) });
-    return this.__mutate(({ range }) => (range.min = { inclusive: false, value: gt }));
+    return this.__mutate(({ range }) => (range!.min = { inclusive: false, value: gt }));
   }
 
   gte(gte: number) {
     this.__default({ range: new NumberRange({}) });
-    return this.__mutate(({ range }) => (range.min = { inclusive: true, value: gte }));
+    return this.__mutate(({ range }) => (range!.min = { inclusive: true, value: gte }));
   }
 
   lt(lt: number) {
     this.__default({ range: new NumberRange({}) });
-    return this.__mutate(({ range }) => (range.max = { inclusive: false, value: lt }));
+    return this.__mutate(({ range }) => (range!.max = { inclusive: false, value: lt }));
   }
 
   lte(lte: number) {
     this.__default({ range: new NumberRange({}) });
-    return this.__mutate(({ range }) => (range.max = { inclusive: true, value: lte }));
+    return this.__mutate(({ range }) => (range!.max = { inclusive: true, value: lte }));
   }
 }

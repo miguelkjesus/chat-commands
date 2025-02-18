@@ -2,18 +2,25 @@
   "name": "command-bar",
   "version": "0.0.0",
   "description": "",
-  "scripts": {
-    "build": "tsc",
-    "prepack": "npm ci && npm run build"
-  },
-  "keywords": [],
   "author": "Miguel Jesus",
   "license": "Apache-2.0",
-  "dependencies": {
-    "@minecraft/server": "^1.18.0-beta.1.21.60-preview.25"
+  "keywords": [
+    "minecraft",
+    "mcbe",
+    "commands"
+  ],
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc && tsc-alias",
+    "prepack": "npm ci && npm run build"
   },
   "devDependencies": {
     "@types/node": "^22.13.2",
-    "prettier": "^3.5.0"
+    "prettier": "^3.5.0",
+    "tsc-alias": "^1.8.10"
+  },
+  "dependencies": {
+    "@minecraft/server": "beta"
   }
 }

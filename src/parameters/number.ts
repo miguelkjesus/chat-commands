@@ -10,6 +10,10 @@ export class NumberParameter<Name extends string> extends Parameter<number, Name
 
   parse({ tokens }: ParameterParseContext): number {
     const token = tokens.pop();
+    if (token === undefined) {
+      throw new ParameterParseError("Empt lol"); // TODO: error
+    }
+
     const value = parseFloat(token);
 
     if (Number.isNaN(value)) {
@@ -17,11 +21,11 @@ export class NumberParameter<Name extends string> extends Parameter<number, Name
       return value;
     }
 
-    if (Number.isFinite(value) && !this.allowInf) {
+    if (!Number.isFinite(value) && !this.allowInf) {
       throw new ParameterParseError(`Expected finite integer, got ${token}`);
     }
 
-    if (this.range?.contains(value)) {
+    if (!this.range?.contains(value)) {
       throw new ParameterParseError(`Expected number in range ${this.range}, got ${token}`);
     }
 

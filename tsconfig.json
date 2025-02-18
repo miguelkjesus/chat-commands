@@ -1,21 +1,21 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",
-    "target": "ES2021",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "declaration": true,
     "skipLibCheck": true,
     "outDir": "dist",
     "esModuleInterop": true,
     "stripInternal": true,
+    "strictNullChecks": true,
 
     "forceConsistentCasingInFileNames": true,
     "emitDecoratorMetadata": false,
 
-    "baseUrl": ".",
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": ["./src/*"]
     }
   },
   "exclude": ["node_modules"],

@@ -40,7 +40,7 @@ const parseSelectorType = function (unparsed: string) {
     } else if (ch === "\\") {
       escape = true;
     } else if (ch === " " || ch === "[") {
-      newUnparsed = unparsed.slice(i + 1);
+      newUnparsed = unparsed.slice(i);
       break;
     } else {
       selectorCode += ch;
@@ -75,7 +75,7 @@ const parseQueryOptions = function (unparsed: string) {
   }
 
   const pairsParseResult = parseFilter("[]")(unparsed);
-  const options = pairsParseResult.token;
+  const options = pairsParseResult.token!;
   unparsed = pairsParseResult.unparsed;
 
   let query: EntityQueryOptions = {};
@@ -215,8 +215,13 @@ const parseQueryOptions = function (unparsed: string) {
   }
 
   // TODO: errors for these
-  query.location = location as Vector3;
-  query.volume = volume as Vector3;
+  if (location.x && location.y && location.z) {
+    query.location = location as Vector3;
+  }
+
+  if (volume.x && volume.y && volume.z) {
+    query.volume = volume as Vector3;
+  }
 
   return {
     unparsed,

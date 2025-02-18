@@ -11,9 +11,14 @@ export function command(name: string) {
   for (const subname of subnames) {
     const builder = new CommandBuilder(new Command(subname));
     commandManager.commands.add(builder.__state); // register command
-    parentBuilder.subcommands([builder.__state]); // set current as child of last
+
+    if (parentBuilder) {
+      parentBuilder.subcommands([builder.__state]); // set current as child of last
+      parentBuilder = builder;
+    }
+
     parentBuilder = builder;
   }
 
-  return parentBuilder;
+  return parentBuilder!;
 }

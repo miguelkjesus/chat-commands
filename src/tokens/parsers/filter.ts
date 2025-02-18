@@ -37,7 +37,7 @@ export const filter = (brackets = "{}") => {
     let filter: Filter = {};
 
     for (const rawPair of rawPairs) {
-      const { key, exclude, value } = parsePair(rawPair);
+      const { key, exclude, value = "" } = parsePair(rawPair);
 
       if (filter[key] === undefined) {
         filter[key] = new FilterCriteria();
@@ -57,7 +57,7 @@ export const filter = (brackets = "{}") => {
   } as TokenParser<Filter>;
 };
 
-function parsePair(pair: string): { key: string; exclude: boolean; value: string | Filter } {
+function parsePair(pair: string): { key: string; exclude: boolean; value: string | Filter | undefined } {
   let key = "";
 
   // Parse key

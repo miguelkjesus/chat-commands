@@ -26,7 +26,7 @@ export class TokenStream {
   popSome<T>(count: number, parse?: TokenParser<T>): T[] | string[] {
     const tokens: T[] = [];
     for (let i = 0; i < count; i++) {
-      const token = this.pop(parse);
+      const token = this.pop(parse ?? (argument as TokenParser<T>));
       if (token === undefined) break;
       tokens.push(token);
     }
@@ -37,7 +37,7 @@ export class TokenStream {
   flush<T>(parse: TokenParser<T>): Generator<T, void, unknown>;
   *flush<T>(parse?: TokenParser<T>): Generator<T | string, void, unknown> {
     let token: T | string | undefined;
-    while ((token = this.pop(parse))) yield token;
+    while ((token = this.pop(parse ?? (argument as TokenParser<T>)))) yield token;
   }
 
   isEmpty() {
@@ -48,5 +48,5 @@ export class TokenStream {
 export function tokenize(message: string): string[];
 export function tokenize<T>(message: string, parse: TokenParser<T>): T[];
 export function tokenize<T>(message: string, parse?: TokenParser<T>): T[] {
-  return [...new TokenStream(message).flush(parse)];
+  return [...new TokenStream(message).flush(parse ?? (argument as TokenParser<T>))];
 }

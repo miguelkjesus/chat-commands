@@ -12,7 +12,7 @@ export class StringParameter<Name extends string> extends Parameter<string, Name
 
   parse({ tokens, params }: ParameterParseContext): string {
     const isLast = params.indexOf(this) === params.length - 1;
-    const value = isLast ? tokens.pop(all) : tokens.pop();
+    const value = (isLast ? tokens.pop(all) : tokens.pop()) ?? "";
 
     if (value.length < this.minLength)
       throw new ParameterParseError(`Expected string with length >= ${this.minLength}`);

@@ -4,7 +4,6 @@ export * from "./commands";
 export * from "./parameters";
 export * from "./tokens";
 
-export * from "./utils/decorators";
 export * from "./utils/filter";
 export * from "./utils/range";
 export * from "./utils/resolvers";

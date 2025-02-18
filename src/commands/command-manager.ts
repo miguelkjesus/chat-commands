@@ -1,7 +1,7 @@
 import { ChatSendBeforeEvent, world } from "@minecraft/server";
 
 import { TokenStream } from "~/tokens";
-import { ParameterParseContext } from "~/parameters";
+import { Parameter, ParameterParseContext, StringParameter } from "~/parameters";
 
 import type { Command, CommandArgs } from "./command";
 import { Invocation } from "./invocation";
@@ -12,16 +12,20 @@ export class CommandManager {
   commands = new CommandCollection();
 
   listen(): void {
-    world.beforeEvents.chatSend.subscribe((event) => {
-      if (!event.message.startsWith(this.prefix)) return;
+    if (this.prefix === undefined) return;
 
-      const tokens = new TokenStream(event.message.slice(this.prefix.length));
+    world.beforeEvents.chatSend.subscribe((event) => {
+      if (!event.message.startsWith(this.prefix!)) return;
+
+      const tokens = new TokenStream(event.message.slice(this.prefix!.length));
       const command = this.getInvokedCommand(tokens);
       if (!command) return;
 
+      event.cancel = true;
+
       const args = this.getArguments(command, event, tokens);
       const invocation = new Invocation(this, event.sender, event.message, args);
-      command?.execute(invocation);
+      command.execute?.(invocation);
     });
   }
 
@@ -30,11 +34,13 @@ export class CommandManager {
 
     let command: Command | undefined;
     let token: string | undefined;
-    while ((token = stream.pop())) {
-      const match = search.find((cmd) => cmd.subname === token || cmd.aliases.includes(token));
+    while ((token = stream.peek())) {
+      const match = search.find((cmd) => cmd.subname === token || cmd.aliases.includes(token!));
       if (!match) return command;
+
       command = match;
       search = [...command.subcommands];
+      stream.pop();
     }
   }
 
