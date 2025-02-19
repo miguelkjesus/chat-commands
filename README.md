@@ -1,4 +1,6 @@
-# MCBE Commander
+# mcbe-commands
 
-> [!IMPORTANT]
-> This library is very much a work in progress!
+An easy command library for Minecraft: Bedrock Edition!
+
+> [!WARNING]
+> This library is very unstable at the moment!
