@@ -13,14 +13,17 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc && tsc-alias",
+    "build:watch": "tsc && (concurrently \"tsc -w\" \"tsc-alias -w\")",
     "prepack": "npm ci && npm run build"
   },
   "devDependencies": {
     "@types/node": "^22.13.2",
+    "concurrently": "^9.1.2",
     "prettier": "^3.5.0",
     "tsc-alias": "^1.8.10"
   },
   "dependencies": {
+    "@mhesus/mcbe-colors": "^2.0.3",
     "@minecraft/server": "beta"
   }
 }

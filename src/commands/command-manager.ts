@@ -1,11 +1,12 @@
 import { ChatSendBeforeEvent, world } from "@minecraft/server";
+import { darkGray, red, white } from "@mhesus/mcbe-colors";
 
-import { TokenStream } from "~/tokens";
-import { Parameter, ParameterParseContext, StringParameter } from "~/parameters";
+import { ParseError, TokenStream } from "~/tokens";
+import { ParameterParseContext } from "~/parameters";
 
 import type { Command, CommandArgs } from "./command";
-import { Invocation } from "./invocation";
 import { CommandCollection } from "./command-collection";
+import { Invocation } from "./invocation";
 
 export class CommandManager {
   prefix?: string;
@@ -16,16 +17,34 @@ export class CommandManager {
 
     world.beforeEvents.chatSend.subscribe((event) => {
       if (!event.message.startsWith(this.prefix!)) return;
+      event.cancel = true;
+
+      event.sender.sendMessage(darkGray(`You executed: ${event.message}`));
 
       const tokens = new TokenStream(event.message.slice(this.prefix!.length));
       const command = this.getInvokedCommand(tokens);
-      if (!command) return;
 
-      event.cancel = true;
+      if (command === undefined) {
+        // TODO: Reccommend similar commands.
+        // TODO: Additional message if /help has not been registered.
+        event.sender.sendMessage(red(`Unknown or incomplete command. Type ${white(this.prefix + "help")} for help.`));
+        return;
+      }
 
       const args = this.getArguments(command, event, tokens);
+      if (args === undefined) return;
+
       const invocation = new Invocation(this, event.sender, event.message, args);
-      command.execute?.(invocation);
+
+      try {
+        command.execute?.(invocation);
+      } catch (err) {
+        event.sender.sendMessage(
+          red(
+            "Unexpected error while running this command. Please contact the server owner or the behaviour pack owner.",
+          ),
+        );
+      }
     });
   }
 
@@ -48,11 +67,26 @@ export class CommandManager {
     command: Command,
     event: ChatSendBeforeEvent,
     stream: TokenStream,
-  ): CommandArgs<T> {
+  ): CommandArgs<T> | undefined {
     let args = {} as CommandArgs<T>;
     for (const param of command.parameters) {
       const context = new ParameterParseContext(this, event.sender, event.message, stream, command.parameters);
-      args[param.name] = param.parse(context);
+
+      try {
+        args[param.name] = param.parse(context);
+      } catch (err) {
+        if (!(err instanceof ParseError)) {
+          event.sender.sendMessage(
+            red(
+              "Unexpected error while running this command. Please contact the server owner or the behaviour pack owner.",
+            ),
+          );
+          return;
+        }
+
+        event.sender.sendMessage(red(err.message));
+        return;
+      }
     }
     return args;
   }
