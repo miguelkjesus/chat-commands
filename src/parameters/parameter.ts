@@ -1,8 +1,9 @@
 import type { Player } from "@minecraft/server";
+
 import type { CommandManager } from "~/commands";
+import { TokenStream } from "~/tokens";
 import { Resolvable } from "~/utils/resolvers";
 import { isCallable } from "~/utils/types";
-import { TokenStream } from "~/tokens";
 
 export abstract class Parameter<T = any, Name extends string = string> {
   readonly name: Name;
@@ -17,11 +18,9 @@ export abstract class Parameter<T = any, Name extends string = string> {
 
   toString() {
     if (!this.optional) return this.name;
-
     if (!this.optional.defaultValue) return `[${this.name}]`;
 
     const defaultString = isCallable(this.optional.defaultValue) ? "function" : this.optional.defaultValue;
-
     return `[${this.name} = ${defaultString}]`;
   }
 }
