@@ -7,7 +7,15 @@ import { filter as parseFilter } from "./filter";
 
 export const targetSelector = function (unparsed: string) {
   if (!unparsed.startsWith("@")) {
-    return parseArgument(unparsed);
+    // just passing a player name is basically the same as: @a[name="player name"]
+
+    const argParseResult = parseArgument(unparsed);
+    const player = argParseResult.token;
+
+    return {
+      unparsed: argParseResult.unparsed,
+      token: new TargetSelector("players", { name: player }),
+    };
   }
 
   const typeParseResult = parseSelectorType(unparsed);
@@ -22,7 +30,7 @@ export const targetSelector = function (unparsed: string) {
     unparsed,
     token: new TargetSelector(type, filter),
   };
-} as TokenParser<TargetSelector | string>;
+} satisfies TokenParser<TargetSelector>;
 
 const parseSelectorType = function (unparsed: string) {
   unparsed = unparsed.trimStart();
@@ -65,7 +73,7 @@ const parseSelectorType = function (unparsed: string) {
     unparsed: newUnparsed,
     token: type,
   };
-} satisfies TokenParser<TargetSelectorType | string>;
+} satisfies TokenParser<TargetSelectorType>;
 
 const parseQueryOptions = function (unparsed: string) {
   unparsed = unparsed.trimStart();
