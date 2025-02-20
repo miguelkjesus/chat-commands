@@ -44,6 +44,7 @@ export class CommandManager {
             "Unexpected error while running this command. Please contact the server owner or the behaviour pack owner.",
           ),
         );
+        console.error(err);
       }
     });
   }
@@ -81,6 +82,7 @@ export class CommandManager {
               "Unexpected error while running this command. Please contact the server owner or the behaviour pack owner.",
             ),
           );
+          console.error(err);
           return;
         }
 
