@@ -27,7 +27,7 @@ export class CommandManager {
       if (command === undefined) {
         // TODO: Reccommend similar commands.
         // TODO: Additional message if /help has not been registered.
-        event.sender.sendMessage(red(`Unknown or incomplete command. Type ${white(this.prefix + "help")} for help.`));
+        event.sender.sendMessage(red(`Unknown or incomplete command. Type ${white(this.prefix + "help")} for help!`));
         return;
       }
 
@@ -40,9 +40,7 @@ export class CommandManager {
         command.execute?.(invocation);
       } catch (err) {
         event.sender.sendMessage(
-          red(
-            "Unexpected error while running this command. Please contact the server owner or the behaviour pack owner.",
-          ),
+          red("Uh oh! There was an error while running this command!\nPlease contact the behaviour pack owner"),
         );
         console.error(err);
       }
@@ -70,6 +68,7 @@ export class CommandManager {
     stream: TokenStream,
   ): CommandArgs<T> | undefined {
     let args = {} as CommandArgs<T>;
+
     for (const param of command.parameters) {
       const context = new ParameterParseContext(this, event.sender, event.message, stream, command.parameters);
 
@@ -78,15 +77,13 @@ export class CommandManager {
       } catch (err) {
         if (!(err instanceof ParseError)) {
           event.sender.sendMessage(
-            red(
-              "Unexpected error while running this command. Please contact the server owner or the behaviour pack owner.",
-            ),
+            red("Uh oh! There was an error while running this command!\nPlease contact the behaviour pack owner"),
           );
           console.error(err);
           return;
         }
 
-        event.sender.sendMessage(red(err.message));
+        event.sender.sendMessage(red(`Oops! There was an error in parameter ${white(param.name)}\n${err.message}`));
         return;
       }
     }

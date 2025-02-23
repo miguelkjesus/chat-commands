@@ -4,6 +4,7 @@ import { TargetSelector, TargetSelectorType } from "~/utils/target-selector";
 import type { TokenParser } from "./parser";
 import { argument as parseArgument } from "./argument";
 import { filter as parseFilter } from "./filter";
+import { ParseError } from "../parse-error";
 
 export const targetSelector = function (unparsed: string) {
   if (!unparsed.startsWith("@")) {
@@ -218,7 +219,7 @@ const parseQueryOptions = function (unparsed: string) {
       // TODO: hasitem
 
       default:
-        throw new Error(`Unknown entity selector filter key: ${key}`);
+        throw new ParseError(`Unknown entity selector filter key "${key}"`);
     }
   }
 

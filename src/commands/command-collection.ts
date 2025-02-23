@@ -1,3 +1,4 @@
+import { tokenize } from "~/tokens";
 import { Command } from "./command";
 
 export class CommandCollection {
@@ -16,6 +17,7 @@ export class CommandCollection {
   }
 
   add(...commands: Command[]) {
+    // TODO: warnings when adding commands with the same name
     for (const command of commands) {
       this.commands.add(command);
     }
