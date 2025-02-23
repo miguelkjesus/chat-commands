@@ -6,13 +6,12 @@
     "allowSyntheticDefaultImports": true,
     "declaration": true,
     "skipLibCheck": true,
-    "outDir": "dist",
+    "outDir": "dist/package",
     "esModuleInterop": true,
-    "stripInternal": true,
     "strictNullChecks": true,
 
     "forceConsistentCasingInFileNames": true,
-    "emitDecoratorMetadata": false,
+    "stripInternal": true,
 
     "paths": {
       "~/*": ["./src/*"]

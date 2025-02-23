@@ -1,5 +1,5 @@
 {
-  "name": "@mhesus/mcbe-commands",
+  "name": "@mhesus/chat-commands",
   "version": "0.0.0",
   "description": "",
   "author": "Miguel Jesus",
@@ -9,21 +9,36 @@
     "mcbe",
     "commands"
   ],
-  "types": "./dist/index.d.ts",
-  "main": "./dist/index.js",
+  "types": "./dist/package/index.d.ts",
+  "main": "./dist/package/index.js",
   "scripts": {
-    "build": "tsc && tsc-alias",
-    "build:watch": "tsc && (concurrently \"tsc -w\" \"tsc-alias -w\")",
-    "prepack": "npm ci && npm run build"
+    "clean": "rimraf dist && mkdir dist",
+    "build:package": "tsc && tsc-alias",
+    "watch:package": "tsc && (concurrently \"tsc -w\" \"tsc-alias -w\")",
+    "build:bundle": "tsup",
+    "build": "npm run build:package && npm run build:bundle",
+    "prepack": "npmignore --auto && npm run build"
+  },
+  "publishConfig": {
+    "ignore": [
+      "!dist/package/",
+      "src/",
+      "*.map"
+    ]
   },
   "devDependencies": {
     "@types/node": "^22.13.2",
     "concurrently": "^9.1.2",
+    "npmignore": "^0.3.1",
     "prettier": "^3.5.0",
-    "tsc-alias": "^1.8.10"
+    "rimraf": "^6.0.1",
+    "tsc-alias": "^1.8.10",
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "@mhesus/mcbe-colors": "^2.0.3",
-    "@minecraft/server": "beta"
+    "@minecraft/server": "beta",
+    "fastest-levenshtein": "^1.0.16"
   }
 }

@@ -1,6 +1,5 @@
 node_modules/
 dist/
+temp/
 
-# temp
-testing.ts
-usage-plan.ts
+.npmignore
