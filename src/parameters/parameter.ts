@@ -5,15 +5,15 @@ import { ParseError, TokenStream } from "~/tokens";
 import { Resolvable } from "~/utils/resolvers";
 import { isCallable } from "~/utils/types";
 
-export abstract class Parameter<T = any, Name extends string = string> {
-  readonly name: Name;
-  displayName?: Resolvable<(player: Player) => string>;
+export abstract class Parameter<T = any> {
+  id?: string;
+  name?: Resolvable<(player: Player) => string>;
   description?: Resolvable<(player: Player) => string>;
   optional?: { defaultValue?: T };
 
   checks: Check<T>[] = [];
 
-  constructor(name: Name) {
+  constructor(name?: string) {
     this.name = name;
   }
 
@@ -34,7 +34,7 @@ export abstract class Parameter<T = any, Name extends string = string> {
   }
 }
 
-export class ParameterParseContext<const Params extends Parameter[] = Parameter[]> {
+export class ParameterParseContext<const Params extends readonly Parameter[] = readonly Parameter[]> {
   readonly manager: CommandManager;
   readonly player: Player;
   readonly message: string;
@@ -67,3 +67,5 @@ export class Check<T> {
 }
 
 export type ParameterType<T extends Parameter> = T extends Parameter<infer Type> ? Type : never;
+
+export type Arguments<T extends Record<string, Parameter>> = { [K in keyof T]: ParameterType<T[K]> };

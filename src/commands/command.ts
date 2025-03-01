@@ -1,24 +1,19 @@
-import type { Player } from "@minecraft/server";
-
-import type { Resolvable } from "~/utils/resolvers";
-import type { Parameter } from "~/parameters";
-
-import type { Invocation, KeywordArguments } from "./invocation";
+import { TokenStream } from "~/tokens";
 import { CommandCollection } from "./command-collection";
+import { Overload } from "./overload";
 
-export class Command<const Params extends Parameter[] = Parameter[]> {
+export class Command<const Overloads extends readonly Overload[] = readonly Overload[]> {
   parent?: Command;
 
   readonly subname: string;
   aliases: string[] = [];
-  description?: Resolvable<(player: Player) => string>;
-  checks: Resolvable<(player: Player) => boolean>[] = [];
-  parameters: Params; // TODO: Introduce behaviour for multiple overloads
+  description?: string;
+  overloads: Overloads;
   subcommands = new CommandCollection();
-  execute: ((this: this, ctx: Invocation<Params>) => void) | undefined;
 
-  constructor(subname: string) {
+  constructor(subname: string, overloads: Overloads) {
     this.subname = subname.trim();
+    this.overloads = overloads;
   }
 
   get name(): string {
@@ -38,8 +33,10 @@ export class Command<const Params extends Parameter[] = Parameter[]> {
       queue.push(...command.subcommands);
     }
   }
+
+  getInvokedOverload(tokens: TokenStream): Overload {
+    // TODO
+  }
 }
 
-export type CommandParams<T extends Command> = T extends Command<infer Params> ? Params : never;
-
-export type CommandArgs<T extends Command> = KeywordArguments<CommandParams<T>>;
+export type CommandOverloads<T extends Command> = T extends Command<infer Overloads> ? Overloads : never;

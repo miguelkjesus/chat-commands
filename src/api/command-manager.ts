@@ -1,11 +1,11 @@
 import { CommandManager } from "~/commands";
 
-export const commandManager = new CommandManager();
+export const manager = new CommandManager();
 
 export function prefix(value: string) {
-  commandManager.prefix = value;
+  manager.prefix = value;
 }
 
 export function start() {
-  commandManager.listen();
+  manager.start();
 }

@@ -1,7 +1,7 @@
 import type { NumberParameter } from "~/parameters";
 import { ParameterBuilder } from "./parameter-builder";
 
-export class NumberParameterBuilder<Name extends string> extends ParameterBuilder<NumberParameter<Name>> {
+export class NumberParameterBuilder extends ParameterBuilder<NumberParameter> {
   allowNaN(allowNaN: boolean) {
     return this.__set({ allowNaN });
   }

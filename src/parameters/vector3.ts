@@ -2,7 +2,7 @@ import { Player, Vector3 } from "@minecraft/server";
 import { Parameter, ParameterParseContext } from "./parameter";
 import { ParseError } from "~/tokens";
 
-export class Vector3Parameter<Name extends string> extends Parameter<Vector3, Name> {
+export class Vector3Parameter extends Parameter<Vector3> {
   parse({ tokens, player }: ParameterParseContext): Vector3 {
     const rawLocation = { x: tokens.pop(), y: tokens.pop(), z: tokens.pop() };
 

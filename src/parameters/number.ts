@@ -3,7 +3,7 @@ import { NumberRange } from "~/utils/range";
 
 import { Parameter, type ParameterParseContext } from "./parameter";
 
-export class NumberParameter<Name extends string> extends Parameter<number, Name> {
+export class NumberParameter extends Parameter<number> {
   allowNaN = false;
   allowInf = false;
   range = new NumberRange({});

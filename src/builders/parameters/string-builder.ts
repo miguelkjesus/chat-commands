@@ -1,7 +1,7 @@
 import type { StringParameter } from "~/parameters";
 import { ParameterBuilder } from "./parameter-builder";
 
-export class StringParameterBuilder<Name extends string> extends ParameterBuilder<StringParameter<Name>> {
+export class StringParameterBuilder extends ParameterBuilder<StringParameter> {
   notEmpty(notEmpty: boolean) {
     return this.__set({ notEmpty });
   }

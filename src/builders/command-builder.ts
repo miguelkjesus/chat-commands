@@ -1,22 +1,16 @@
-import { Resolvable, resolve } from "~/utils/resolvers";
-import { type Command, CommandCollection } from "~/commands";
-import { type Parameter } from "~/parameters";
-import { parameterTypes } from "~/api";
+import { type Command, CommandCollection, Overload } from "~/commands";
 
-import type { ParameterBuilder } from "./parameters";
-import { Builder } from "./builder";
+import { Builder, StateOf } from "./builder";
+import { OverloadBuilder } from "./overload-builder";
 
-export class CommandBuilder<const Params extends Parameter[]> extends Builder<Command<Params>> {
+export class CommandBuilder<T extends Command> extends Builder<T> {
   aliases(...aliases: string[]) {
-    return this.__set({ aliases });
+    this.__state.aliases = aliases;
+    return this.__set({ aliases } as Partial<T>);
   }
 
-  description(description: Command["description"]) {
-    return this.__set({ description });
-  }
-
-  execute(execute: Command<Params>["execute"]) {
-    return this.__set({ execute });
+  description(description: string) {
+    return this.__set({ description } as Partial<T>);
   }
 
   subcommands(subcommands_: Command[]) {
@@ -28,21 +22,15 @@ export class CommandBuilder<const Params extends Parameter[]> extends Builder<Co
     return this.__mutate(({ subcommands }) => subcommands!.add(...subcommands_));
   }
 
-  parameters<const T extends Parameter[]>(
-    parameters: Resolvable<(types: typeof parameterTypes) => { [K in keyof T]: ParameterBuilder<T[K]> }>,
-  ) {
-    const p = resolve(parameters, [parameterTypes]).map((builder) => builder.__state) as T;
-
-    const seenNames = new Set();
-    for (const param of p) {
-      if (seenNames.has(param.name)) {
-        throw new Error("Parameter names must be unique.");
-      }
-      seenNames.add(param.name);
+  overloads<const TOverloads extends readonly Overload[]>(
+    ...overloads: {
+      [K in keyof TOverloads]: OverloadBuilder<TOverloads[K]>;
     }
+  ) {
+    const builtOverloads = overloads.map((builder) => builder.__state) as unknown as TOverloads;
 
-    return this.__set<CommandBuilder<T>>({
-      parameters: p,
+    return this.__set<CommandBuilder<Command<TOverloads>>>({
+      overloads: builtOverloads,
     });
   }
 }

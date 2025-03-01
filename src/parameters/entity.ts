@@ -14,7 +14,7 @@ import { parsers } from "~/tokens";
 
 import { Parameter, type ParameterParseContext } from "./parameter";
 
-export class EntityParameter<Name extends string> extends Parameter<Entity[], Name> {
+export class EntityParameter extends Parameter<Entity[]> {
   parse({ tokens, player }: ParameterParseContext): Entity[] {
     const selector = tokens.pop(parsers.targetSelector);
     if (selector === undefined) return [];

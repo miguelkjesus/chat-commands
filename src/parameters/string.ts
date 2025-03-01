@@ -3,7 +3,7 @@ import { ParseError } from "~/tokens";
 
 import { Parameter, type ParameterParseContext } from "./parameter";
 
-export class StringParameter<Name extends string> extends Parameter<string, Name> {
+export class StringParameter extends Parameter<string> {
   notEmpty = false;
   minLength = 0;
   maxLength = Infinity;

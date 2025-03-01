@@ -4,7 +4,7 @@ import { darkGray, red, white } from "@mhesus/mcbe-colors";
 import { ParseError, TokenStream } from "~/tokens";
 import { ParameterParseContext } from "~/parameters";
 
-import type { Command, CommandArgs } from "./command";
+import type { Command } from "./command";
 import { CommandCollection } from "./command-collection";
 import { Invocation } from "./invocation";
 
@@ -12,7 +12,7 @@ export class CommandManager {
   prefix?: string;
   commands = new CommandCollection();
 
-  listen(): void {
+  start(): void {
     if (this.prefix === undefined) return;
 
     world.beforeEvents.chatSend.subscribe((event) => {
@@ -31,16 +31,21 @@ export class CommandManager {
         return;
       }
 
-      const args = this.getArguments(command, event, tokens);
+      const overload = command.getInvokedOverload(tokens);
+      if (overload === undefined) return; // TODO: ERROR
+
+      const args = overload.getArguments(event, tokens);
       if (args === undefined) return;
 
       const invocation = new Invocation(this, event.sender, event.message, args);
 
       try {
-        command.execute?.(invocation);
+        overload.execute?.(invocation);
       } catch (err) {
         event.sender.sendMessage(
-          red("Uh oh! There was an error while running this command!\nPlease contact the behaviour pack owner"),
+          red(
+            "Uh oh! There was an unexpected error while running this command!\nPlease contact the behaviour pack owner",
+          ),
         );
         console.error(err);
       }
@@ -62,31 +67,31 @@ export class CommandManager {
     }
   }
 
-  private getArguments<T extends Command>(
-    command: Command,
-    event: ChatSendBeforeEvent,
-    stream: TokenStream,
-  ): CommandArgs<T> | undefined {
-    let args = {} as CommandArgs<T>;
+  // private getArguments<T extends Command>(
+  //   command: Command,
+  //   event: ChatSendBeforeEvent,
+  //   stream: TokenStream,
+  // ): CommandArgs<T> | undefined {
+  //   let args = {} as CommandArgs<T>;
 
-    for (const param of command.parameters) {
-      const context = new ParameterParseContext(this, event.sender, event.message, stream, command.parameters);
+  //   for (const param of command.parameters) {
+  //     const context = new ParameterParseContext(this, event.sender, event.message, stream, command.parameters);
 
-      try {
-        args[param.name] = param.parse(context);
-      } catch (err) {
-        if (!(err instanceof ParseError)) {
-          event.sender.sendMessage(
-            red("Uh oh! There was an error while running this command!\nPlease contact the behaviour pack owner"),
-          );
-          console.error(err);
-          return;
-        }
+  //     try {
+  //       args[param.name] = param.parse(context);
+  //     } catch (err) {
+  //       if (!(err instanceof ParseError)) {
+  //         event.sender.sendMessage(
+  //           red("Uh oh! There was an error while running this command!\nPlease contact the behaviour pack owner"),
+  //         );
+  //         console.error(err);
+  //         return;
+  //       }
 
-        event.sender.sendMessage(red(`Oops! There was an error in parameter ${white(param.name)}\n${err.message}`));
-        return;
-      }
-    }
-    return args;
-  }
+  //       event.sender.sendMessage(red(`Oops! There was an error in parameter ${white(param.name)}\n${err.message}`));
+  //       return;
+  //     }
+  //   }
+  //   return args;
+  // }
 }

@@ -1,7 +1,7 @@
 import { Check, type Parameter, type ParameterType } from "~/parameters";
 import { Builder } from "../builder";
 
-export class ParameterBuilder<T extends Parameter> extends Builder<T> {
+export class ParameterBuilder<T extends Parameter = Parameter> extends Builder<T> {
   description(description: T["description"]) {
     return this.__set({ description } as Partial<T>);
   }
