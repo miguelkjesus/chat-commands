@@ -1,6 +1,5 @@
 export abstract class Builder<State extends object = object> {
-  // This must stay readonly:
-  // Some things rely on this value being modified and not reassigned.
+  // This must stay readonly. Some things rely on this value being modified and not reassigned.
   /** @internal */
   readonly __state: State;
 

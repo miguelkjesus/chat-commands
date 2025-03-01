@@ -1,7 +1,7 @@
 import type { Player } from "@minecraft/server";
 
 import type { CommandManager } from "~/commands";
-import { TokenStream } from "~/tokens";
+import { ParseError, TokenStream } from "~/tokens";
 import { Resolvable } from "~/utils/resolvers";
 import { isCallable } from "~/utils/types";
 
@@ -11,11 +11,19 @@ export abstract class Parameter<T = any, Name extends string = string> {
   description?: Resolvable<(player: Player) => string>;
   optional?: { defaultValue?: T };
 
+  checks: Check<T>[] = [];
+
   constructor(name: Name) {
     this.name = name;
   }
 
   abstract parse(context: ParameterParseContext): T;
+
+  isValid(value: T) {
+    for (const check of this.checks) {
+      check.assert(value);
+    }
+  }
 
   toString() {
     if (!this.optional) return this.name;
@@ -41,3 +49,21 @@ export class ParameterParseContext<const Params extends Parameter[] = Parameter[
     this.params = params;
   }
 }
+
+export class Check<T> {
+  test: (value: T) => boolean;
+  errorMessage: string;
+
+  constructor(callback: (value: T) => boolean, errorMessage: string) {
+    this.test = callback;
+    this.errorMessage = errorMessage;
+  }
+
+  assert(value: T) {
+    if (!this.test(value)) {
+      throw new ParseError(this.errorMessage);
+    }
+  }
+}
+
+export type ParameterType<T extends Parameter> = T extends Parameter<infer Type> ? Type : never;

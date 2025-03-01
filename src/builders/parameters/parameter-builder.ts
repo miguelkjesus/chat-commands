@@ -1,4 +1,4 @@
-import type { Parameter } from "~/parameters";
+import { Check, type Parameter, type ParameterType } from "~/parameters";
 import { Builder } from "../builder";
 
 export class ParameterBuilder<T extends Parameter> extends Builder<T> {
@@ -10,7 +10,11 @@ export class ParameterBuilder<T extends Parameter> extends Builder<T> {
     return this.__set({ optional: optional ? {} : undefined } as Partial<T>);
   }
 
-  defaultValue(defaultValue: T extends Parameter<infer V> ? V : never) {
+  defaultValue(defaultValue: ParameterType<T>) {
     return this.__set({ optional: { defaultValue } } as Partial<T>);
+  }
+
+  check(callback: (value: ParameterType<T>) => boolean, errorMessage: string) {
+    return this.__mutate(({ checks }) => checks.push(new Check(callback, errorMessage)));
   }
 }
