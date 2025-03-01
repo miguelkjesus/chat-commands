@@ -11,8 +11,9 @@ export class Command<const Overloads extends readonly Overload[] = readonly Over
   overloads: Overloads;
   subcommands = new CommandCollection();
 
-  constructor(subname: string, overloads: Overloads) {
+  constructor(subname: string, aliases: string[], overloads: Overloads) {
     this.subname = subname.trim();
+    this.aliases = aliases;
     this.overloads = overloads;
   }
 
