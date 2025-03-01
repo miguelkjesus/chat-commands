@@ -7,6 +7,7 @@ import { isCallable } from "~/utils/types";
 
 export abstract class Parameter<T = any, Name extends string = string> {
   readonly name: Name;
+  displayName?: Resolvable<(player: Player) => string>;
   description?: Resolvable<(player: Player) => string>;
   optional?: { defaultValue?: T };
 
@@ -25,7 +26,7 @@ export abstract class Parameter<T = any, Name extends string = string> {
   }
 }
 
-export class ParameterParseContext<Params extends readonly Parameter[] = Parameter[]> {
+export class ParameterParseContext<const Params extends Parameter[] = Parameter[]> {
   readonly manager: CommandManager;
   readonly player: Player;
   readonly message: string;

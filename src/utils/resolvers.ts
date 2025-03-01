@@ -1,13 +1,13 @@
 import { type Callable, isCallable } from "./types";
 
-export function resolve<Resolver extends Callable>(
-  resolver: Resolver | ReturnType<Resolver>,
-  context: Parameters<Resolver>,
+export function resolve<Value, const Params extends any[]>(
+  resolvable: Resolvable<(...params: Params) => Value>,
+  params: Params,
 ) {
-  if (isCallable(resolver)) {
-    return resolver(...context);
+  if (isCallable(resolvable)) {
+    return resolvable(...params);
   }
-  return resolver;
+  return resolvable;
 }
 
 export type Resolvable<Resolver extends Callable = Callable> = Resolver | ReturnType<Resolver>;

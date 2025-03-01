@@ -1,12 +1,12 @@
-import { StringParameter, type Parameter } from "~/parameters";
-import { type Command, CommandCollection } from "~/commands";
 import { Resolvable, resolve } from "~/utils/resolvers";
+import { type Command, CommandCollection } from "~/commands";
+import { type Parameter } from "~/parameters";
+import { parameterTypes } from "~/api";
 
 import type { ParameterBuilder } from "./parameters";
-import { params } from "~/api";
 import { Builder } from "./builder";
 
-export class CommandBuilder<Params extends readonly Parameter[]> extends Builder<Command<Params>> {
+export class CommandBuilder<const Params extends Parameter[]> extends Builder<Command<Params>> {
   aliases(...aliases: string[]) {
     return this.__set({ aliases });
   }
@@ -16,7 +16,7 @@ export class CommandBuilder<Params extends readonly Parameter[]> extends Builder
   }
 
   execute(execute: Command<Params>["execute"]) {
-    return this.__set({ execute: execute?.bind(this.__state) });
+    return this.__set({ execute });
   }
 
   subcommands(subcommands_: Command[]) {
@@ -28,15 +28,21 @@ export class CommandBuilder<Params extends readonly Parameter[]> extends Builder
     return this.__mutate(({ subcommands }) => subcommands!.add(...subcommands_));
   }
 
-  parameters<T extends readonly Parameter[]>(
-    parameters: Resolvable<
-      (types: typeof params) => {
-        [K in keyof T]: ParameterBuilder<T[K]>;
+  parameters<const T extends Parameter[]>(
+    parameters: Resolvable<(types: typeof parameterTypes) => { [K in keyof T]: ParameterBuilder<T[K]> }>,
+  ) {
+    const p = resolve(parameters, [parameterTypes]).map((builder) => builder.__state) as T;
+
+    const seenNames = new Set();
+    for (const param of p) {
+      if (seenNames.has(param.name)) {
+        throw new Error("Parameter names must be unique.");
       }
-    >,
-  ): CommandBuilder<T> {
-    return this.__set({
-      parameters: resolve(parameters, [params]).map((builder) => builder.__state) as any,
-    }) as any as CommandBuilder<T>;
+      seenNames.add(param.name);
+    }
+
+    return this.__set<CommandBuilder<T>>({
+      parameters: p,
+    });
   }
 }

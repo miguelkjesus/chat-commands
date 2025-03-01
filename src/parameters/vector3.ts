@@ -1,13 +1,13 @@
 import { Player, Vector3 } from "@minecraft/server";
 import { Parameter, ParameterParseContext } from "./parameter";
-import { white } from "@mhesus/mcbe-colors";
 import { ParseError } from "~/tokens";
 
 export class Vector3Parameter<Name extends string> extends Parameter<Vector3, Name> {
   parse({ tokens, player }: ParameterParseContext): Vector3 {
     const rawLocation = { x: tokens.pop(), y: tokens.pop(), z: tokens.pop() };
+
     let location = {} as Vector3;
-    let deltaLocation = {} as Vector3; // Only used in local mode
+    let deltaLocation = {} as Vector3; // Only used in local (^) mode
 
     let hasAbsolute = false;
     let hasRelative = false;

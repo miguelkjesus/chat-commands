@@ -3,10 +3,10 @@ import type { Player } from "@minecraft/server";
 import type { Resolvable } from "~/utils/resolvers";
 import type { Parameter } from "~/parameters";
 
-import type { Invocation, KwArgs } from "./invocation";
+import type { Invocation, KeywordArguments } from "./invocation";
 import { CommandCollection } from "./command-collection";
 
-export class Command<Params extends readonly Parameter[] = Parameter[]> {
+export class Command<const Params extends Parameter[] = Parameter[]> {
   parent?: Command;
 
   readonly subname: string;
@@ -15,7 +15,7 @@ export class Command<Params extends readonly Parameter[] = Parameter[]> {
   checks: Resolvable<(player: Player) => boolean>[] = [];
   parameters: Params; // TODO: Introduce behaviour for multiple overloads
   subcommands = new CommandCollection();
-  execute: ((this: this, ctx: Invocation<KwArgs<Params>>) => void) | undefined;
+  execute: ((this: this, ctx: Invocation<Params>) => void) | undefined;
 
   constructor(subname: string) {
     this.subname = subname.trim();
@@ -42,4 +42,4 @@ export class Command<Params extends readonly Parameter[] = Parameter[]> {
 
 export type CommandParams<T extends Command> = T extends Command<infer Params> ? Params : never;
 
-export type CommandArgs<T extends Command> = KwArgs<CommandParams<T>>;
+export type CommandArgs<T extends Command> = KeywordArguments<CommandParams<T>>;
