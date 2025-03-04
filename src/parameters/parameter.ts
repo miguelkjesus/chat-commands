@@ -1,14 +1,13 @@
-import type { Player } from "@minecraft/server";
-
-import type { CommandManager } from "~/commands";
-import { ParseError, TokenStream } from "~/tokens";
-import { Resolvable } from "~/utils/resolvers";
+import { ParseError } from "~/errors";
+import type { ParameterParseContext } from "./parameter-parse-context";
 import { isCallable } from "~/utils/types";
 
 export abstract class Parameter<T = any> {
+  typeName: string;
+
   id?: string;
-  name?: Resolvable<(player: Player) => string>;
-  description?: Resolvable<(player: Player) => string>;
+  name?: string;
+  description?: string;
   optional?: { defaultValue?: T };
 
   checks: Check<T>[] = [];
@@ -19,35 +18,34 @@ export abstract class Parameter<T = any> {
 
   abstract parse(context: ParameterParseContext): T;
 
-  isValid(value: T) {
+  validate(value: T) {
+    this.performChecks(value);
+  }
+
+  performChecks(value: T) {
     for (const check of this.checks) {
       check.assert(value);
     }
   }
 
-  toString() {
-    if (!this.optional) return this.name;
-    if (!this.optional.defaultValue) return `[${this.name}]`;
+  getSignature(options?: ParameterSignatureOptions) {
+    if (this.name === undefined) {
+      throw new Error("Parameter has no name.");
+    }
 
-    const defaultString = isCallable(this.optional.defaultValue) ? "function" : this.optional.defaultValue;
-    return `[${this.name} = ${defaultString}]`;
+    if (!this.optional) return `<${this.name}: ${this.typeName}>`;
+
+    if (options?.showDefaultValue && this.optional.defaultValue) {
+      const defaultString = isCallable(this.optional.defaultValue) ? "..." : this.optional.defaultValue;
+      return `[${this.name}: ${this.typeName} = ${defaultString}]`;
+    }
+
+    return `[${this.name}: ${this.typeName}]`;
   }
 }
 
-export class ParameterParseContext<const Params extends readonly Parameter[] = readonly Parameter[]> {
-  readonly manager: CommandManager;
-  readonly player: Player;
-  readonly message: string;
-  readonly tokens: TokenStream;
-  readonly params: Params;
-
-  constructor(manager: CommandManager, player: Player, message: string, tokens: TokenStream, params: Params) {
-    this.manager = manager;
-    this.player = player;
-    this.message = message;
-    this.tokens = tokens;
-    this.params = params;
-  }
+export interface ParameterSignatureOptions {
+  showDefaultValue?: boolean;
 }
 
 export class Check<T> {

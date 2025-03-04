@@ -1,7 +1,9 @@
 import { all } from "~/tokens/parsers";
-import { ParseError } from "~/tokens";
 
-import { Parameter, type ParameterParseContext } from "./parameter";
+import { ParseError } from "~/errors";
+
+import type { ParameterParseContext } from "./parameter-parse-context";
+import { Parameter } from "./parameter";
 
 export class StringParameter extends Parameter<string> {
   notEmpty = false;
@@ -13,8 +15,13 @@ export class StringParameter extends Parameter<string> {
   };
 
   parse({ tokens, params }: ParameterParseContext): string {
-    const isLast = params.indexOf(this) === params.length - 1;
-    const value = (isLast ? tokens.pop(all) : tokens.pop()) ?? "";
+    const paramArray = Object.values(params);
+    const isLast = paramArray.indexOf(this) === paramArray.length - 1;
+    return (isLast ? tokens.pop(all) : tokens.pop()) ?? "";
+  }
+
+  validate(value: string) {
+    super.validate(value);
 
     if (this.notEmpty && value === "") {
       throw new ParseError(`Expected a non-empty string`);
@@ -33,8 +40,6 @@ export class StringParameter extends Parameter<string> {
         this.pattern.failMessage ?? `Expected a string matching the pattern ${regexToString(this.pattern.value)}`,
       );
     }
-
-    return value;
   }
 }
 

@@ -1,7 +1,8 @@
-import { ParseError } from "~/tokens";
 import { NumberRange } from "~/utils/range";
+import { ParseError } from "~/errors";
 
-import { Parameter, type ParameterParseContext } from "./parameter";
+import type { ParameterParseContext } from "./parameter-parse-context";
+import { Parameter } from "./parameter";
 
 export class NumberParameter extends Parameter<number> {
   allowNaN = false;

@@ -1,10 +1,11 @@
 import type { EntityQueryOptions, GameMode, Vector3 } from "@minecraft/server";
+
 import { TargetSelector, TargetSelectorType } from "~/utils/target-selector";
+import { ParseError } from "~/errors";
 
 import type { TokenParser } from "./parser";
 import { argument as parseArgument } from "./argument";
 import { filter as parseFilter } from "./filter";
-import { ParseError } from "../parse-error";
 
 export const targetSelector = function (unparsed: string) {
   if (!unparsed.startsWith("@")) {

@@ -3,19 +3,15 @@ import { OverloadBuilder, ParameterBuilder } from "~/builders";
 import { Overload } from "~/commands";
 import { Parameter } from "~/parameters";
 
-import * as parameterTypes from "./parameters";
+import { params, ParameterTypes } from "./parameter-types";
 
-export function overload<const TParams extends Record<string, Parameter>>(
-  parameters: Resolvable<
-    (t: typeof parameterTypes) => {
-      [K in keyof TParams]: ParameterBuilder<TParams[K]>;
-    }
-  >,
-) {
-  const paramBuilders = resolve(parameters, [parameterTypes]);
+export function overload<TParamBuilders extends Record<string, ParameterBuilder>>(
+  parameters: Resolvable<(t: ParameterTypes) => TParamBuilders>,
+): OverloadBuilder<{ [K in keyof TParamBuilders]: TParamBuilders[K] extends ParameterBuilder<infer T> ? T : never }> {
+  const paramBuilders = resolve(parameters, [params]);
 
   // Build the params, and assign the id to the key in the record
-  const builtParams = {} as TParams;
+  const builtParams = {} as any;
   for (const [id, builder] of Object.entries(paramBuilders)) {
     const state = (builder as ParameterBuilder).__state;
 

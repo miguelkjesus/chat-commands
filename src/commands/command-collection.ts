@@ -1,4 +1,3 @@
-import { tokenize } from "~/tokens";
 import { Command } from "./command";
 
 export class CommandCollection {

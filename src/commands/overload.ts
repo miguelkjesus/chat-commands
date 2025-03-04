@@ -1,22 +1,23 @@
-import type { ChatSendBeforeEvent, Player } from "@minecraft/server";
+import type { Player } from "@minecraft/server";
 
-import type { Arguments, Parameter } from "~/parameters";
 import type { Resolvable } from "~/utils/resolvers";
+import type { Arguments, Parameter, ParameterSignatureOptions } from "~/parameters";
 
 import type { Invocation } from "./invocation";
-import { TokenStream } from "~/tokens";
 
-export class Overload<const TParams extends Record<string, Parameter> = Record<string, Parameter>> {
+export class Overload<TParams extends Record<string, Parameter> = Record<string, Parameter>> {
+  readonly parameters: TParams;
   checks: Resolvable<(player: Player) => boolean>[] = []; // TODO:
-  parameters: TParams;
-  execute: ((ctx: Invocation<TParams>) => void) | undefined;
+  execute: ((ctx: Invocation<TParams>, args: Arguments<TParams>) => void) | undefined;
 
   constructor(parameters: TParams) {
     this.parameters = parameters;
   }
 
-  getArguments(event: ChatSendBeforeEvent, tokens: TokenStream): Arguments<TParams> {
-    // TODO
+  getSignature(options?: ParameterSignatureOptions) {
+    return Object.values(this.parameters)
+      .map((param) => param.getSignature(options))
+      .join(" ");
   }
 }
 

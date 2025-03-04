@@ -1,6 +1,9 @@
 import { Player, Vector3 } from "@minecraft/server";
-import { Parameter, ParameterParseContext } from "./parameter";
-import { ParseError } from "~/tokens";
+
+import { ParseError } from "~/errors";
+
+import type { ParameterParseContext } from "./parameter-parse-context";
+import { Parameter } from "./parameter";
 
 export class Vector3Parameter extends Parameter<Vector3> {
   parse({ tokens, player }: ParameterParseContext): Vector3 {

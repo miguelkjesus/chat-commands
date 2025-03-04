@@ -1,6 +1,7 @@
 export * from "./api";
 export * from "./builders";
 export * from "./commands";
+export * from "./errors";
 export * from "./parameters";
 export * from "./tokens";
 

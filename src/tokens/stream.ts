@@ -43,6 +43,10 @@ export class TokenStream {
   isEmpty() {
     return this.unparsed === "";
   }
+
+  clone() {
+    return new TokenStream(this.unparsed);
+  }
 }
 
 export function tokenize(message: string): string[];
