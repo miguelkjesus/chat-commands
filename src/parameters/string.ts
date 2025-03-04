@@ -1,5 +1,4 @@
 import { all } from "~/tokens/parsers";
-
 import { ParseError } from "~/errors";
 
 import type { ParameterParseContext } from "./parameter-parse-context";
@@ -27,12 +26,16 @@ export class StringParameter extends Parameter<string> {
       throw new ParseError(`Expected a non-empty string`);
     }
 
+    if (this.minLength === this.maxLength && value.length !== this.minLength) {
+      throw new ParseError(`Expected a string with a length of ${this.minLength}`);
+    }
+
     if (value.length < this.minLength) {
-      throw new ParseError(`Expected a string with a length of at least ${this.minLength}`);
+      throw new ParseError(`String too short! Expected a length of at least ${this.minLength}`);
     }
 
     if (value.length > this.maxLength) {
-      throw new ParseError(`Expected a string with a length of at most ${this.maxLength}`);
+      throw new ParseError(`String too long! Expected a length of at most ${this.maxLength}`);
     }
 
     if (this.pattern && !this.pattern.value.test(value)) {

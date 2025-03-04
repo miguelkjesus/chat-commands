@@ -1,6 +1,5 @@
 import { StringParameter } from "~/parameters";
 import { ParameterBuilder } from "./parameter-builder";
-import { StateOf } from "../builder";
 
 export class StringParameterBuilder extends ParameterBuilder<StringParameter> {
   notEmpty(notEmpty: boolean) {
