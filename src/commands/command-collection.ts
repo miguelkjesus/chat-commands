@@ -15,9 +15,27 @@ export class CommandCollection {
     return [...this.commands];
   }
 
+  get(name: string): Command | undefined {
+    for (const command of this.commands) {
+      if (command.name === name) {
+        return command;
+      }
+    }
+  }
+
+  has(name: string): boolean {
+    return this.get(name) !== undefined;
+  }
+
   add(...commands: Command[]) {
-    // TODO: warnings when adding commands with the same name
     for (const command of commands) {
+      const existing = this.get(command.name);
+      if (existing) {
+        console.warn(`Command "${command.name}" will overwrite the command of the same name.`);
+        this.commands.delete(existing);
+        continue;
+      }
+
       this.commands.add(command);
     }
   }
