@@ -9,6 +9,4 @@ export class OverloadBuilder<T extends Record<string, Parameter> = Record<string
   execute(execute: ((ctx: Invocation<T>, args: Arguments<T>) => void) | undefined): this {
     return this.__set({ execute } as Partial<Overload<T>>);
   }
-
-  
 }

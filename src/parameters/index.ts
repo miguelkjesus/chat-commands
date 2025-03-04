@@ -4,5 +4,6 @@ export * from "./string";
 export * from "./player";
 export * from "./entity";
 export * from "./vector3";
+export * from "./literal";
 
 export * from "./parameter-parse-context";
