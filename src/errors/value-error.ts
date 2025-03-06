@@ -1,7 +1,7 @@
 import { ChatCommandError } from "./command-error";
 
-export class ParseError extends ChatCommandError {
-  name = "ParseError";
+export class ValueError extends ChatCommandError {
+  name = "ValueError";
 
   constructor(message: string) {
     super(message);

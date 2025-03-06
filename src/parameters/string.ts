@@ -1,10 +1,16 @@
 import { all } from "~/tokens/parsers";
-import { ParseError } from "~/errors";
+import { ParseError, ValueError } from "~/errors";
 
-import type { ParameterParseContext } from "./parameter-parse-context";
+import type {
+  ParameterParseTokenContext,
+  ParameterParseValueContext,
+  ParameterValidateContext,
+} from "./parameter-parse-context";
 import { Parameter } from "./parameter";
 
 export class StringParameter extends Parameter<string> {
+  typeName = "string";
+
   notEmpty = false;
   minLength = 0;
   maxLength = Infinity;
@@ -13,33 +19,35 @@ export class StringParameter extends Parameter<string> {
     failMessage?: string;
   };
 
-  parse({ tokens, params }: ParameterParseContext): string {
+  parseToken({ tokens, params }: ParameterParseTokenContext) {
     const paramArray = Object.values(params);
     const isLast = paramArray.indexOf(this) === paramArray.length - 1;
     return (isLast ? tokens.pop(all) : tokens.pop()) ?? "";
   }
 
-  validate(value: string) {
-    super.validate(value);
+  parseValue({ token }: ParameterParseValueContext<string>): string {
+    return token;
+  }
 
+  validate({ value }: ParameterValidateContext<string>) {
     if (this.notEmpty && value === "") {
-      throw new ParseError(`Expected a non-empty string`);
+      throw new ValueError(`Expected a non-empty string`);
     }
 
     if (this.minLength === this.maxLength && value.length !== this.minLength) {
-      throw new ParseError(`Expected a string with a length of ${this.minLength}`);
+      throw new ValueError(`Expected a string with a length of ${this.minLength}`);
     }
 
     if (value.length < this.minLength) {
-      throw new ParseError(`String too short! Expected a length of at least ${this.minLength}`);
+      throw new ValueError(`String too short! Expected a length of at least ${this.minLength}`);
     }
 
     if (value.length > this.maxLength) {
-      throw new ParseError(`String too long! Expected a length of at most ${this.maxLength}`);
+      throw new ValueError(`String too long! Expected a length of at most ${this.maxLength}`);
     }
 
     if (this.pattern && !this.pattern.value.test(value)) {
-      throw new ParseError(
+      throw new ValueError(
         this.pattern.failMessage ?? `Expected a string matching the pattern ${regexToString(this.pattern.value)}`,
       );
     }

@@ -15,9 +15,9 @@ export class CommandCollection {
     return [...this.commands];
   }
 
-  get(name: string): Command | undefined {
+  get(nameOrAlias: string): Command | undefined {
     for (const command of this.commands) {
-      if (command.name === name) {
+      if (command.name === nameOrAlias || command.aliases.includes(nameOrAlias)) {
         return command;
       }
     }
@@ -29,11 +29,8 @@ export class CommandCollection {
 
   add(...commands: Command[]) {
     for (const command of commands) {
-      const existing = this.get(command.name);
-      if (existing) {
-        console.warn(`Command "${command.name}" will overwrite the command of the same name.`);
-        this.commands.delete(existing);
-        continue;
+      if (this.get(command.name)) {
+        throw new Error(`Command "${command.name}" has the same name or alias as another command.`);
       }
 
       this.commands.add(command);

@@ -1,43 +1,21 @@
 import type { ChatSendBeforeEvent } from "@minecraft/server";
 
 import type { TokenStream } from "~/tokens";
-import { ParameterParseContext, type ParameterSignatureOptions } from "~/parameters";
+import { Parameter, ParameterParseTokenContext, type ParameterSignatureOptions } from "~/parameters";
 import { ParseError } from "~/errors";
 
 import { Overload } from "./overload";
-import { CommandCollection } from "./command-collection";
 
 export class Command<Overloads extends readonly Overload[] = readonly Overload[]> {
-  parent?: Command;
-
-  readonly subname: string;
+  name: string;
   aliases: string[] = [];
   description?: string;
   overloads: Overloads;
-  subcommands = new CommandCollection();
 
   constructor(subname: string, aliases: string[], overloads: Overloads) {
-    this.subname = subname.trim();
+    this.name = subname.trim();
     this.aliases = aliases;
     this.overloads = overloads;
-  }
-
-  get name(): string {
-    if (this.parent) {
-      return `${this.parent.name} ${this.subname}`;
-    }
-
-    return this.subname;
-  }
-
-  *descendants() {
-    const queue = [...this.subcommands];
-
-    let command: Command | undefined;
-    while ((command = queue.shift())) {
-      yield command;
-      queue.push(...command.subcommands);
-    }
   }
 
   getSignatures(options?: ParameterSignatureOptions) {
@@ -47,53 +25,83 @@ export class Command<Overloads extends readonly Overload[] = readonly Overload[]
   getInvokedOverload(
     event: ChatSendBeforeEvent,
     stream: TokenStream,
-  ): { overload?: Overload; args: Record<string, any>; errors: Map<Overload, Error> } {
-    let paramIdx = 0;
+  ): { overload: Overload; args: Record<string, any> } | { errors: Map<Overload, Error> } {
     let candidates = [...this.overloads];
 
-    let errors = new Map<Overload, Error>();
-    let args = new Map<Overload, unknown[]>(candidates.map((overload) => [overload, []]));
+    const errors = new Map<Overload, Error>();
+    const overloadArgs = new Map<Overload, Record<string, unknown>>(candidates.map((o) => [o, {}]));
+    const streams = new Map<Overload, TokenStream>(candidates.map((o) => [o, stream.clone()]));
 
-    // Each overload gets their own stream
-    let streams = new Map<Overload, TokenStream>(candidates.map((overload) => [overload, stream.clone()]));
+    // test for empty overload
 
-    while (candidates.length > 1) {
-      const nextCandidates: Overload[] = [];
+    const emptyOverload = candidates.find((o) => Object.keys(o.parameters).length === 0);
+
+    if (emptyOverload) {
+      if (stream.isEmpty()) {
+        return { overload: emptyOverload, args: {} };
+      } else {
+        candidates.splice(candidates.indexOf(emptyOverload), 1);
+      }
+    }
+
+    // test for other overloads
+
+    let paramIdx = 0;
+    let matchedOverloads: Overload[] = [];
+
+    while (candidates.length !== 0) {
+      if (candidates.length === 0) {
+        return { errors };
+      }
 
       errors.clear();
+      const nextCandidates: Overload[] = [];
+      const nextMatchedOverloads: Overload[] = [];
 
       for (const overload of candidates) {
-        const param = Object.values(overload.parameters)[paramIdx];
+        const stream = streams.get(overload)!;
+        const args = overloadArgs.get(overload)!;
 
-        if (param === undefined) {
-          errors.set(overload, new ParseError("Didn't expect more arguments."));
-          continue;
+        const param: Parameter | undefined = Object.values(overload.parameters)[paramIdx];
+        const parseCtx = new ParameterParseTokenContext(event.sender, event.message, overload.parameters, stream);
+
+        if (param) {
+          try {
+            args[param.id!] = param.parse(parseCtx);
+            nextCandidates.push(overload);
+          } catch (err) {
+            errors.set(overload, err);
+            args.length = 0;
+          }
+        } else if (!stream.isEmpty()) {
+          // no param and theres more tokens to be collected: too many args
+          errors.set(overload, new ParseError("Too many arguments!"));
+        } else {
+          // no param and no more tokens: successfully matched
+          nextMatchedOverloads.push(overload);
+
+          // return { overload, args };
         }
+      }
 
-        const tokens = streams.get(overload)!;
-        const context = new ParameterParseContext(event.sender, event.message, tokens, overload.parameters);
-
-        try {
-          args.get(overload)!.push(param.parse(context));
-          nextCandidates.push(overload);
-        } catch (err) {
-          errors.set(overload, err);
-          args.get(overload)!.length = 0; // clear args
-        }
+      if (nextMatchedOverloads.length > 0) {
+        matchedOverloads = nextMatchedOverloads;
       }
 
       candidates = nextCandidates;
       paramIdx++;
     }
 
-    const overload = candidates[0];
-    stream.unparsed = streams.get(overload)!.unparsed;
+    if (matchedOverloads.length > 0) {
+      if (matchedOverloads.length > 1) {
+        console.warn("More than 1 overload was matched for this parameter signature!");
+      }
 
-    return {
-      overload,
-      args: args.get(overload)!,
-      errors,
-    };
+      const overload = matchedOverloads[0];
+      return { overload, args: overloadArgs.get(overload)! };
+    }
+
+    return { errors };
   }
 }
 

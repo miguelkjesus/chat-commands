@@ -13,14 +13,14 @@ export class CommandBuilder<T extends readonly Overload[] = readonly Overload[]>
     return this.__set({ description } as Partial<Command<T>>);
   }
 
-  subcommands(subcommands_: Command[]) {
-    for (const subcommand of subcommands_) {
-      subcommand.parent = this.__state as Command;
-    }
+  // subcommands(subcommands_: Command[]) {
+  //   for (const subcommand of subcommands_) {
+  //     subcommand.parent = this.__state as Command;
+  //   }
 
-    this.__default({ subcommands: new CommandCollection() });
-    return this.__mutate(({ subcommands }) => subcommands!.add(...subcommands_));
-  }
+  //   this.__default({ subcommands: new CommandCollection() });
+  //   return this.__mutate(({ subcommands }) => subcommands!.add(...subcommands_));
+  // }
 
   overloads<TOverloads extends readonly Overload[]>(
     ...overloads: {

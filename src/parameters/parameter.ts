@@ -1,30 +1,52 @@
-import { ParseError } from "~/errors";
-import type { ParameterParseContext } from "./parameter-parse-context";
+import { ParseError, ValueError } from "~/errors";
+import {
+  ParameterParseTokenContext,
+  ParameterParseValueContext,
+  ParameterValidateContext,
+} from "./parameter-parse-context";
 import { isCallable } from "~/utils/types";
 
-export abstract class Parameter<T = any> {
+export abstract class Parameter<TValue = any, TToken = any> {
   typeName: string;
 
   id?: string;
   name?: string;
   description?: string;
-  optional?: { defaultValue?: T };
+  optional?: { defaultValue?: TValue };
 
-  checks: Check<T>[] = [];
+  checks: Check<TValue>[] = [];
 
   constructor(name?: string) {
     this.name = name;
   }
 
-  abstract parse(context: ParameterParseContext): T;
+  abstract parseToken(context: ParameterParseTokenContext): TToken | undefined;
+  abstract parseValue(context: ParameterParseValueContext<TToken>): TValue;
+  validate(context: ParameterValidateContext<TValue>) {}
 
-  validate(value: T) {
-    this.performChecks(value);
-  }
-
-  performChecks(value: T) {
+  performChecks(value: TValue) {
     for (const check of this.checks) {
       check.assert(value);
+    }
+  }
+
+  parse(context: ParameterParseTokenContext): TValue | undefined {
+    const token = this.parseToken(context);
+
+    if (token === undefined) {
+      if (this.optional) {
+        return this.optional.defaultValue;
+      } else {
+        throw new ParseError("This is a required parameter!");
+      }
+    } else {
+      const value = this.parseValue(
+        new ParameterParseValueContext(context.player, context.message, context.params, token),
+      );
+      this.validate(new ParameterValidateContext(context.player, context.message, context.params, value));
+      this.performChecks(value);
+
+      return value;
     }
   }
 
@@ -59,7 +81,7 @@ export class Check<T> {
 
   assert(value: T) {
     if (!this.test(value)) {
-      throw new ParseError(this.errorMessage);
+      throw new ValueError(this.errorMessage);
     }
   }
 }

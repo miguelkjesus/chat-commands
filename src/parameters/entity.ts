@@ -10,18 +10,28 @@ TODO:
 
 import type { Entity } from "@minecraft/server";
 
+import type { TargetSelector } from "~/utils/target-selector";
+import { ValueError } from "~/errors";
 import { parsers } from "~/tokens";
 
-import type { ParameterParseContext } from "./parameter-parse-context";
+import type {
+  ParameterParseTokenContext,
+  ParameterParseValueContext,
+  ParameterValidateContext,
+} from "./parameter-parse-context";
 import { Parameter } from "./parameter";
-import { ParseError } from "~/errors";
 
 export class EntityParameter extends Parameter<Entity[]> {
+  typeName = "entity";
+
   maxCount = Infinity;
   minCount = 0;
 
-  parse({ tokens, player }: ParameterParseContext): Entity[] {
-    const selector = tokens.pop(parsers.targetSelector);
+  parseToken({ tokens }: ParameterParseTokenContext) {
+    return tokens.pop(parsers.targetSelector);
+  }
+
+  parseValue({ token: selector, player }: ParameterParseValueContext<TargetSelector>): Entity[] {
     if (selector === undefined) return [];
 
     if (typeof selector === "string") {
@@ -31,15 +41,13 @@ export class EntityParameter extends Parameter<Entity[]> {
     }
   }
 
-  validate(value: Entity[]) {
-    super.validate(value);
-
+  validate({ value }: ParameterValidateContext<Entity[]>) {
     if (value.length < this.minCount) {
-      throw new ParseError(`Too little entities! Expected at least ${this.minCount}`);
+      throw new ValueError(`Too little entities! Expected at least ${this.minCount}`);
     }
 
     if (value.length > this.maxCount) {
-      throw new ParseError(`Too many entities! Expected a string with a length of at most ${this.maxCount}`);
+      throw new ValueError(`Too many entities! Expected a string with a length of at most ${this.maxCount}`);
     }
   }
 }

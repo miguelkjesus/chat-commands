@@ -10,8 +10,8 @@ export class ParameterBuilder<T extends Parameter = Parameter> extends Builder<T
     return this.__set({ optional: optional ? {} : undefined } as Partial<T>);
   }
 
-  defaultValue(defaultValue: ParameterType<T>) {
-    return this.__set({ optional: { defaultValue } } as Partial<T>);
+  default(value: ParameterType<T>) {
+    return this.__set({ optional: { defaultValue: value } } as Partial<T>);
   }
 
   check(callback: (value: ParameterType<T>) => boolean, errorMessage: string) {

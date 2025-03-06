@@ -5,19 +5,25 @@ import type { Arguments, Parameter, ParameterSignatureOptions } from "~/paramete
 
 import type { Invocation } from "./invocation";
 
-export class Overload<TParams extends Record<string, Parameter> = Record<string, Parameter>> {
+export class Overload<
+  TParams extends Record<string, Parameter> = Record<string, Parameter>,
+  TOverload extends readonly Overload[] = readonly any[],
+> {
   readonly parameters: TParams;
+  overloads: TOverload;
+
   checks: Resolvable<(player: Player) => boolean>[] = []; // TODO:
+  description?: string;
+
   execute: ((ctx: Invocation<TParams>, args: Arguments<TParams>) => void) | undefined;
 
-  constructor(parameters: TParams) {
+  constructor(parameters: TParams, overloads: TOverload) {
     this.parameters = parameters;
+    this.overloads = overloads;
   }
 
   getSignature(options?: ParameterSignatureOptions) {
-    return Object.values(this.parameters)
-      .map((param) => param.getSignature(options))
-      .join(" ");
+    return [...Object.values(this.parameters)].map((param) => param.getSignature(options)).join(" ");
   }
 }
 

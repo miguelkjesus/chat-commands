@@ -17,7 +17,7 @@ export class StringParameterBuilder extends ParameterBuilder<StringParameter> {
   length(range: [number?, number?]): this;
   length(length: number): this;
   length(arg: [number?, number?] | number) {
-    const range = typeof arg === "number" ? ([arg, arg] as [number, number]) : arg;
+    const range = typeof arg === "number" ? [arg, arg] : arg;
 
     if (range[0]) {
       this.__state.minLength = range[0];
