@@ -21,7 +21,7 @@ const defaultColors = {
 export function removeHelpCommand() {
   const existing = manager.commands.get("help");
   if (existing) {
-    manager.commands.remove(existing);
+    manager.commands.delete(existing);
   }
 }
 
@@ -40,7 +40,7 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
         .execute((ctx, { page }) => {
           const pageSize = 10;
 
-          const commands = [...ctx.manager.commands]
+          const commands = ctx.manager.commands.values()
             .flatMap((cmd) =>
               [
                 c.highlight(ctx.manager.prefix + cmd.name),

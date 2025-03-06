@@ -67,18 +67,6 @@ export class CommandManager {
 
   private getInvokedCommand(stream: TokenStream): Command | undefined {
     const name = stream.pop()!;
-    return [...this.commands].find((cmd) => cmd.name === name || cmd.aliases.includes(name));
-    // let search = [...this.commands].filter((cmd) => cmd.parent === undefined);
-    //
-    // let command: Command | undefined;
-    // let token: string | undefined;
-    // while ((token = stream.peek())) {
-    //   const match = search.find((cmd) => cmd.subname === token || cmd.aliases.includes(token!));
-    //   if (!match) return command;
-    //
-    //   command = match;
-    //   search = [...command.subcommands];
-    //   stream.pop();
-    // }
+    return this.commands.get(name);
   }
 }

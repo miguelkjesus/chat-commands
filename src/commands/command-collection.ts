@@ -2,29 +2,38 @@ import { Command } from "./command";
 
 export class CommandCollection {
   private commands = new Set<Command>();
+  private aliasMap = new Map<string, Command>();
 
   constructor(...commands: Command[]) {
     this.add(...commands);
+  }
+
+  get size() {
+    return this.commands.size;
   }
 
   *[Symbol.iterator]() {
     yield* this.commands;
   }
 
-  toArray() {
+  names() {
+    return this.values().map((command) => command.name);
+  }
+
+  aliases() {
+    return [...this.aliasMap.keys()];
+  }
+
+  values() {
     return [...this.commands];
   }
 
-  get(nameOrAlias: string): Command | undefined {
-    for (const command of this.commands) {
-      if (command.name === nameOrAlias || command.aliases.includes(nameOrAlias)) {
-        return command;
-      }
-    }
+  get(alias: string): Command | undefined {
+    return this.aliasMap.get(alias);
   }
 
-  has(name: string): boolean {
-    return this.get(name) !== undefined;
+  has(alias: string): boolean {
+    return this.aliasMap.has(alias);
   }
 
   add(...commands: Command[]) {
@@ -34,12 +43,28 @@ export class CommandCollection {
       }
 
       this.commands.add(command);
+      this.aliasMap.set(command.name, command);
+      for (const alias of command.aliases) {
+        this.aliasMap.set(alias, command);
+      }
     }
   }
 
-  remove(...commands: Command[]) {
+  delete(...commands: Command[]) {
     for (const command of commands) {
       this.commands.delete(command);
+      this.aliasMap.delete(command.name);
+      for (const alias of command.aliases) {
+        this.aliasMap.delete(alias);
+      }
     }
+  }
+
+  clear() {
+    this.commands.clear();
+  }
+
+  forEach(callback: (command: Command, collection: this) => void) {
+    this.commands.forEach((command) => callback(command, this));
   }
 }
