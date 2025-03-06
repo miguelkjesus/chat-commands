@@ -51,7 +51,7 @@ export class CommandManager {
     }
 
     const { overload, args } = result;
-    const invocation = new Invocation(this, event.sender, event.message, args);
+    const invocation = new Invocation(this, event.sender, event.message, args, overload, command);
 
     try {
       overload.execute?.(invocation, args);
