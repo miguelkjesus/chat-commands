@@ -1,10 +1,10 @@
 import { darkGray, darkRed, gold, gray, minecoin, red } from "@mhesus/mcbe-colors";
 
 import { command } from "~/api/command";
-import { manager } from "~/api/command-manager";
 import { overload } from "~/api/overload";
 import { t } from "~/api/parameter-types";
 
+import { manager } from "../command-manager";
 import { HelpCommandOptions } from "./options";
 
 const defaultColors = {
@@ -40,7 +40,8 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
         .execute((ctx, { page }) => {
           const pageSize = 10;
 
-          const commands = ctx.manager.commands.values()
+          const commands = ctx.manager.commands
+            .values()
             .flatMap((cmd) =>
               [
                 c.highlight(ctx.manager.prefix + cmd.name),

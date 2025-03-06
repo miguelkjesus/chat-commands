@@ -14,9 +14,10 @@
   "scripts": {
     "clean": "rimraf dist && mkdir dist",
     "build:package": "tsc && tsc-alias",
-    "watch:package": "tsc && (concurrently \"tsc -w\" \"tsc-alias -w\")",
     "build:bundle": "tsup",
     "build": "npm run build:package && npm run build:bundle",
+    "clean-build": "npm run clean && npm run build",
+    "watch:package": "tsc && (concurrently \"tsc -w\" \"tsc-alias -w\")",
     "prepack": "npmignore --auto && npm run build"
   },
   "publishConfig": {

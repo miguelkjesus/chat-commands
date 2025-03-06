@@ -1,7 +1,5 @@
 import { CommandBuilder } from "~/builders";
-import { Command } from "~/commands";
-
-import { manager } from "./command-manager";
+import { Command, manager } from "~/commands";
 import { tokenize } from "~/tokens";
 
 export function command(name: string, ...aliases: string[]) {

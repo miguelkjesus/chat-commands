@@ -70,3 +70,5 @@ export class CommandManager {
     return this.commands.get(name);
   }
 }
+
+export const manager = new CommandManager();

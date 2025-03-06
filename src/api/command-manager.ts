@@ -1,6 +1,4 @@
-import { CommandManager } from "~/commands";
-
-export const manager = new CommandManager();
+import { manager } from "~/commands";
 
 export function prefix(value: string) {
   manager.prefix = value;
