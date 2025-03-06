@@ -2,7 +2,7 @@ export * from "./api";
 export * from "./builders";
 export * from "./commands";
 export * from "./errors";
-export * from "./parameters";
+export * from "./parameters/types";
 export * from "./tokens";
 
 export * from "./utils/filter";

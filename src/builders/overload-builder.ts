@@ -1,5 +1,5 @@
 import type { Invocation, Overload } from "~/commands";
-import type { Arguments, Parameter } from "~/parameters";
+import type { Arguments, Parameter } from "~/parameters/types";
 
 import { Builder } from "./builder";
 

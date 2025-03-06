@@ -1,7 +1,7 @@
 import { ValueError } from "~/errors";
 
+import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
-import { ParameterParseTokenContext, ParameterParseValueContext } from "./parameter-parse-context";
 
 // TODO: This shouldn't have all parameter things!
 export class LiteralParameter extends Parameter<undefined> {

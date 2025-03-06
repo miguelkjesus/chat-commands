@@ -1,6 +1,6 @@
 import type { Player } from "@minecraft/server";
 
-import type { ParameterParseTokenContext, ParameterParseValueContext } from "./parameter-parse-context";
+import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
 
 export class PlayerParameter extends Parameter<Player[]> {

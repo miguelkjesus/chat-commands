@@ -1,5 +1,5 @@
 import type { Player } from "@minecraft/server";
-import type { Arguments, Parameter } from "~/parameters";
+import type { Arguments, Parameter } from "~/parameters/types";
 import type { CommandManager } from "./command-manager";
 
 export class Invocation<TParams extends Record<string, Parameter> = Record<string, Parameter>> {

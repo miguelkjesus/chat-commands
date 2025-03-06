@@ -1,4 +1,4 @@
-import type { NumberParameter } from "~/parameters";
+import type { NumberParameter } from "~/parameters/types";
 import { ParameterBuilder } from "./parameter-builder";
 
 export class NumberParameterBuilder extends ParameterBuilder<NumberParameter> {

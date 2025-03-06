@@ -18,7 +18,7 @@ import type {
   ParameterParseTokenContext,
   ParameterParseValueContext,
   ParameterValidateContext,
-} from "./parameter-parse-context";
+} from "../parameter-parse-context";
 import { Parameter } from "./parameter";
 
 export class EntityParameter extends Parameter<Entity[]> {

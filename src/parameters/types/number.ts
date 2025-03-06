@@ -1,11 +1,11 @@
 import { NumberRange } from "~/utils/range";
-import { ParseError, ValueError } from "~/errors";
+import { ValueError } from "~/errors";
 
 import type {
   ParameterParseTokenContext,
   ParameterParseValueContext,
   ParameterValidateContext,
-} from "./parameter-parse-context";
+} from "../parameter-parse-context";
 import { Parameter } from "./parameter";
 
 export class NumberParameter extends Parameter<number> {

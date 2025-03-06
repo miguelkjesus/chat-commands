@@ -1,4 +1,4 @@
-export * from "./parameters";
+export * from "./parameter-types";
 
 export * from "./builder";
 export * from "./command-builder";

@@ -1,11 +1,11 @@
 import { all } from "~/tokens/parsers";
-import { ParseError, ValueError } from "~/errors";
+import { ValueError } from "~/errors";
 
 import type {
   ParameterParseTokenContext,
   ParameterParseValueContext,
   ParameterValidateContext,
-} from "./parameter-parse-context";
+} from "../parameter-parse-context";
 import { Parameter } from "./parameter";
 
 export class StringParameter extends Parameter<string> {

@@ -1,6 +1,6 @@
 import type { Player } from "@minecraft/server";
 import type { TokenStream } from "~/tokens";
-import type { Parameter } from "./parameter";
+import type { Parameter } from "./types/parameter";
 
 export abstract class ParameterParseContext {
   readonly player: Player;

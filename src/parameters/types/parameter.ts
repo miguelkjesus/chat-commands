@@ -1,10 +1,11 @@
+import { isCallable } from "~/utils/types";
 import { ParseError, ValueError } from "~/errors";
+
 import {
   ParameterParseTokenContext,
   ParameterParseValueContext,
   ParameterValidateContext,
-} from "./parameter-parse-context";
-import { isCallable } from "~/utils/types";
+} from "../parameter-parse-context";
 
 export abstract class Parameter<TValue = any, TToken = any> {
   typeName: string;
