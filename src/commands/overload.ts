@@ -1,7 +1,7 @@
 import type { Player } from "@minecraft/server";
 
 import type { Resolvable } from "~/utils/resolvers";
-import type { Arguments, Parameter, ParameterSignatureOptions } from "~/parameters/types";
+import type { Arguments, Parameter, ParameterSignatureOptions } from "~/parameters";
 
 import type { Invocation } from "./invocation";
 
