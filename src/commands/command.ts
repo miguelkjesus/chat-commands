@@ -93,10 +93,6 @@ export class Command<Overloads extends readonly Overload[] = readonly Overload[]
     }
 
     if (matchedOverloads.length > 0) {
-      if (matchedOverloads.length > 1) {
-        console.warn("More than 1 overload was matched for this parameter signature!");
-      }
-
       const overload = matchedOverloads[0];
       return { overload, args: overloadArgs.get(overload)! };
     }
