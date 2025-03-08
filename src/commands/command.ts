@@ -15,8 +15,8 @@ export class Command<Overloads extends readonly Overload[] = readonly Overload[]
   beforeExecute?: MultipleInvocationCallback<Overloads>;
   afterExecute?: MultipleInvocationCallback<Overloads>;
 
-  constructor(subname: string, aliases: string[], overloads: Overloads) {
-    this.name = subname.trim();
+  constructor(name: string, aliases: string[], overloads: Overloads) {
+    this.name = name;
     this.aliases = aliases;
     this.overloads = overloads;
   }

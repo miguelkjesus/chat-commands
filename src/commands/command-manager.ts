@@ -7,6 +7,7 @@ import type { Command } from "./command";
 import { CommandCollection } from "./command-collection";
 import { Invocation } from "./invocation";
 import { ParseError } from "~/errors";
+import { literal } from "~/tokens/parsers";
 
 export class CommandManager {
   prefix?: string;
@@ -68,7 +69,7 @@ export class CommandManager {
   }
 
   private getInvokedCommand(stream: TokenStream): Command | undefined {
-    const name = stream.pop()!;
+    const name = stream.pop(literal(...this.commands.aliases()))!;
     return this.commands.get(name);
   }
 }
