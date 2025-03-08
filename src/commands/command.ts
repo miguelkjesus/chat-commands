@@ -1,16 +1,19 @@
 import type { ChatSendBeforeEvent } from "@minecraft/server";
 
 import type { TokenStream } from "~/tokens";
-import { Parameter, ParameterParseTokenContext, type ParameterSignatureOptions } from "~/parameters";
+import { ParameterParseTokenContext, Parameter, ParameterSignatureOptions } from "~/parameters";
 import { ParseError } from "~/errors";
 
-import { Overload } from "./overload";
+import { InvocationCallback, Overload, OverloadParameters } from "./overload";
 
 export class Command<Overloads extends readonly Overload[] = readonly Overload[]> {
   name: string;
   aliases: string[] = [];
   description?: string;
   overloads: Overloads;
+
+  beforeExecute?: MultipleInvocationCallback<Overloads>;
+  afterExecute?: MultipleInvocationCallback<Overloads>;
 
   constructor(subname: string, aliases: string[], overloads: Overloads) {
     this.name = subname.trim();
@@ -102,3 +105,11 @@ export class Command<Overloads extends readonly Overload[] = readonly Overload[]
 }
 
 export type CommandOverloads<T extends Command> = T extends Command<infer Overloads> ? Overloads : never;
+
+export type CombinedOverloadParameters<Overloads extends readonly Overload[]> = {
+  [K in keyof Overloads]: OverloadParameters<Overloads[K]>;
+}[number];
+
+export type MultipleInvocationCallback<Overloads extends readonly Overload[]> = InvocationCallback<
+  CombinedOverloadParameters<Overloads>
+>;

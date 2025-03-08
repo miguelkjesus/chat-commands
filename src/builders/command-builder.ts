@@ -1,4 +1,4 @@
-import { type Command, CommandCollection, Overload, OverloadParameters } from "~/commands";
+import { type Command, Overload } from "~/commands";
 
 import { Builder } from "./builder";
 import { OverloadBuilder } from "./overload-builder";
@@ -25,12 +25,22 @@ export class CommandBuilder<Overloads extends readonly Overload[] = readonly Ove
   //   return this.__mutate(({ subcommands }) => subcommands!.add(...subcommands_));
   // }
 
-  overloads<NewOverloads extends readonly Overload[]>(
-    ...overloads: {
-      [K in keyof NewOverloads]: OverloadBuilder<OverloadParameters<NewOverloads[K]>>;
-    }
-  ) {
-    this.state.overloads = overloads.map((builder) => builder.state as NewOverloads[number]) as any;
-    return this as any as CommandBuilder<NewOverloads>;
+  overloads<T extends readonly OverloadBuilder[]>(...overloads: T) {
+    this.state.overloads = overloads.map((builder) => builder.state as OverloadsFromBuilders<T>[number]) as any;
+    return this as any as CommandBuilder<OverloadsFromBuilders<T>>;
+  }
+
+  afterExecute(callback: Command<Overloads>["afterExecute"]) {
+    this.state.afterExecute = callback;
+    return this;
+  }
+
+  beforeExecute(callback: Command<Overloads>["beforeExecute"]) {
+    this.state.beforeExecute = callback;
+    return this;
   }
 }
+
+export type OverloadsFromBuilders<T> = {
+  [K in keyof T]: T[K] extends OverloadBuilder<infer U> ? Overload<U> : never;
+};
