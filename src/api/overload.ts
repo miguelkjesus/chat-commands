@@ -3,6 +3,7 @@ import { Overload } from "~/commands";
 import { OverloadBuilder, ParameterBuilder, ParametersFromBuilders } from "~/builders";
 
 import { params, ParameterTypes } from "./parameter-types";
+import { LiteralParameter } from "~/parameters";
 
 export function overload(): OverloadBuilder<{}>;
 export function overload<TParamBuilders extends Record<string, ParameterBuilder>>(
@@ -19,7 +20,12 @@ export function overload<TParamBuilders extends Record<string, ParameterBuilder>
     const state = (builder as ParameterBuilder).state;
 
     state.id = id;
-    if (state.name === undefined) state.name = id;
+
+    if (state instanceof LiteralParameter && state.choices.length === 0) {
+      state.choices = [id];
+    } else if (state.name === undefined) {
+      state.name = id;
+    }
 
     (builtParams as {})[id] = builder.state;
   }

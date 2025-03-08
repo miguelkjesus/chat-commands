@@ -8,7 +8,7 @@ export class LiteralParameter<const Choices extends readonly string[] = readonly
   Choices extends readonly [] ? unknown : Choices[number],
   string
 > {
-  readonly choices: Choices;
+  choices: Choices;
 
   constructor(...choices: Choices) {
     super();
