@@ -8,7 +8,7 @@ import type {
 } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
 
-export class NumberParameter extends Parameter<number> {
+export class NumberParameter extends Parameter<number, string> {
   typeName = "number";
 
   allowNaN = false;

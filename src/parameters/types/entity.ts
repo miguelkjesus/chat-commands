@@ -21,7 +21,7 @@ import type {
 } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
 
-export class EntityParameter extends Parameter<Entity[]> {
+export class EntityParameter extends Parameter<Entity[], TargetSelector> {
   typeName = "entity";
 
   maxCount = Infinity;

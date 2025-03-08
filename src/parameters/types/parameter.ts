@@ -87,8 +87,8 @@ export class Check<T> {
   }
 }
 
-export type ParameterType<T extends Parameter> = T extends Parameter<infer Type> ? Type : never;
+export type ParameterType<T extends Parameter> = T extends Parameter<infer Type, any> ? Type : never;
 
 export type Arguments<T extends Record<string, Parameter>> = {
-  [K in keyof T as undefined extends ParameterType<T[K]> ? never : K]: ParameterType<T[K]>;
+  [K in keyof T]: ParameterType<T[K]>;
 };

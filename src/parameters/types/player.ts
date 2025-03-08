@@ -3,7 +3,7 @@ import type { Player } from "@minecraft/server";
 import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
 
-export class PlayerParameter extends Parameter<Player[]> {
+export class PlayerParameter extends Parameter<Player[], string> {
   typeName = "player";
 
   parseToken({ tokens }: ParameterParseTokenContext) {

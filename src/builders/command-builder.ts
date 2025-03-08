@@ -3,14 +3,17 @@ import { type Command, CommandCollection, Overload, OverloadParameters } from "~
 import { Builder } from "./builder";
 import { OverloadBuilder } from "./overload-builder";
 
-export class CommandBuilder<T extends readonly Overload[] = readonly Overload[]> extends Builder<Command<T>> {
+export class CommandBuilder<Overloads extends readonly Overload[] = readonly Overload[]> extends Builder<
+  Command<Overloads>
+> {
   aliases(...aliases: string[]) {
-    this.__state.aliases = aliases;
-    return this.__set({ aliases } as Partial<Command<T>>);
+    this.state.aliases = aliases;
+    return this;
   }
 
   description(description: string) {
-    return this.__set({ description } as Partial<Command<T>>);
+    this.state.description = description;
+    return this;
   }
 
   // subcommands(subcommands_: Command[]) {
@@ -22,13 +25,12 @@ export class CommandBuilder<T extends readonly Overload[] = readonly Overload[]>
   //   return this.__mutate(({ subcommands }) => subcommands!.add(...subcommands_));
   // }
 
-  overloads<TOverloads extends readonly Overload[]>(
+  overloads<NewOverloads extends readonly Overload[]>(
     ...overloads: {
-      [K in keyof TOverloads]: OverloadBuilder<OverloadParameters<TOverloads[K]>>;
+      [K in keyof NewOverloads]: OverloadBuilder<OverloadParameters<NewOverloads[K]>>;
     }
   ) {
-    const builtOverloads = overloads.map((builder) => builder.__state) as unknown as TOverloads;
-
-    return this.__set<CommandBuilder<TOverloads>>({ overloads: builtOverloads });
+    this.state.overloads = overloads.map((builder) => builder.state as NewOverloads[number]) as any;
+    return this as any as CommandBuilder<NewOverloads>;
   }
 }

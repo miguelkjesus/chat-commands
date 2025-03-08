@@ -8,7 +8,7 @@ import type {
 } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
 
-export class StringParameter extends Parameter<string> {
+export class StringParameter extends Parameter<string, string> {
   typeName = "string";
 
   notEmpty = false;

@@ -3,15 +3,18 @@ import { ParameterBuilder } from "./parameter-builder";
 
 export class StringParameterBuilder extends ParameterBuilder<StringParameter> {
   notEmpty(notEmpty: boolean) {
-    return this.__set({ notEmpty });
+    this.state.notEmpty = notEmpty;
+    return this;
   }
 
   minLength(minLength: number) {
-    return this.__set({ minLength });
+    this.state.minLength = minLength;
+    return this;
   }
 
   maxLength(maxLength: number) {
-    return this.__set({ maxLength });
+    this.state.maxLength = maxLength;
+    return this;
   }
 
   length(range: [number?, number?]): this;
@@ -20,17 +23,18 @@ export class StringParameterBuilder extends ParameterBuilder<StringParameter> {
     const range = typeof arg === "number" ? [arg, arg] : arg;
 
     if (range[0]) {
-      this.__state.minLength = range[0];
+      this.state.minLength = range[0];
     }
 
     if (range[1]) {
-      this.__state.maxLength = range[1];
+      this.state.maxLength = range[1];
     }
 
     return this;
   }
 
   pattern(pattern: RegExp, failMessage?: string) {
-    return this.__set({ pattern: { value: pattern, failMessage } });
+    this.state.pattern = { value: pattern, failMessage };
+    return this;
   }
 }

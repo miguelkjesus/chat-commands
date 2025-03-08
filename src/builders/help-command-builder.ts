@@ -1,26 +1,24 @@
 import { type HelpCommandColors, type HelpCommandOptions, makeHelpCommand, removeHelpCommand } from "~/commands";
 
-import { Builder, StateOf } from "./builder";
+import { Builder } from "./builder";
 
 export class HelpCommandBuilder extends Builder<HelpCommandOptions> {
-  protected __set(object: HelpCommandOptions): this;
-  protected __set<Next extends Builder>(object: Partial<StateOf<Next>>): Next;
-  protected __set<Next extends Builder = this>(object: any): Next {
-    super.__set(object);
-    makeHelpCommand(this.__state);
-    return this as unknown as Next;
-  }
-
   colors(colors: Partial<HelpCommandColors>) {
-    return this.__set({ colors });
+    this.state.colors = colors;
+    makeHelpCommand(this.state);
+    return this;
   }
 
   description(description: string) {
-    return this.__set({ description });
+    this.state.description = description;
+    makeHelpCommand(this.state);
+    return this;
   }
 
   aliases(aliases: string[]) {
-    return this.__set({ aliases });
+    this.state.aliases = aliases;
+    makeHelpCommand(this.state);
+    return this;
   }
 
   remove() {

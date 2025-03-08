@@ -11,6 +11,6 @@ export function command(name: string, ...aliases: string[]) {
   }
 
   const builder = new CommandBuilder(new Command(name, aliases, []));
-  manager.commands.add(builder.__state);
+  manager.commands.add(builder.state);
   return builder;
 }

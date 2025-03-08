@@ -5,14 +5,16 @@ import { ParseError } from "~/errors";
 import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
 
-export class Vector3Parameter extends Parameter<Vector3> {
+type Vector3Token = { x: string | undefined; y: string | undefined; z: string | undefined };
+
+export class Vector3Parameter extends Parameter<Vector3, Vector3Token> {
   typeName = "x y z";
 
   parseToken({ tokens }: ParameterParseTokenContext) {
     return { x: tokens.pop(), y: tokens.pop(), z: tokens.pop() };
   }
 
-  parseValue({ token: rawLocation, player }: ParameterParseValueContext<{ x: string; y: string; z: string }>): Vector3 {
+  parseValue({ token: rawLocation, player }: ParameterParseValueContext<Vector3Token>): Vector3 {
     let location = {} as Vector3;
     let deltaLocation = {} as Vector3; // Only used in local (^) mode
 
