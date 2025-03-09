@@ -7,31 +7,31 @@ import {
   ParameterValidateContext,
 } from "../parameter-parse-context";
 
-export abstract class Parameter<TValue = any, TToken = any> {
+export abstract class Parameter<Value = any, Token = any> {
   typeName: string;
 
   id?: string;
   name?: string;
   description?: string;
-  optional?: { defaultValue?: TValue };
+  optional?: { defaultValue?: Value };
 
-  checks: Check<TValue>[] = [];
+  checks: Check<Value>[] = [];
 
   constructor(name?: string) {
     this.name = name;
   }
 
-  abstract parseToken(context: ParameterParseTokenContext): TToken | undefined;
-  abstract parseValue(context: ParameterParseValueContext<TToken>): TValue;
-  validate(context: ParameterValidateContext<TValue>) {}
+  abstract parseToken(context: ParameterParseTokenContext): Token | undefined;
+  abstract parseValue(context: ParameterParseValueContext<Token>): Value;
+  validate(context: ParameterValidateContext<Value>) {}
 
-  performChecks(value: TValue) {
+  performChecks(value: Value) {
     for (const check of this.checks) {
       check.assert(value);
     }
   }
 
-  parse(context: ParameterParseTokenContext): TValue | undefined {
+  parse(context: ParameterParseTokenContext): Value | undefined {
     const token = this.parseToken(context);
 
     if (token === undefined) {

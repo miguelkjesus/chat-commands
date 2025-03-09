@@ -14,10 +14,10 @@ export abstract class ParameterParseContext {
   }
 }
 
-export class ParameterParseValueContext<TToken> extends ParameterParseContext {
-  readonly token: TToken;
+export class ParameterParseValueContext<Token> extends ParameterParseContext {
+  readonly token: Token;
 
-  constructor(player: Player, message: string, params: Record<string, Parameter>, token: TToken) {
+  constructor(player: Player, message: string, params: Record<string, Parameter>, token: Token) {
     super(player, message, params);
     this.token = token;
   }
@@ -32,10 +32,10 @@ export class ParameterParseTokenContext extends ParameterParseContext {
   }
 }
 
-export class ParameterValidateContext<TValue> extends ParameterParseContext {
-  readonly value: TValue;
+export class ParameterValidateContext<Value> extends ParameterParseContext {
+  readonly value: Value;
 
-  constructor(player: Player, message: string, params: Record<string, Parameter>, value: TValue) {
+  constructor(player: Player, message: string, params: Record<string, Parameter>, value: Value) {
     super(player, message, params);
     this.value = value;
   }

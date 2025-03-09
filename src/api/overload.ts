@@ -6,12 +6,12 @@ import { params, ParameterTypes } from "./parameter-types";
 import { LiteralParameter } from "~/parameters";
 
 export function overload(): OverloadBuilder<{}>;
-export function overload<TParamBuilders extends Record<string, ParameterBuilder>>(
-  parameters: Resolvable<(t: ParameterTypes) => TParamBuilders>,
-): OverloadBuilder<ParametersFromBuilders<TParamBuilders>>;
-export function overload<TParamBuilders extends Record<string, ParameterBuilder>>(
-  parameters?: Resolvable<(t: ParameterTypes) => TParamBuilders>,
-): OverloadBuilder<ParametersFromBuilders<TParamBuilders>> {
+export function overload<ParamBuilders extends Record<string, ParameterBuilder>>(
+  parameters: Resolvable<(t: ParameterTypes) => ParamBuilders>,
+): OverloadBuilder<ParametersFromBuilders<ParamBuilders>>;
+export function overload<ParamBuilders extends Record<string, ParameterBuilder>>(
+  parameters?: Resolvable<(t: ParameterTypes) => ParamBuilders>,
+): OverloadBuilder<ParametersFromBuilders<ParamBuilders>> {
   const paramBuilders = resolve(parameters, [params]);
 
   // Build the params, and assign the id to the key in the record
