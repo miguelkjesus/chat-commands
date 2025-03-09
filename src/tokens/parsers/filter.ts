@@ -1,4 +1,5 @@
 import { FilterCriteria, type Filter } from "~/utils/filter";
+
 import { argument as parseArgument } from "./argument";
 import { TokenParser } from "./parser";
 
@@ -10,27 +11,8 @@ export const filter = (brackets = "{}") => {
 
     // Get a list of the raw pairs: e.g. "{tag=sometag, m=survival}" -> ["tag=sometag", "m=survival"]
 
-    let rawPairs = [""];
-    let newUnparsed = "";
-    let escape = false;
-
-    for (let i = 1; i < unparsed.length; i++) {
-      const ch = unparsed[i];
-
-      if (escape) {
-        rawPairs[rawPairs.length - 1] += ch;
-        escape = false;
-      } else if (ch === "\\") {
-        escape = true;
-      } else if (ch === ",") {
-        rawPairs.push("");
-      } else if (ch === brackets[1]) {
-        newUnparsed = unparsed.slice(i + 1);
-        break;
-      } else {
-        rawPairs[rawPairs.length - 1] += ch;
-      }
-    }
+    let [rawFilter, newUnparsed] = unparsed.slice(1).split(brackets[1], 2);
+    let rawPairs = rawFilter.split(/\s*,\s*/g);
 
     // Parse the raw pairs into the key value pairs
 

@@ -12,11 +12,15 @@ export const targetSelector = function (unparsed: string) {
     // just passing a player name is basically the same as: @a[name="player name"]
 
     const argParseResult = parseArgument(unparsed);
-    const player = argParseResult.token;
+    const playerName = argParseResult.token;
+
+    if (playerName === undefined) {
+      return { unparsed, token: undefined };
+    }
 
     return {
       unparsed: argParseResult.unparsed,
-      token: new TargetSelector("players", { name: player }),
+      token: new TargetSelector("players", { name: playerName }),
     };
   }
 
@@ -32,7 +36,7 @@ export const targetSelector = function (unparsed: string) {
     unparsed,
     token: new TargetSelector(type, filter),
   };
-} satisfies TokenParser<TargetSelector>;
+} satisfies TokenParser<TargetSelector | undefined>;
 
 const parseSelectorType = function (unparsed: string) {
   unparsed = unparsed.trimStart();

@@ -31,14 +31,12 @@ export class EntityParameter extends Parameter<Entity[], TargetSelector> {
     return tokens.pop(parsers.targetSelector);
   }
 
-  parseValue({ token: selector, player }: ParameterParseValueContext<TargetSelector>): Entity[] {
-    if (selector === undefined) return [];
-
-    if (typeof selector === "string") {
-      return player.dimension.getPlayers({ name: selector });
-    } else {
-      return selector.execute(player);
+  parseValue({ token, player }: ParameterParseValueContext<TargetSelector>): Entity[] {
+    if (token === undefined) {
+      return [];
     }
+
+    return token.execute(player);
   }
 
   validate({ value }: ParameterValidateContext<Entity[]>) {
