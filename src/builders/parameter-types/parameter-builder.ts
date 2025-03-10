@@ -8,6 +8,11 @@ export class ParameterBuilder<T extends Parameter = Parameter> extends Builder<T
     return this;
   }
 
+  typeName(typeName: string) {
+    this.state.typeName = typeName;
+    return this;
+  }
+
   description(description: string) {
     this.state.description = description;
     return this;
