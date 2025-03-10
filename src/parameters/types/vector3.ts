@@ -1,20 +1,20 @@
 import { Player, Vector3 } from "@minecraft/server";
 
+import { vector3, Vector3Token } from "~/tokens/parsers";
 import { ParseError } from "~/errors";
 
 import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
-
-type Vector3Token = { x: string | undefined; y: string | undefined; z: string | undefined };
+import { Entries } from "~/utils/types";
 
 export class Vector3Parameter extends Parameter<Vector3, Vector3Token> {
   typeName = "x y z";
 
   parseToken({ tokens }: ParameterParseTokenContext) {
-    return { x: tokens.pop(), y: tokens.pop(), z: tokens.pop() };
+    return tokens.pop(vector3);
   }
 
-  parseValue({ token: rawLocation, player }: ParameterParseValueContext<Vector3Token>): Vector3 {
+  parseValue({ token, player }: ParameterParseValueContext<Vector3Token>): Vector3 {
     let location = {} as Vector3;
     let deltaLocation = {} as Vector3; // Only used in local (^) mode
 
@@ -22,24 +22,16 @@ export class Vector3Parameter extends Parameter<Vector3, Vector3Token> {
     let hasRelative = false;
     let hasLocal = false;
 
-    for (const [axis, token] of Object.entries(rawLocation)) {
-      if (token === undefined) {
-        throw new ParseError(`Missing ${axis} component of the vector.`);
-      }
-
-      if (token.startsWith("~")) {
+    for (const [axis, component] of Object.entries(token) as Entries<Vector3Token>) {
+      if (component.type === "relative") {
         hasRelative = true;
-        const deltaToken = token.slice(1);
-        const delta = deltaToken === "" ? 0 : parseFloat(deltaToken);
-        location[axis] = player.location[axis] + delta;
-      } else if (token.startsWith("^")) {
+        location[axis] = component.value;
+      } else if (component.type === "local") {
         hasLocal = true;
-        const deltaToken = token.slice(1);
-        const delta = deltaToken === "" ? 0 : parseFloat(deltaToken);
-        deltaLocation[axis] = delta;
+        deltaLocation[axis] = component.value;
       } else {
         hasAbsolute = true;
-        location[axis] = parseFloat(token);
+        location[axis] = component.value;
       }
     }
 

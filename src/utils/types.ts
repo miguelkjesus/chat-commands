@@ -9,3 +9,5 @@ export type Simplify<T> = T extends any[] | Date
   : {
       [K in keyof T]: T[K];
     } & {};
+
+export type Entries<T> = [keyof T, T[keyof T]][];
