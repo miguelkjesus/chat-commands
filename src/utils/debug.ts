@@ -2,7 +2,7 @@ import { gray } from "@mhesus/mcbe-colors";
 import { world } from "@minecraft/server";
 
 export function log(...args: any[]) {
-  world.sendMessage(gray(args.map((arg) => arg.toString()).join(" ")));
+  world.sendMessage(gray(args.map((arg) => `${arg}`).join(" ")));
 }
 
 export interface DirOptions {
