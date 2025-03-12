@@ -1,5 +1,6 @@
 import { darkGray, darkRed, gold, gray, minecoin, red } from "@mhesus/mcbe-colors";
 
+import { joinTruthy } from "~/utils/string";
 import { command } from "~/api/command";
 import { overload } from "~/api/overload";
 import { t } from "~/api/parameter-types";
@@ -43,28 +44,26 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
           const commands = ctx.manager.commands
             .values()
             .flatMap((cmd) =>
-              [
+              joinTruthy(" ", [
                 c.highlight(ctx.manager.prefix + cmd.name),
-                cmd.aliases.length > 0 ? c.dim(`(${cmd.aliases.join(", ")})`) : undefined,
-                cmd.description ? cmd.description : undefined,
-              ]
-                .filter((str) => str !== undefined)
-                .join(" "),
+                cmd.aliases.length > 0 && c.dim(`(${cmd.aliases.join(", ")})`),
+                cmd.description,
+              ]),
             )
             .slice(pageSize * (page - 1), pageSize * page);
 
-          const banner = `${"-".repeat(10)}[${c.highlight(ctx.manager.prefix + "help")} ${`page ${page}/${(
-            commands.length / pageSize +
-            0.5
-          ).toFixed()}`}]${"-".repeat(10)}`;
+          const banner =
+            "-".repeat(10) +
+            `[${c.highlight(ctx.manager.prefix + "help")} ${`page ${page}/${(commands.length / pageSize + 0.5).toFixed()}`}]` +
+            "-".repeat(10);
 
           ctx.player.sendMessage(
-            [
+            joinTruthy("\n", [
               c.mute(banner),
               `Type ${c.highlight("!help")} ${c.mute("<command>")} to learn how to use a command!`,
-              "",
+              " ",
               ...commands,
-            ].join("\n"),
+            ]),
           );
         }),
 
@@ -80,25 +79,21 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
           const banner = `${"-".repeat(10)}[${c.highlight(`${ctx.manager.prefix}help ${c.mute(command.name)}`)}]${"-".repeat(10)}`;
 
           const signatures = command.overloads.map((overload) =>
-            [
+            joinTruthy(" ", [
               `${c.highlight(ctx.manager.prefix + command.name)}`,
               ...[...Object.values(overload.parameters)].map((param) => c.mute(param.getSignature())),
               overload.description,
-            ]
-              .filter((v) => v)
-              .join(" "),
+            ]),
           );
 
           ctx.player.sendMessage(
-            [
+            joinTruthy(" ", [
               banner,
               [command.name, ...command.aliases].map((s) => c.highlight(ctx.manager.prefix + s)).join(c.mute(", ")),
               command.description,
               " ",
               ...signatures,
-            ]
-              .filter((v) => v)
-              .join("\n"),
+            ]),
           );
         }),
     );

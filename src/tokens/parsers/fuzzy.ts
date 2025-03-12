@@ -1,9 +1,9 @@
 import { TokenParser } from "./parser";
+import { fuzzyPrefixSearch } from "~/utils/string";
 
-export function literal(...choices: string[]): TokenParser<string | undefined> {
+export function fuzzy(...choices: string[]): TokenParser<string | undefined> {
   return (unparsed: string) => {
-    const matches = choices.filter((choice) => unparsed.startsWith(choice + " "));
-    const bestMatch = matches.reduce<string>((a, b) => (a.length > b.length ? a : b), "");
+    const bestMatch = fuzzyPrefixSearch(unparsed, choices);
 
     if (bestMatch) {
       return {
