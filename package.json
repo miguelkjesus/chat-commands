@@ -30,7 +30,13 @@
     "ignore": [
       "!dist/package/",
       "src/",
-      "*.map"
+      "*.map",
+      "tsdoc-metadata.json",
+      ".vscode",
+      "tsconfig.json",
+      "tsup.config.js",
+      ".prettierrc",
+      "api-extractor.json"
     ]
   },
   "devDependencies": {
