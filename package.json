@@ -41,14 +41,17 @@
   },
   "devDependencies": {
     "@microsoft/api-extractor": "^7.52.1",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.13.9",
     "concurrently": "^9.1.2",
+    "jest": "^29.7.0",
     "npmignore": "^0.3.1",
     "prettier": "^3.5.0",
     "rimraf": "^6.0.1",
+    "ts-jest": "^29.2.6",
     "tsc-alias": "^1.8.10",
     "tsup": "^8.3.6",
-    "typescript": "^5.7.3"
+    "typescript": "^5.8.2"
   },
   "dependencies": {
     "@mhesus/mcbe-colors": "^2.0.3",
