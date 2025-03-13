@@ -63,7 +63,7 @@ export interface FilterCriteriaMapOptions<
 
 export type FilterCriteriaAssertOptions = "filter" | "string";
 
-type AssertedCriteria<T extends FilterCriteriaAssertOptions> = "filter" extends T
+export type AssertedCriteria<T extends FilterCriteriaAssertOptions> = "filter" extends T
   ? FilterCriteria<Filter>
   : "string" extends T
     ? FilterCriteria<string>

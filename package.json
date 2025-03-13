@@ -6,10 +6,14 @@
   "license": "Apache-2.0",
   "keywords": [
     "minecraft",
+    "bedrock",
+    "pocket",
+    "edition",
     "mcbe",
-    "commands"
+    "commands",
+    "chat"
   ],
-  "types": "./dist/package/index.d.ts",
+  "typings": "./dist/package/index.d.ts",
   "main": "./dist/package/index.js",
   "scripts": {
     "clean": "rimraf dist && mkdir dist",
@@ -19,6 +23,7 @@
     "watch:package": "tsc && (concurrently \"tsc -w\" \"tsc-alias -w\")",
     "watch:bundle": "tsup --watch",
     "watch": "npm run clean && concurrently \"npm run watch:package\" \"npm run watch:bundle\"",
+    "report": "api-extractor run --local --verbose",
     "prepack": "npmignore --auto && npm run build"
   },
   "publishConfig": {
@@ -29,6 +34,7 @@
     ]
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "^7.52.1",
     "@types/node": "^22.13.9",
     "concurrently": "^9.1.2",
     "npmignore": "^0.3.1",
