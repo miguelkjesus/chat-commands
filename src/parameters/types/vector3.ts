@@ -1,17 +1,17 @@
 import { Player, Vector3 } from "@minecraft/server";
 
-import { vector3, Vector3Token } from "~/tokens/parsers";
+import type { Entries } from "~/utils/types";
+import type { Vector3Token } from "~/tokens/parsers";
 import { ParseError } from "~/errors";
 
 import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
-import { Entries } from "~/utils/types";
 
 export class Vector3Parameter extends Parameter<Vector3, Vector3Token> {
   typeName = "x y z";
 
-  parseToken({ tokens }: ParameterParseTokenContext) {
-    return tokens.pop(vector3);
+  parseToken({ tokens, parsers }: ParameterParseTokenContext) {
+    return tokens.pop(parsers.vector3);
   }
 
   parseValue({ token, player }: ParameterParseValueContext<Vector3Token>): Vector3 {

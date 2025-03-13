@@ -3,7 +3,7 @@ import { darkGray, darkRed, gold, gray, minecoin, red } from "@mhesus/mcbe-color
 import { joinTruthy } from "~/utils/string";
 import { command } from "~/api/command";
 import { overload } from "~/api/overload";
-import { t } from "~/api/parameter-types";
+import { number, string } from "~/api/parameter-types";
 
 import { manager } from "../command-manager";
 import { HelpCommandOptions } from "./options";
@@ -36,7 +36,7 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
   command("help", ...aliases)
     .description(description)
     .overloads(
-      overload({ page: t.number().gte(1).default(1) })
+      overload({ page: number().gte(1).default(1) })
         .description("View a list of commands")
         .execute((ctx, { page }) => {
           const pageSize = 10;
@@ -68,7 +68,7 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
           );
         }),
 
-      overload({ commandName: t.string("command") })
+      overload({ commandName: string("command") })
         .description("Get help on a specific command")
         .execute((ctx, { commandName }) => {
           const command = ctx.manager.commands.get(commandName);

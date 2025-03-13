@@ -1,4 +1,3 @@
-import { all } from "~/tokens/parsers";
 import { ValueError } from "~/errors";
 
 import type {
@@ -19,10 +18,10 @@ export class StringParameter extends Parameter<string, string> {
     failMessage?: string;
   };
 
-  parseToken({ tokens, params }: ParameterParseTokenContext) {
+  parseToken({ tokens, parsers, params }: ParameterParseTokenContext) {
     const paramArray = Object.values(params);
     const isLast = paramArray.indexOf(this) === paramArray.length - 1;
-    return isLast ? tokens.pop(all) : tokens.pop();
+    return isLast ? tokens.pop(parsers.all) : tokens.pop();
   }
 
   parseValue({ token }: ParameterParseValueContext<string>): string {

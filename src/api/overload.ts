@@ -1,9 +1,9 @@
 import { type Resolvable, resolve } from "~/utils/resolvers";
 import { OverloadBuilder, ParameterBuilder, ParametersFromBuilders } from "~/builders";
-import { Overload } from "~/commands";
 import { LiteralParameter } from "~/parameters";
+import { Overload } from "~/commands";
 
-import { params, ParameterTypes } from "./parameter-types";
+import { type ParameterTypes, params } from "./parameters-object";
 
 export function overload(): OverloadBuilder<{}>;
 export function overload<ParamBuilders extends Record<string, ParameterBuilder>>(

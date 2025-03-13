@@ -12,7 +12,6 @@ import type { Entity } from "@minecraft/server";
 
 import type { TargetSelector } from "~/utils/target-selector";
 import { ValueError } from "~/errors";
-import { parsers } from "~/tokens";
 
 import type {
   ParameterParseTokenContext,
@@ -27,7 +26,7 @@ export class EntityParameter extends Parameter<Entity[], TargetSelector> {
   maxCount = Infinity;
   minCount = 0;
 
-  parseToken({ tokens }: ParameterParseTokenContext) {
+  parseToken({ tokens, parsers }: ParameterParseTokenContext) {
     return tokens.pop(parsers.targetSelector);
   }
 

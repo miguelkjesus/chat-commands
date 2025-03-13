@@ -1,8 +1,7 @@
 import { ValueError } from "~/errors";
+
 import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Parameter, ParameterSignatureOptions } from "./parameter";
-
-import { literal } from "~/tokens/parsers";
 
 export class LiteralParameter<const Choices extends readonly string[] = readonly string[]> extends Parameter<
   Choices extends readonly [] ? unknown : Choices[number],
@@ -15,8 +14,8 @@ export class LiteralParameter<const Choices extends readonly string[] = readonly
     this.choices = choices;
   }
 
-  parseToken({ tokens }: ParameterParseTokenContext) {
-    return tokens.pop(literal(...this.choices));
+  parseToken({ tokens, parsers }: ParameterParseTokenContext) {
+    return tokens.pop(parsers.literal(...this.choices));
   }
 
   parseValue({ token }: ParameterParseValueContext<string>) {

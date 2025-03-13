@@ -1,7 +1,5 @@
 import type { Player } from "@minecraft/server";
 
-import type { Arguments, Parameter } from "~/parameters";
-
 import type { CommandManager } from "./command-manager";
 import { Overload } from "./overload";
 import { Command } from "./command";
