@@ -1,6 +1,6 @@
 import { type Resolvable, resolve } from "~/utils/resolvers";
+import { type Parameter, LiteralParameter } from "~/parameters";
 import { OverloadBuilder, ParameterBuilder, ParametersFromBuilders } from "~/builders";
-import { LiteralParameter } from "~/parameters";
 import { Overload } from "~/commands";
 
 import { type ParameterTypes, params } from "./parameters-object";
@@ -15,7 +15,7 @@ export function overload<ParamBuilders extends Record<string, ParameterBuilder>>
   const paramBuilders = resolve(parameters, [params]);
 
   // Build the params, and assign the id to the key in the record
-  const builtParams = {} as any;
+  const builtParams = {} as Record<string, Parameter>;
   for (const [id, { state }] of Object.entries(paramBuilders ?? {})) {
     state.id = id;
 
@@ -25,7 +25,7 @@ export function overload<ParamBuilders extends Record<string, ParameterBuilder>>
       state.name = id;
     }
 
-    (builtParams as {})[id as string] = state;
+    (builtParams as {})[id] = state;
   }
 
   return new OverloadBuilder(new Overload(builtParams, []));
