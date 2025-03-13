@@ -43,6 +43,7 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
 
           const commands = ctx.manager.commands
             .values()
+            .sort((a, b) => a.name.localeCompare(b.name))
             .flatMap((cmd) =>
               joinTruthy(" ", [
                 c.highlight(ctx.manager.prefix + cmd.name),
@@ -87,7 +88,7 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
           );
 
           ctx.player.sendMessage(
-            joinTruthy(" ", [
+            joinTruthy("\n", [
               banner,
               [command.name, ...command.aliases].map((s) => c.highlight(ctx.manager.prefix + s)).join(c.mute(", ")),
               command.description,
