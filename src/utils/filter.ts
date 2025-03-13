@@ -6,7 +6,7 @@ export class FilterCriteria<T extends string | Filter = string | Filter> {
   include: T[] = [];
   exclude: T[] = [];
 
-  assert<Options extends FilterCriteriaAssertOptions>(options?: Options): AssertedCriteria<Options> {
+  assert<Options extends FilterCriteriaAssertOptions>(options: Options): AssertedCriteria<Options> {
     for (const value of [...this.include, ...this.exclude]) {
       if (options === "string" && typeof value === "object") {
         throw new Error("Unexpected filter.");
@@ -19,7 +19,7 @@ export class FilterCriteria<T extends string | Filter = string | Filter> {
   }
 
   map<Include extends FilterValueMapOptions = undefined, Exclude extends FilterValueMapOptions = undefined>(
-    options?: FilterCriteriaMapOptions<Include, Exclude>,
+    options: FilterCriteriaMapOptions<Include, Exclude>,
   ): {
     include: MappedFilterValue<T, Include>;
     exclude: MappedFilterValue<T, Exclude>;
@@ -39,18 +39,29 @@ export class FilterCriteria<T extends string | Filter = string | Filter> {
   }
 }
 
-// map criteria stuff
+// Map criteria stuff
 
 export type FilterValueMapOptions = "none" | "single" | undefined;
 
-export type MappedFilterValue<T extends string | Filter, Option extends FilterValueMapOptions> = "none" extends Option
-  ? undefined
-  : "single" extends Option
-    ? T
-    : Option extends undefined
-      ? T[]
-      : never;
+// prettier-ignore
+export type MappedFilterValue<T extends string | Filter, Option extends FilterValueMapOptions> = 
+  Option extends "none" ? undefined : 
+  Option extends "single" ? T :
+  Option extends undefined ? T[] : 
+  never;
 
+// Assert criteria stuff
+
+export type FilterCriteriaAssertOptions = "filter" | "string" | undefined;
+
+// prettier-ignore
+export type AssertedCriteria<Option extends FilterCriteriaAssertOptions> = 
+  Option extends "filter" ? FilterCriteria<Filter> :
+  Option extends "string" ? FilterCriteria<string> :
+  Option extends undefined ? FilterCriteria :
+  never;
+
+// Map criteria options
 export interface FilterCriteriaMapOptions<
   Include extends FilterValueMapOptions,
   Exclude extends FilterValueMapOptions,
@@ -58,15 +69,3 @@ export interface FilterCriteriaMapOptions<
   include?: Include;
   exclude?: Exclude;
 }
-
-// assert criteria stuff
-
-export type FilterCriteriaAssertOptions = "filter" | "string";
-
-export type AssertedCriteria<T extends FilterCriteriaAssertOptions> = "filter" extends T
-  ? FilterCriteria<Filter>
-  : "string" extends T
-    ? FilterCriteria<string>
-    : T extends undefined
-      ? FilterCriteria
-      : never;
