@@ -16,12 +16,16 @@ export class LiteralParameter<const Choices extends readonly string[] = readonly
   }
 
   parseToken({ tokens }: ParameterParseTokenContext) {
-    return tokens.pop(literal(...this.choices)) ?? "";
+    return tokens.pop(literal(...this.choices));
   }
 
   parseValue({ token }: ParameterParseValueContext<string>) {
     if (!this.choices.includes(token)) {
-      throw new ValueError(`Expected one of the following: ${this.choices.join(", ")}`);
+      if (this.choices.length > 1) {
+        throw new ValueError(`Expected one of the following: ${this.choices.join(", ")}`);
+      } else {
+        throw new ValueError(`Expected: ${this.choices[0]}`);
+      }
     }
 
     return token as Choices extends readonly [] ? unknown : Choices[number];

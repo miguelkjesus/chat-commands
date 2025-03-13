@@ -22,7 +22,7 @@ export class StringParameter extends Parameter<string, string> {
   parseToken({ tokens, params }: ParameterParseTokenContext) {
     const paramArray = Object.values(params);
     const isLast = paramArray.indexOf(this) === paramArray.length - 1;
-    return (isLast ? tokens.pop(all) : tokens.pop()) ?? "";
+    return isLast ? tokens.pop(all) : tokens.pop();
   }
 
   parseValue({ token }: ParameterParseValueContext<string>): string {

@@ -30,7 +30,7 @@ export const targetSelector = function (unparsed: string) {
 
   const filterParseResult = parseQueryOptions(unparsed);
   const filter = filterParseResult.token;
-  unparsed = typeParseResult.unparsed;
+  unparsed = filterParseResult.unparsed;
 
   return {
     unparsed,

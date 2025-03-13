@@ -1,8 +1,8 @@
 import { ChatSendBeforeEvent, world } from "@minecraft/server";
-import { darkGray, gold, gray, italic, red, white } from "@mhesus/mcbe-colors";
+import { darkGray, gray, italic, red, white } from "@mhesus/mcbe-colors";
 
 import { type Parameter, ParameterParseTokenContext } from "~/parameters";
-import { fuzzySearch, joinTruthy } from "~/utils/string";
+import { joinTruthy } from "~/utils/string";
 import { ChatCommandError, ParseError } from "~/errors";
 import { TokenStream, parsers } from "~/tokens";
 
@@ -80,9 +80,9 @@ export class CommandManager {
   ): { command: Command; overload: Overload; args: Record<string, any> } {
     let candidates = [...command.overloads];
 
-    const errors = new Map<Overload, Error>();
+    const overloadErrors = new Map<Overload, ChatCommandError>();
     const overloadArgs = new Map<Overload, Record<string, unknown>>(candidates.map((o) => [o, {}]));
-    const streams = new Map<Overload, TokenStream>(candidates.map((o) => [o, stream.clone()]));
+    const overloadStreams = new Map<Overload, TokenStream>(candidates.map((o) => [o, stream.clone()]));
 
     // test for empty overload
 
@@ -102,16 +102,12 @@ export class CommandManager {
     let matchedOverloads: Overload[] = [];
 
     while (candidates.length !== 0) {
-      if (candidates.length === 0) {
-        throw this.overloadError(command, errors);
-      }
-
-      errors.clear();
+      overloadErrors.clear();
       const nextCandidates: Overload[] = [];
       const nextMatchedOverloads: Overload[] = [];
 
       for (const overload of candidates) {
-        const stream = streams.get(overload)!;
+        const stream = overloadStreams.get(overload)!;
         const args = overloadArgs.get(overload)!;
 
         const param: Parameter | undefined = Object.values(overload.parameters)[paramIdx];
@@ -122,17 +118,16 @@ export class CommandManager {
             args[param.id!] = param.parse(parseCtx);
             nextCandidates.push(overload);
           } catch (err) {
-            errors.set(overload, err);
+            if (!(err instanceof ChatCommandError)) throw err;
+            overloadErrors.set(overload, err);
             args.length = 0;
           }
         } else if (!stream.isEmpty()) {
           // no param and theres more tokens to be collected: too many args
-          errors.set(overload, new ParseError("Too many arguments!"));
+          overloadErrors.set(overload, new ParseError("Too many arguments!"));
         } else {
           // no param and no more tokens: successfully matched
           nextMatchedOverloads.push(overload);
-
-          // return { overload, args };
         }
       }
 
@@ -149,18 +144,18 @@ export class CommandManager {
       return { command, overload, args: overloadArgs.get(overload)! };
     }
 
-    throw this.overloadError(command, errors);
+    throw this.overloadError(command, overloadErrors);
   }
 
   private overloadError(command: Command, errors: Map<Overload, Error>) {
     return new ParseError(
       joinTruthy("\n", [
-        "Command errored in the following overloads:",
-        ...[...errors.entries()].flatMap(([overload, error]) => {
-          if (!(error instanceof ParseError)) throw error;
-          return [gray(`${this.prefix + command.name} ${overload.getSignature()}`), `  > ${italic(error.message)}`];
-        }),
-        `\nType ${white(this.prefix + "help teleport")} for help with this command!`,
+        "Oops! The command had the following errors:",
+        ...[...errors.entries()].flatMap(([overload, error]) => [
+          gray(`${this.prefix + command.name} ${overload.getSignature()}`),
+          `  > ${italic(error.message)}`,
+        ]),
+        `\nType ${white(`${this.prefix}help ${command.name}`)} for help with this command!`,
       ]),
     );
   }
