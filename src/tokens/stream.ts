@@ -1,4 +1,4 @@
-import { type TokenParser, argument } from "./parsers";
+import { type TokenParser, TokenParserResult, argument } from "./parsers";
 
 export class TokenStream {
   unparsed: string;
@@ -7,26 +7,35 @@ export class TokenStream {
     this.unparsed = message;
   }
 
+  private runParser<T>(parse?: TokenParser<T>): TokenParserResult<T | string | undefined> {
+    const { unparsed, token } = (parse ?? argument)(this.unparsed);
+    return { unparsed: unparsed.trimStart(), token };
+  }
+
+  private applyParser<T>(parse?: TokenParser<T>): TokenParserResult<T | string | undefined> {
+    const result = this.runParser(parse);
+    this.unparsed = result.unparsed;
+    return result;
+  }
+
   peek(): string | undefined;
   peek<T>(parse: TokenParser<T>): T | undefined;
   peek<T>(parse?: TokenParser<T>): T | string | undefined {
-    return (parse ?? (argument as TokenParser<T>))(this.unparsed).token;
+    return this.runParser(parse).token;
   }
 
   pop(): string | undefined;
   pop<T>(parse: TokenParser<T>): T | undefined;
   pop<T>(parse?: TokenParser<T>): T | string | undefined {
-    const { unparsed, token } = (parse ?? (argument as TokenParser<T>))(this.unparsed);
-    this.unparsed = unparsed;
-    return token;
+    return this.applyParser(parse).token;
   }
 
   popSome(count: number): string[];
   popSome<T>(count: number, parse: TokenParser<T>): T[];
   popSome<T>(count: number, parse?: TokenParser<T>): T[] | string[] {
-    const tokens: T[] = [];
+    const tokens: any[] = [];
     for (let i = 0; i < count; i++) {
-      const token = this.pop(parse ?? (argument as TokenParser<T>));
+      const token = this.applyParser(parse).token;
       if (token === undefined) break;
       tokens.push(token);
     }
@@ -41,7 +50,7 @@ export class TokenStream {
   }
 
   isEmpty() {
-    return this.unparsed === "";
+    return /^\w+$/.test(this.unparsed);
   }
 
   clone() {
