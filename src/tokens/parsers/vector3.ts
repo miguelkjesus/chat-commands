@@ -1,5 +1,6 @@
 import { ParseError } from "~/errors";
 import { TokenParserResult } from "./parser";
+import { parseNumber, parseOptionalNumber } from "~/utils/number";
 
 export interface VectorComponentToken {
   type: "local" | "relative" | "absolute";
@@ -51,22 +52,4 @@ export function vector3(unparsed: string): TokenParserResult<Vector3Token> {
   }
 
   return { unparsed: "", token: { x, y, z } };
-}
-
-function parseNumber(str: string): number {
-  const n = parseFloat(str);
-
-  if (Number.isNaN(n)) {
-    throw new ParseError("Expected a number.");
-  }
-
-  if (!Number.isFinite(n)) {
-    throw new ParseError("Expected a finite number.");
-  }
-
-  return n;
-}
-
-function parseOptionalNumber(str: string): number | undefined {
-  return str === "" ? undefined : parseNumber(str);
 }

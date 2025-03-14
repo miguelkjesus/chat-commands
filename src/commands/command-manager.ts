@@ -1,8 +1,8 @@
 import { ChatSendBeforeEvent, world } from "@minecraft/server";
 import { darkGray, gray, italic, red, white } from "@mhesus/mcbe-colors";
 
-import { type Parameter, ParameterParseTokenContext } from "~/parameters";
 import { joinTruthy } from "~/utils/string";
+import { type Parameter, ParameterParseTokenContext } from "~/parameters";
 import { ChatCommandError, ParseError } from "~/errors";
 import { TokenStream, parsers } from "~/tokens";
 
@@ -128,6 +128,7 @@ export class CommandManager {
         } else {
           // no param and no more tokens: successfully matched
           nextMatchedOverloads.push(overload);
+          candidates.slice(candidates.indexOf(overload), 1);
         }
       }
 

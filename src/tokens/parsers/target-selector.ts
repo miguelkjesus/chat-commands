@@ -1,6 +1,7 @@
 import type { EntityQueryOptions, GameMode, Vector3 } from "@minecraft/server";
 
-import { TargetSelector, TargetSelectorType } from "~/utils/target-selector";
+import { type TargetSelectorType, TargetSelector } from "~/utils/target-selector";
+import { NumberRange } from "~/utils/range";
 import { ParseError } from "~/errors";
 
 import type { TokenParser } from "./parser";
@@ -116,6 +117,7 @@ const parseQueryOptions = function (unparsed: string) {
         const { include, exclude } = c.assert("string");
         query.families = include;
         query.excludeFamilies = exclude;
+        break;
       }
 
       case "m": {
@@ -128,7 +130,30 @@ const parseQueryOptions = function (unparsed: string) {
       case "scores": {
         const { include } = c.assert("filter").map({ include: "single" });
 
-        // TODO: parse scores
+        query.scoreOptions = [];
+
+        for (const [objective, c] of Object.entries(include)) {
+          const { include, exclude } = c.assert("string");
+
+          for (const value of include) {
+            let range = NumberRange.parse(value);
+            query.scoreOptions.push({
+              objective,
+              minScore: range.min?.value,
+              maxScore: range.max?.value,
+            });
+          }
+
+          for (const value of exclude) {
+            let range = NumberRange.parse(value);
+            query.scoreOptions.push({
+              objective,
+              minScore: range.min?.value,
+              maxScore: range.max?.value,
+              exclude: true,
+            });
+          }
+        }
       }
 
       case "c": {
@@ -221,7 +246,10 @@ const parseQueryOptions = function (unparsed: string) {
         break;
       }
 
-      // TODO: hasitem
+      case "hasitem": {
+        // TODO
+        throw new ParseError("hasitem is not implemented yet.");
+      }
 
       default:
         throw new ParseError(`Unknown entity selector filter key "${key}"`);
