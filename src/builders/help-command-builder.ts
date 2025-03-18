@@ -1,4 +1,9 @@
-import { type HelpCommandColors, type HelpCommandOptions, makeHelpCommand, removeHelpCommand } from "~/commands";
+import {
+  type HelpCommandColors,
+  type HelpCommandOptions,
+  makeHelpCommand,
+  removeHelpCommandIfExists,
+} from "~/commands";
 
 import { Builder } from "./builder";
 
@@ -22,6 +27,6 @@ export class HelpCommandBuilder extends Builder<HelpCommandOptions> {
   }
 
   remove() {
-    removeHelpCommand();
+    removeHelpCommandIfExists();
   }
 }
