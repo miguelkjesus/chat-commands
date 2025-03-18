@@ -3,7 +3,7 @@ import { type ParameterTypes, overload } from "~/api";
 import { type Command, Overload } from "~/commands";
 
 import { Builder } from "./builder";
-import { OverloadBuilder } from "./overload-builder";
+import { OverloadBuilder, OverloadBuilderFromParameterBuilders } from "./overload-builder";
 import { ParameterBuilder, ParametersFromBuilders } from "./parameter-types";
 
 export class CommandBuilder<Overloads extends readonly Overload[] = readonly Overload[]> extends Builder<
@@ -19,18 +19,18 @@ export class CommandBuilder<Overloads extends readonly Overload[] = readonly Ove
     return this;
   }
 
-  overloads<T extends readonly OverloadBuilder[]>(...overloads: T) {
+  overloads<T extends readonly OverloadBuilder<Overload<any, any>>[]>(...overloads: T) {
     this.state.overloads = overloads.map((builder) => builder.state as OverloadsFromBuilders<T>[number]) as any;
     return this as any as CommandBuilder<OverloadsFromBuilders<T>>;
   }
 
-  overload(): OverloadBuilder<{}>;
+  overload(): OverloadBuilder<Overload<{}>>;
   overload<ParamBuilders extends Record<string, ParameterBuilder>>(
     parameters: Resolvable<(t: ParameterTypes) => ParamBuilders>,
-  ): OverloadBuilder<ParametersFromBuilders<ParamBuilders>>;
+  ): OverloadBuilderFromParameterBuilders<ParamBuilders>;
   overload<ParamBuilders extends Record<string, ParameterBuilder>>(
     parameters?: Resolvable<(t: ParameterTypes) => ParamBuilders>,
-  ): OverloadBuilder<ParametersFromBuilders<ParamBuilders>> {
+  ): OverloadBuilderFromParameterBuilders<ParamBuilders> {
     // TODO refactor how builders work such that either
     //  - they are constructed and readonly
     //  - keep them dynamic like now but without the typing (kinda shit)
@@ -51,5 +51,5 @@ export class CommandBuilder<Overloads extends readonly Overload[] = readonly Ove
 }
 
 export type OverloadsFromBuilders<T> = {
-  [K in keyof T]: T[K] extends OverloadBuilder<infer U> ? Overload<U> : never;
+  [K in keyof T]: T[K] extends OverloadBuilder<infer U> ? U : never;
 };

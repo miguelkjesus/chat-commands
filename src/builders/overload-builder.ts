@@ -1,12 +1,9 @@
-import type { Invocation, InvocationCallback, Overload } from "~/commands";
-import type { Arguments, Parameter } from "~/parameters";
+import type { InvocationCallback, Overload } from "~/commands";
 
+import type { ParameterBuilder, ParametersFromBuilders } from "./parameter-types";
 import { Builder } from "./builder";
-import { Simplify } from "~/utils/types";
 
-export class OverloadBuilder<T extends Record<string, Parameter> = Record<string, Parameter>> extends Builder<
-  Overload<any> // Overload<T> fucks everything for god knows why
-> {
+export class OverloadBuilder<T extends Overload = Overload> extends Builder<T> {
   execute(execute: InvocationCallback<T>) {
     this.state.execute = execute;
     return this;
@@ -17,3 +14,7 @@ export class OverloadBuilder<T extends Record<string, Parameter> = Record<string
     return this;
   }
 }
+
+export type OverloadBuilderFromParameterBuilders<
+  ParamBuilders extends Record<string, ParameterBuilder> = Record<string, ParameterBuilder>,
+> = OverloadBuilder<Overload<ParametersFromBuilders<ParamBuilders>>>;

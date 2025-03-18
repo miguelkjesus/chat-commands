@@ -1,6 +1,6 @@
 import { ParameterSignatureOptions } from "~/parameters";
 
-import { InvocationCallback, Overload, OverloadParameters } from "./overload";
+import { InvocationCallback, Overload } from "./overload";
 
 export class Command<Overloads extends readonly Overload[] = readonly Overload[]> {
   name: string;
@@ -8,8 +8,8 @@ export class Command<Overloads extends readonly Overload[] = readonly Overload[]
   description?: string;
   overloads: Overloads;
 
-  beforeExecute?: MultipleInvocationCallback<Overloads>;
-  afterExecute?: MultipleInvocationCallback<Overloads>;
+  beforeExecute?: InvocationCallback<Overloads[number]>;
+  afterExecute?: InvocationCallback<Overloads[number]>;
 
   constructor(name: string, aliases: string[], overloads: Overloads) {
     this.name = name;
@@ -21,13 +21,3 @@ export class Command<Overloads extends readonly Overload[] = readonly Overload[]
     return this.overloads.map((overload) => `${this.name} ${overload.getSignature(options)}`);
   }
 }
-
-export type CommandOverloads<T extends Command> = T extends Command<infer Overloads> ? Overloads : never;
-
-export type CombinedOverloadParameters<Overloads extends readonly Overload[]> = {
-  [K in keyof Overloads]: OverloadParameters<Overloads[K]>;
-}[number];
-
-export type MultipleInvocationCallback<Overloads extends readonly Overload[]> = InvocationCallback<
-  CombinedOverloadParameters<Overloads>
->;

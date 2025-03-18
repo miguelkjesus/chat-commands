@@ -4,11 +4,10 @@ import type { Resolvable } from "~/utils/resolvers";
 import type { Arguments, Parameter, ParameterSignatureOptions } from "~/parameters";
 
 import type { Invocation } from "./invocation";
-import { Simplify } from "~/utils/types";
 
 export class Overload<
   Params extends Record<string, Parameter> = Record<string, Parameter>,
-  Overloads extends readonly Overload[] = readonly any[],
+  const Overloads extends Overload[] = any[],
 > {
   readonly parameters: Params;
   overloads: Overloads; // TODO
@@ -16,7 +15,7 @@ export class Overload<
   checks: Resolvable<(player: Player) => boolean>[] = []; // TODO
   description?: string;
 
-  execute?: InvocationCallback<Params>;
+  execute?: InvocationCallback<this>;
 
   constructor(parameters: Params, overloads: Overloads) {
     this.parameters = parameters;
@@ -30,7 +29,6 @@ export class Overload<
 
 export type OverloadParameters<T extends Overload> = T extends Overload<infer TParams> ? TParams : never;
 
-export type InvocationCallback<Params extends Record<string, Parameter> = Record<string, Parameter>> = (
-  ctx: Invocation,
-  args: Simplify<Arguments<Params>>,
-) => void;
+export type OverloadArguments<T extends Overload> = Arguments<OverloadParameters<T>>;
+
+export type InvocationCallback<T extends Overload> = (ctx: Invocation<T>, args: OverloadArguments<T>) => void;
