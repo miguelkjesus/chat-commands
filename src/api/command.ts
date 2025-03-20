@@ -13,7 +13,7 @@ import { Command, manager, Overload } from "~/commands";
  * @param aliases
  *    Alternative names that can also trigger the command. These provide flexibility to your players.
  * @returns
- *    A command builder instance for further configuration.
+ *    A builder instance for configuring the command.
  */
 export function command(name: string, ...aliases: string[]) {
   const builder = new CommandBuilder(new Command(name, aliases, [] as Overload[]));

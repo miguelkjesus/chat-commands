@@ -27,7 +27,7 @@ import { type ParameterTypes, params } from "./parameters-object";
  *    An object defining the parameter that this overload expects. \
  *    Each key represents a parameter name, and the value defines its type.
  * @returns
- *    An overload builder instance for further configuration.
+ *    A builder instance for configuring the overload.
  */
 export function overload<ParamBuilders extends Record<string, ParameterBuilder>>(
   parameters?: Resolvable<(t: ParameterTypes) => ParamBuilders>,
