@@ -4,12 +4,12 @@ import type { ParameterBuilder, ParametersFromBuilders } from "./parameter-types
 import { Builder } from "./builder";
 
 export class OverloadBuilder<T extends Overload = Overload> extends Builder<T> {
-  execute(execute: InvocationCallback<T>) {
+  onExecute(execute: InvocationCallback<T>) {
     this.state.execute = execute;
     return this;
   }
 
-  description(description: string) {
+  setDescription(description: string) {
     this.state.description = description;
     return this;
   }

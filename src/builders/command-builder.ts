@@ -9,26 +9,26 @@ import { ParameterBuilder, ParametersFromBuilders } from "./parameter-types";
 export class CommandBuilder<Overloads extends readonly Overload[] = readonly Overload[]> extends Builder<
   Command<Overloads>
 > {
-  aliases(...aliases: string[]) {
+  setAliases(...aliases: string[]) {
     this.state.aliases = aliases;
     return this;
   }
 
-  description(description: string) {
+  setDescription(description: string) {
     this.state.description = description;
     return this;
   }
 
-  overloads<T extends readonly OverloadBuilder<Overload<any, any>>[]>(...overloads: T) {
+  setOverloads<T extends readonly OverloadBuilder<Overload<any, any>>[]>(...overloads: T) {
     this.state.overloads = overloads.map((builder) => builder.state as OverloadsFromBuilders<T>[number]) as any;
     return this as any as CommandBuilder<OverloadsFromBuilders<T>>;
   }
 
-  overload(): OverloadBuilder<Overload<{}>>;
-  overload<ParamBuilders extends Record<string, ParameterBuilder>>(
+  createOverload(): OverloadBuilder<Overload<{}>>;
+  createOverload<ParamBuilders extends Record<string, ParameterBuilder>>(
     parameters: Resolvable<(t: ParameterTypes) => ParamBuilders>,
   ): OverloadBuilderFromParameterBuilders<ParamBuilders>;
-  overload<ParamBuilders extends Record<string, ParameterBuilder>>(
+  createOverload<ParamBuilders extends Record<string, ParameterBuilder>>(
     parameters?: Resolvable<(t: ParameterTypes) => ParamBuilders>,
   ): OverloadBuilderFromParameterBuilders<ParamBuilders> {
     // TODO refactor how builders work such that either

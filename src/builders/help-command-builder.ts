@@ -8,19 +8,19 @@ import {
 import { Builder } from "./builder";
 
 export class HelpCommandBuilder extends Builder<HelpCommandOptions> {
-  colors(colors: Partial<HelpCommandColors>) {
+  setColors(colors: Partial<HelpCommandColors>) {
     this.state.colors = colors;
     makeHelpCommand(this.state);
     return this;
   }
 
-  description(description: string) {
+  setDescription(description: string) {
     this.state.description = description;
     makeHelpCommand(this.state);
     return this;
   }
 
-  aliases(aliases: string[]) {
+  setAliases(aliases: string[]) {
     this.state.aliases = aliases;
     makeHelpCommand(this.state);
     return this;

@@ -32,12 +32,12 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
   const aliases = options?.aliases ?? ["commands", "?"];
   const description = options?.description ?? "Get help on different commands";
 
-  const help = command("help", ...aliases).description(description);
+  const help = command("help", ...aliases).setDescription(description);
 
   help
-    .overload({ page: number().gte(1).default(1) })
-    .description("View a list of commands")
-    .execute((ctx, { page }) => {
+    .createOverload({ page: number().gte(1).default(1) })
+    .setDescription("View a list of commands")
+    .onExecute((ctx, { page }) => {
       const pageSize = 10;
 
       const commands = ctx.manager.commands
@@ -68,9 +68,9 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
     });
 
   help
-    .overload({ commandName: string("command") })
-    .description("Get help on a specific command")
-    .execute((ctx, { commandName }) => {
+    .createOverload({ commandName: string("command") })
+    .setDescription("Get help on a specific command")
+    .onExecute((ctx, { commandName }) => {
       const command = ctx.manager.commands.get(commandName);
       if (command === undefined) {
         ctx.player.sendMessage(c.error("Unknown command."));
