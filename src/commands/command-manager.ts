@@ -15,8 +15,12 @@ export class CommandManager {
   prefix?: string;
   commands = new CommandCollection();
 
+  private isStarted = false;
+
   start(): void {
+    if (this.isStarted) return;
     if (this.prefix === undefined) return;
+
     world.beforeEvents.chatSend.subscribe((event) => {
       try {
         this.processEvent(event);
@@ -25,6 +29,8 @@ export class CommandManager {
         event.sender.sendMessage(red(err.message));
       }
     });
+
+    this.isStarted = true;
   }
 
   protected processEvent(event: ChatSendBeforeEvent) {

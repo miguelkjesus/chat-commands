@@ -24,10 +24,6 @@ export class CommandBuilder<Overloads extends readonly Overload[] = readonly Ove
     return this as any as CommandBuilder<OverloadsFromBuilders<T>>;
   }
 
-  createOverload(): OverloadBuilder<Overload<{}>>;
-  createOverload<ParamBuilders extends Record<string, ParameterBuilder>>(
-    parameters: Resolvable<(t: ParameterTypes) => ParamBuilders>,
-  ): OverloadBuilderFromParameterBuilders<ParamBuilders>;
   createOverload<ParamBuilders extends Record<string, ParameterBuilder>>(
     parameters?: Resolvable<(t: ParameterTypes) => ParamBuilders>,
   ): OverloadBuilderFromParameterBuilders<ParamBuilders> {
