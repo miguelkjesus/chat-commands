@@ -10,6 +10,7 @@ The **best** way to create commands for Minecraft: Bedrock Edition!
 ## Contents
 
 - [**Installation**](#installation)
+- [**Showcase**](#showcase)
 - [**How do I use this library?**](#how-do-i-use-this-library)
 
 ## Installation
@@ -31,6 +32,10 @@ npm i @mhesus/chat-commands
 You can install the project by downloading the most recent release of this package from the `releases` tab in github!
 
 <!-- TODO add proper release instructions once I figure it out. -->
+
+## Showcase
+
+<!-- TODO add images and gifs of example commands -->
 
 ## How do I use this library?
 
