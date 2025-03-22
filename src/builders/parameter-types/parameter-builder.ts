@@ -2,33 +2,105 @@ import { Check, LiteralParameter, type Parameter, type ParameterType } from "~/p
 import { Builder } from "../builder";
 import { LiteralParameterBuilder } from "./literal-builder";
 
-export class ParameterBuilder<T extends Parameter = Parameter> extends Builder<T> {
-  name(name: string) {
+/**
+ * A base class for building and configuring command parameters. \
+ * All parameter builders inherit this class.
+ *
+ * @template T
+ *    The parameter type being built.
+ */
+export abstract class ParameterBuilder<T extends Parameter = Parameter> extends Builder<T> {
+  /**
+   * Sets the display name of the parameter. \
+   * This name is displayed in help menus and should convey what the parameter represents.
+   *
+   * Alternatively, you can also set the name of a parameter like so: `number("example name")`
+   *
+   * @example
+   * const usage = overload({
+   *   givenAmount: number().setName("given amount")
+   * });
+   * console.log(usage.getSignature());
+   * // "<given amount: number>"
+   *
+   * @param name
+   *    The display name of the parameter. \
+   *    This name is displayed in help menus and should convey what the parameter represents.
+   * @returns
+   *    A builder instance for configuring the parameter.
+   */
+  setName(name: string) {
     this.state.name = name;
     return this;
   }
 
-  typeName(typeName: string) {
+  /**
+   * Sets the display type of the parameter. \
+   * This is displayed in help menus and should convey what values will be accepted by this parameter.
+   *
+   * @example
+   * const usage = overload({
+   *   commandName: string("command name").setTypeName("command")
+   * });
+   * console.log(usage.getSignature());
+   * // "<command name: command>"
+   *
+   * @param typeName
+   *    The display type of the parameter. \
+   *    This is displayed in help menus and should convey what values will be accepted by this parameter.
+   * @returns
+   *    A builder instance for configuring the parameter.
+   */
+  setTypeName(typeName: string) {
     this.state.typeName = typeName;
     return this;
   }
 
-  description(description: string) {
+  /**
+   * Sets the description of the parameter. \
+   * This is displayed in help menus and should briefly describe the parameter.
+   *
+   * @example
+   * overload({
+   *   amount: number()
+   *     .setDescription("The amount of money to give a player")
+   * });
+   *
+   * @param description
+   *    A brief explanation of the parameter.
+   * @returns
+   *    A builder instance for configuring the parameter.
+   */
+  setDescription(description: string) {
     this.state.description = description;
     return this;
   }
 
-  optional(optional = true) {
-    this.state.optional = optional ? {} : undefined;
+  // TODO enforce that optional params cant appear before required params for now
+  // TODO make it so that optional params can appear before required params
+  //      maybe when parsing, split choices into two trees, one with param one without?
+
+  /**
+   * Sets whether a parameter is required or not.
+   *
+   * **Note:** Optional parameters cannot appear before required parameters!
+   *
+   * @example
+   * overload({ amount: number().setOptional() });
+   * // If this parameter isn't given, it will default to undefined.
+   *
+   * @param optional
+   *    A brief explanation of the parameter.
+   * @returns
+   *    A builder instance for configuring the parameter.
+   */
+  setOptional(optional = true) {
+    this.state.optional = optional;
     return this;
   }
 
-  default(value: ParameterType<T>) {
-    this.state.optional = { defaultValue: value };
-    return this;
-  }
-
-  check(callback: (value: ParameterType<T>) => boolean, errorMessage: string) {
+  // TODO jsdoc
+  addCheck(callback: (value: ParameterType<T>) => boolean, errorMessage: string) {
     this.state.checks.push(new Check(callback, errorMessage));
     return this;
   }

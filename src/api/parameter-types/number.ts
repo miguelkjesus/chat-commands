@@ -3,7 +3,7 @@ import { NumberParameter } from "~/parameters/types";
 
 /**
  * Creates a number parameter for use in overload definitions. \
- * This parameter allows the player to input any number: e.g.,
+ * Number parameters allow the player to input any number: e.g.,
  *
  * **Example inputs:**
  * - `!money give 2.50`
@@ -15,7 +15,7 @@ import { NumberParameter } from "~/parameters/types";
  *
  * @param name
  *    An optional display name for the parameter. \
- *    This name will be displayed in help menus and should indicate what the parameter represents.
+ *    This name will be displayed in help menus and should convey what the parameter represents.
  *
  *    If omitted, this will default to the key used in the overload definition.
  * @returns

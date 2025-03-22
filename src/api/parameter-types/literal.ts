@@ -3,7 +3,7 @@ import { LiteralParameter } from "~/parameters";
 
 /**
  * Creates a literal parameter with predefined choices for use in an overload definition. \
- * A literal parameter restricts input to specific keywords.
+ * Literal parameters restrict the player's input to specific keywords.
  *
  * @example
  * overload({ mode: literal("easy", "normal", "hard") });

@@ -4,8 +4,10 @@ import type { ParameterBuilder, ParametersFromBuilders } from "./parameter-types
 import { Builder } from "./builder";
 
 /**
- * A builder for creating and configuring command overloads.
- * Overloads define different parameter patterns a command can accept.
+ * A builder for creating and configuring command overloads. \
+ * Overloads define the different ways that a command can be triggered based on parameter types.
+ *
+ * Overloads **should not** be created this way. Instead use `overload()` or `command().createOverload()`.
  *
  * @template T
  *    The overload definition being built.

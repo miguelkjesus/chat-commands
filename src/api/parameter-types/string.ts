@@ -3,7 +3,7 @@ import { StringParameter } from "~/parameters/types";
 
 /**
  * Creates a string parameter for use in overload definitions. \
- * This parameter allows the player to input any text value.
+ * String parameters allow the player to input any text value.
  *
  * **Example Inputs:**
  * - `!rename diamond_sword Excalibur`
@@ -18,7 +18,7 @@ import { StringParameter } from "~/parameters/types";
  *
  * @param name
  *    An optional display name for the parameter. \
- *    This name will be displayed in help menus and should indicate what the parameter represents.
+ *    This name will be displayed in help menus and should convey what the parameter represents.
  *
  *    If omitted, it defaults to the key used in the overload definition.
  * @returns

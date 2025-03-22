@@ -1,7 +1,7 @@
 import type { Player } from "@minecraft/server";
 
 import type { Resolvable } from "~/utils/resolvers";
-import type { Arguments, Parameter, ParameterSignatureOptions } from "~/parameters";
+import type { Arguments, Parameter } from "~/parameters";
 
 import type { Invocation } from "./invocation";
 
@@ -22,8 +22,8 @@ export class Overload<
     this.overloads = overloads;
   }
 
-  getSignature(options?: ParameterSignatureOptions) {
-    return [...Object.values(this.parameters)].map((param) => param.getSignature(options)).join(" ");
+  getSignature() {
+    return [...Object.values(this.parameters)].map((param) => param.getSignature()).join(" ");
   }
 }
 

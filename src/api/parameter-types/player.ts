@@ -3,7 +3,7 @@ import { PlayerParameter } from "~/parameters/types";
 
 /**
  * Creates a player parameter for use in overload definitions. \
- * This parameter allows the player to specify a target player: e.g.,
+ * Player parameters allow the player to input the name of any online player: e.g.,
  *
  * **Example Inputs:**
  * - `!kick Notch`
@@ -16,7 +16,7 @@ import { PlayerParameter } from "~/parameters/types";
  *
  * @param name
  *    An optional display name for the parameter. \
- *    This name will be displayed in help menus and should indicate what the parameter represents.
+ *    This name will be displayed in help menus and should convey what the parameter represents.
  *
  *    If omitted, it defaults to the key used in the overload definition.
  * @returns

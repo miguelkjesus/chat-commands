@@ -25,6 +25,8 @@ export function removeHelpCommandIfExists() {
   }
 }
 
+// TODO add option to see parameter descriptions
+
 export function makeHelpCommand(options?: HelpCommandOptions) {
   removeHelpCommandIfExists();
 
@@ -35,7 +37,7 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
   const help = command("help", ...aliases).setDescription(description);
 
   help
-    .createOverload({ page: number().gte(1).default(1) })
+    .createOverload({ page: number().gte(1).setOptional() })
     .setDescription("View a list of commands")
     .onExecute((ctx, { page }) => {
       const pageSize = 10;

@@ -3,7 +3,7 @@ import { EntityParameter } from "~/parameters";
 
 /**
  * Creates an entity parameter for use in overload definitions. \
- * This parameter allows the player to target one or more entities (e.g., players, mobs): e.g.,
+ * Entity parameters allow the player to target one or more entities (e.g., players, mobs): e.g.,
  *
  * **Example inputs:**
  * - `!smite TheLegend27`
@@ -14,7 +14,7 @@ import { EntityParameter } from "~/parameters";
  *
  * @param name
  *    An optional display name for the parameter. \
- *    This name will be displayed in help menus and should indicate what the parameter represents.
+ *    This name will be displayed in help menus and should convey what the parameter represents.
  *
  *    If omitted, this will default to the key used in the overload definition.
  * @returns

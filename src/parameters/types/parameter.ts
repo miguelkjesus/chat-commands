@@ -13,7 +13,7 @@ export abstract class Parameter<Value = any, Token = any> {
   id?: string;
   name?: string;
   description?: string;
-  optional?: { defaultValue?: Value };
+  optional = false;
 
   checks: Check<Value>[] = [];
 
@@ -35,40 +35,28 @@ export abstract class Parameter<Value = any, Token = any> {
     const token = this.parseToken(context);
 
     if (token === undefined) {
-      if (this.optional) {
-        return this.optional.defaultValue;
-      } else {
-        throw new ParseError("This is a required parameter!");
-      }
-    } else {
-      const value = this.parseValue(
-        new ParameterParseValueContext(context.player, context.message, context.params, token),
-      );
-      this.validate(new ParameterValidateContext(context.player, context.message, context.params, value));
-      this.performChecks(value);
-
-      return value;
+      if (this.optional) return;
+      throw new ParseError("This is a required parameter!");
     }
+
+    const value = this.parseValue(
+      new ParameterParseValueContext(context.player, context.message, context.params, token),
+    );
+    this.validate(new ParameterValidateContext(context.player, context.message, context.params, value));
+    this.performChecks(value);
+
+    return value;
   }
 
-  getSignature(options?: ParameterSignatureOptions) {
+  getSignature() {
     if (this.name === undefined) {
       throw new Error("Parameter has no name.");
     }
 
     if (!this.optional) return `<${this.name}: ${this.typeName}>`;
 
-    if (options?.showDefaultValue && this.optional.defaultValue) {
-      const defaultString = isCallable(this.optional.defaultValue) ? "..." : this.optional.defaultValue;
-      return `[${this.name}: ${this.typeName} = ${defaultString}]`;
-    }
-
     return `[${this.name}: ${this.typeName}]`;
   }
-}
-
-export interface ParameterSignatureOptions {
-  showDefaultValue?: boolean;
 }
 
 export class Check<T> {
@@ -87,7 +75,12 @@ export class Check<T> {
   }
 }
 
-export type ParameterType<T extends Parameter> = T extends Parameter<infer Type, any> ? Type : never;
+export type ParameterType<T extends Parameter> =
+  T extends Parameter<infer Type, any>
+    ? T["optional"] extends { defaultValue: undefined }
+      ? Type | undefined
+      : Type
+    : never;
 
 export type Arguments<T extends Record<string, Parameter>> = {
   [K in keyof T]: ParameterType<T[K]>;

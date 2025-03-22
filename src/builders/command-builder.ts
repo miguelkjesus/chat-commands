@@ -6,8 +6,12 @@ import { Builder } from "./builder";
 import { OverloadBuilder, OverloadBuilderFromParameterBuilders } from "./overload-builder";
 import { ParameterBuilder } from "./parameter-types";
 
+// TODO figure out how to make `command()` a link
+
 /**
  * A builder for configuring commands.
+ *
+ * Commands **should not** be created this way. Instead use `command()`.
  *
  * @template Overloads
  *    The overload definitions for the command.
