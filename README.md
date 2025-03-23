@@ -2,7 +2,7 @@
 
 `chat-commands` is an easy way to add commands into your MCBE add-ons!
 
-`📄` [Documentation](#) \
+`✏️` [Documentation](#) \
 `🗞️` [Changelog](./CHANGELOG.md)
 
 <!-- TODO docs website -->
