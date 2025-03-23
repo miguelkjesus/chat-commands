@@ -1,19 +1,13 @@
 # `@mhesus/chat-commands`
 
-The **best** way to create commands for Minecraft: Bedrock Edition!
+`chat-commands` is an easy way to add commands into your MCBE add-ons!
 
 `📄` [Documentation](#) \
 `🗞️` [Changelog](./CHANGELOG.md)
 
 <!-- TODO docs website -->
 
-## Contents
-
-- [**Installation**](#installation)
-- [**Showcase**](#showcase)
-- [**How do I use this library?**](#how-do-i-use-this-library)
-
-## Installation
+## ⚙️ Installation
 
 > [!WARNING]
 > You **cannot** install this library yet, as it has not been released! \
@@ -21,7 +15,7 @@ The **best** way to create commands for Minecraft: Bedrock Edition!
 
 ### Bundler [Recommended]
 
-If you use a bundler in your project, then you can install the package using npm:
+You can install the package using npm:
 
 ```text
 npm i @mhesus/chat-commands
@@ -29,27 +23,26 @@ npm i @mhesus/chat-commands
 
 ### No Bundler
 
-You can install the project by downloading the most recent release of this package from the `releases` tab in github!
+You can download a bundled version of the package by going to the [releases](https://github.com/miguelkjesus/chat-commands/releases) tab in github!
 
 <!-- TODO add proper release instructions once I figure it out. -->
 
-## Showcase
+## ℹ️ How do I use this library?
 
-<!-- TODO add images and gifs of example commands -->
-
-## How do I use this library?
-
-For full information, read the [documentation](#). However, I will cover a simple example below.
+This only covers a small portion of what this library is capable of! \
+For more information, read the [documentation](#).
 
 ### `!repeat` Example
 
-> Lets make a simple command that repeats the player's message a number of times.
+Lets make a simple command that repeats the player's message a number of times.
 
 ```ts
+import { command, number, string } from "@mhesus/chat-commands";
+
 const repeat = command("repeat");
 ```
 
-> **Overloads define the different ways a command can be used!** Lets make an overload where the player can first input the number of times to repeat a message, and then the message to be repeated.
+Overloads define the different ways a command can be used! Lets make an overload where the player can first input the number of times to repeat a message, and then the message to be repeated.
 
 ```ts
 repeat
@@ -58,9 +51,9 @@ repeat
     message: string().notEmpty(), // We don't want to allow an empty message!
   })
   .onExecute((ctx, { times, message }) => {
-    // We can execute code for this specific overload here!
+    // Whenever this overload is triggered, this code will be run!
     // `ctx` contains information about the execution, such as the player who executed it.
-    // The second argument contains the arguments the player used.
+    // The second parameter contains the arguments that the player used.
 
     for (const i = 0; i < times; i++) {
       world.sendMessage(message);
@@ -68,9 +61,9 @@ repeat
   });
 ```
 
-> Now, what if we want to also let players just send a message with no number? \
-> We can allow this by adding another overload! \
-> The library is smart enough to know which overload to pick based on what the player inputs.
+Now, what if we want to also let players just send a message with no number? \
+We can allow this by adding another overload! \
+The library is smart enough to know which overload to pick based on what the player inputs.
 
 ```ts
 repeat
@@ -82,8 +75,8 @@ repeat
   });
 ```
 
-> Finally, **the most important bit**! \
-> This must be called at least once to register all the commands that you defined.
+Finally, **the most important bit**! \
+This must be called at least once to register all the commands that you defined.
 
 ```ts
 startWithPrefix("!");
