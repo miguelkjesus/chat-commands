@@ -12,28 +12,67 @@ import { Invocation } from "./invocation";
 import { Overload } from "./overload";
 
 export class CommandManager {
-  prefix?: string;
+  prefix!: string;
   commands = new CommandCollection();
 
-  private isStarted = false;
+  private _isStarted = false;
 
-  start(): void {
+  get isStarted() {
+    return this._isStarted;
+  }
+
+  /**
+   * Sets the prefix to be used for all commands and starts listening for chat commands. \
+   * The prefix determines how commands are recognised when entered by players.
+   *
+   * This should be called at least once, somewhere in your script.
+   *
+   * @example
+   * manager.start("!")
+   * // The command manager will now recognise commands prefixed with "!" (e.g., "!teleport")
+   *
+   * @param prefix
+   *    The prefix to be used for commands (e.g., "!", ";", or any other character sequence)
+   *
+   *    Prefixes **cannot** start with "/" because Minecraft's built-in commands already use it. \
+   *    Prefixes **cannot** be undefined or empty.
+   * @throws
+   *    If the prefix starts with "/". \
+   *    If the prefix is undefined or empty.
+   */
+  start(prefix: string): void {
     if (this.isStarted) return;
-    if (this.prefix === undefined) return;
+
+    this.assertValidPrefix(prefix);
+    this.prefix = prefix;
 
     world.beforeEvents.chatSend.subscribe((event) => {
       try {
-        this.processEvent(event);
+        this.processChatEvent(event);
       } catch (err) {
         if (!(err instanceof ChatCommandError)) throw err;
         event.sender.sendMessage(red(err.message));
       }
     });
 
-    this.isStarted = true;
+    this._isStarted = true;
   }
 
-  protected processEvent(event: ChatSendBeforeEvent) {
+  assertValidPrefix(prefix: string) {
+    if (prefix === undefined) {
+      throw new Error("Prefix cannot be undefined.");
+    }
+
+    if (prefix === "") {
+      throw new Error("Prefix cannot be an empty string.");
+    }
+
+    if (prefix.startsWith("/")) {
+      throw new Error('Prefix cannot start with "/"');
+    }
+  }
+
+  protected processChatEvent(event: ChatSendBeforeEvent) {
     if (!event.message.startsWith(this.prefix!)) return;
 
     event.cancel = true;

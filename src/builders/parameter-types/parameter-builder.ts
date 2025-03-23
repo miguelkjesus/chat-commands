@@ -94,7 +94,7 @@ export abstract class ParameterBuilder<T extends Parameter = Parameter> extends 
    * @returns
    *    A builder instance for configuring the parameter.
    */
-  setOptional(optional = true) {
+  optional(optional = true) {
     this.state.optional = optional;
     return this;
   }

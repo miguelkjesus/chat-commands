@@ -37,7 +37,7 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
   const help = command("help", ...aliases).setDescription(description);
 
   help
-    .createOverload({ page: number().gte(1).setOptional() })
+    .createOverload({ page: number().gte(1).optional() })
     .setDescription("View a list of commands")
     .onExecute((ctx, { page }) => {
       const pageSize = 10;

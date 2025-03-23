@@ -37,7 +37,7 @@ For more information, read the [documentation](#).
 Lets make a simple command that repeats the player's message a number of times.
 
 ```ts
-import { command, number, string } from "@mhesus/chat-commands";
+import { command, manager, number, string } from "@mhesus/chat-commands";
 
 const repeat = command("repeat");
 ```
@@ -52,7 +52,8 @@ repeat
   })
   .onExecute((ctx, { times, message }) => {
     // Whenever this overload is triggered, this code will be run!
-    // `ctx` contains information about the execution, such as the player who executed it.
+
+    // "ctx" contains information such as which player triggered the overload.
     // The second parameter contains the arguments that the player used.
 
     for (const i = 0; i < times; i++) {
@@ -79,12 +80,14 @@ Finally, **the most important bit**! \
 This must be called at least once to register all the commands that you defined.
 
 ```ts
-startWithPrefix("!");
+manager.start("!");
 ```
 
 <details><summary><i>Full code</i></summary>
 
 ```ts
+import { command, manager, number, string } from "@mhesus/chat-commands";
+
 const repeat = command("repeat");
 
 repeat
@@ -106,7 +109,7 @@ repeat
     world.sendMessage(message);
   });
 
-startWithPrefix("!");
+manager.start("!");
 ```
 
 </details>
