@@ -13,17 +13,13 @@
 > You **cannot** install this library yet, as it has not been released! \
 > Anything written here is simply written for when it does release in the future.
 
-### Bundler [Recommended]
-
-You can install the package using npm:
+If you use a bundler, you can install the package using npm:
 
 ```text
 npm i @mhesus/chat-commands
 ```
 
-### No Bundler
-
-You can download a bundled version of the package by going to the [releases](https://github.com/miguelkjesus/chat-commands/releases) tab in github!
+Otherwise, you can download a pre-bundled version of the package by going to the [releases](https://github.com/miguelkjesus/chat-commands/releases) tab in github!
 
 <!-- TODO add proper release instructions once I figure it out. -->
 
