@@ -1,7 +1,7 @@
 import { ValueError } from "~/errors";
 
 import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
-import { Parameter, ParameterSignatureOptions } from "./parameter";
+import { Parameter } from "./parameter";
 
 export class LiteralParameter<const Choices extends readonly string[] = readonly string[]> extends Parameter<
   Choices extends readonly [] ? unknown : Choices[number],
@@ -30,14 +30,10 @@ export class LiteralParameter<const Choices extends readonly string[] = readonly
     return token as Choices extends readonly [] ? unknown : Choices[number];
   }
 
-  getSignature(options: ParameterSignatureOptions): string {
+  getSignature(): string {
     const name = this.choices.join("|");
 
     if (!this.optional) return name;
-
-    if (options?.showDefaultValue && this.optional.defaultValue) {
-      return `[${name} = ${this.optional.defaultValue}]`;
-    }
 
     return `[${name}]`;
   }

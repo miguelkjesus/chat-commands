@@ -1,5 +1,3 @@
-import { ParameterSignatureOptions } from "~/parameters";
-
 import { InvocationCallback, Overload } from "./overload";
 
 export class Command<Overloads extends readonly Overload[] = readonly Overload[]> {
@@ -17,7 +15,7 @@ export class Command<Overloads extends readonly Overload[] = readonly Overload[]
     this.overloads = overloads;
   }
 
-  getSignatures(options?: ParameterSignatureOptions) {
-    return this.overloads.map((overload) => `${this.name} ${overload.getSignature(options)}`);
+  getSignatures() {
+    return this.overloads.map((overload) => `${this.name} ${overload.getSignature()}`);
   }
 }
