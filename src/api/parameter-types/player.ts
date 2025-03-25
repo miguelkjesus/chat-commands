@@ -12,7 +12,7 @@ import { PlayerParameter } from "~/parameters/types";
  * **Note:** Unlike entity parameters, this does not allow target selectors!
  *
  * @example
- * overload({ target: player() });
+ * kick.createOverload({ victim: player() });
  *
  * @param name
  *    An optional display name for the parameter. \

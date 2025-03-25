@@ -34,10 +34,10 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
   const aliases = options?.aliases ?? ["commands", "?"];
   const description = options?.description ?? "Get help on different commands";
 
-  const help = command("help", ...aliases).setDescription(description);
+  const help = command("help", aliases).setDescription(description);
 
   help
-    .createOverload({ page: number().gte(1).optional() })
+    .createOverload({ page: number().gte(1).setOptional() })
     .setDescription("View a list of commands")
     .onExecute((ctx, { page }) => {
       const pageSize = 10;

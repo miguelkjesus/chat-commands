@@ -1,29 +1,34 @@
 import type { Player } from "@minecraft/server";
 
-import type { Resolvable } from "~/utils/resolvers";
 import type { Arguments, Parameter } from "~/parameters";
 
 import type { Invocation } from "./invocation";
 
-export class Overload<
-  Params extends Record<string, Parameter> = Record<string, Parameter>,
-  const Overloads extends Overload[] = any[],
-> {
+export class Overload<Params extends Record<string, Parameter> = Record<string, Parameter>> {
   readonly parameters: Params;
-  overloads: Overloads; // TODO
-
-  checks: Resolvable<(player: Player) => boolean>[] = []; // TODO
+  overloads: Overload[]; // Making this a generic type results in: Type instantiation is excessively deep and possibly infinite
   description?: string;
 
-  execute?: InvocationCallback<this>;
+  canPlayerUse?: (player: Player) => boolean;
+  execute?: ExecuteCallback<this>;
 
-  constructor(parameters: Params, overloads: Overloads) {
+  constructor(parameters: Params, overloads: Overload[]) {
     this.parameters = parameters;
     this.overloads = overloads;
   }
 
-  getSignature() {
-    return [...Object.values(this.parameters)].map((param) => param.getSignature()).join(" ");
+  getSignatures(): string[] {
+    const signatures = this.overloads.flatMap((overload) => overload.getSignatures());
+
+    if (this.execute !== undefined) {
+      signatures.push([...Object.values(this.parameters)].map((param) => param.getSignature()).join(" "));
+    }
+
+    return signatures;
+  }
+
+  getDescendantOverloads(): Overload[] {
+    return [...this.overloads, ...this.overloads.flatMap((overload) => overload.getDescendantOverloads())];
   }
 }
 
@@ -31,4 +36,7 @@ export type OverloadParameters<T extends Overload> = T extends Overload<infer TP
 
 export type OverloadArguments<T extends Overload> = Arguments<OverloadParameters<T>>;
 
-export type InvocationCallback<T extends Overload> = (ctx: Invocation<T>, args: OverloadArguments<T>) => void;
+export type ExecuteCallback<T extends Overload> = (
+  ctx: Invocation<T>,
+  args: OverloadArguments<T>,
+) => void | Promise<void>;

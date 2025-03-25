@@ -6,7 +6,7 @@ import { LiteralParameter } from "~/parameters";
  * Literal parameters restrict the player's input to specific keywords.
  *
  * @example
- * overload({ mode: literal("easy", "normal", "hard") });
+ * .createOverload({ mode: literal("easy", "normal", "hard") });
  * // The "mode" parameter can only be "easy", "normal", or "hard".
  *
  * @param choices

@@ -1,21 +1,16 @@
-import { InvocationCallback, Overload } from "./overload";
+import { Overload } from "./overload";
 
-export class Command<Overloads extends readonly Overload[] = readonly Overload[]> {
+export class Command extends Overload<{}> {
   name: string;
   aliases: string[] = [];
-  description?: string;
-  overloads: Overloads;
 
-  beforeExecute?: InvocationCallback<Overloads[number]>;
-  afterExecute?: InvocationCallback<Overloads[number]>;
-
-  constructor(name: string, aliases: string[], overloads: Overloads) {
+  constructor(name: string, aliases: string[], overloads: Overload[]) {
+    super({}, overloads);
     this.name = name;
     this.aliases = aliases;
-    this.overloads = overloads;
   }
 
-  getSignatures() {
-    return this.overloads.map((overload) => `${this.name} ${overload.getSignature()}`);
+  getSignatures(): string[] {
+    return super.getSignatures().map((signature) => `${this.name} ${signature}`);
   }
 }

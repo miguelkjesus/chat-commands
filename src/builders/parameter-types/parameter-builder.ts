@@ -6,10 +6,10 @@ import { LiteralParameterBuilder } from "./literal-builder";
  * A base class for building and configuring command parameters. \
  * All parameter builders inherit this class.
  *
- * @template T
+ * @template State
  *    The parameter type being built.
  */
-export abstract class ParameterBuilder<T extends Parameter = Parameter> extends Builder<T> {
+export abstract class ParameterBuilder<State extends Parameter = Parameter> extends Builder<State> {
   /**
    * Sets the display name of the parameter. \
    * This name is displayed in help menus and should convey what the parameter represents.
@@ -17,10 +17,8 @@ export abstract class ParameterBuilder<T extends Parameter = Parameter> extends 
    * Alternatively, you can also set the name of a parameter like so: `number("example name")`
    *
    * @example
-   * const usage = overload({
-   *   givenAmount: number().setName("given amount")
-   * });
-   * console.log(usage.getSignature());
+   * const param = number().setName("given amount");
+   * console.log(param.getSignature());
    * // "<given amount: number>"
    *
    * @param name
@@ -39,10 +37,8 @@ export abstract class ParameterBuilder<T extends Parameter = Parameter> extends 
    * This is displayed in help menus and should convey what values will be accepted by this parameter.
    *
    * @example
-   * const usage = overload({
-   *   commandName: string("command name").setTypeName("command")
-   * });
-   * console.log(usage.getSignature());
+   * const param = string("command name").setTypeName("command");
+   * console.log(param.getSignature());
    * // "<command name: command>"
    *
    * @param typeName
@@ -61,9 +57,10 @@ export abstract class ParameterBuilder<T extends Parameter = Parameter> extends 
    * This is displayed in help menus and should briefly describe the parameter.
    *
    * @example
-   * overload({
+   * giveMoney.createOverload({
    *   amount: number()
    *     .setDescription("The amount of money to give a player")
+   *     .gte(0),
    * });
    *
    * @param description
@@ -86,7 +83,7 @@ export abstract class ParameterBuilder<T extends Parameter = Parameter> extends 
    * **Note:** Optional parameters cannot appear before required parameters!
    *
    * @example
-   * overload({ amount: number().setOptional() });
+   * smite.createOverload({ player: player().setOptional() });
    * // If this parameter isn't given, it will default to undefined.
    *
    * @param optional
@@ -94,13 +91,13 @@ export abstract class ParameterBuilder<T extends Parameter = Parameter> extends 
    * @returns
    *    A builder instance for configuring the parameter.
    */
-  optional(optional = true) {
+  setOptional(optional = true) {
     this.state.optional = optional;
     return this;
   }
 
   // TODO jsdoc
-  addCheck(callback: (value: ParameterType<T>) => boolean, errorMessage: string) {
+  addCheck(callback: (value: ParameterType<State>) => boolean, errorMessage: string) {
     this.state.checks.push(new Check(callback, errorMessage));
     return this;
   }

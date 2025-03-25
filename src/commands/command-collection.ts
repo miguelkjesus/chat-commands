@@ -1,3 +1,4 @@
+import { Player } from "@minecraft/server";
 import { Command } from "./command";
 
 export class CommandCollection {
@@ -66,5 +67,9 @@ export class CommandCollection {
 
   forEach(callback: (command: Command, collection: this) => void) {
     this.commands.forEach((command) => callback(command, this));
+  }
+
+  usable(player: Player): CommandCollection {
+    return new CommandCollection(...[...this].filter((command) => command.canPlayerUse?.(player) ?? true));
   }
 }

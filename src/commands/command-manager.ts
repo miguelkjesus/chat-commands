@@ -1,4 +1,4 @@
-import { ChatSendBeforeEvent, world } from "@minecraft/server";
+import { ChatSendBeforeEvent, Player, world } from "@minecraft/server";
 import { darkGray, gray, italic, red, white } from "@mhesus/mcbe-colors";
 
 import { joinTruthy } from "~/utils/string";
@@ -72,7 +72,7 @@ export class CommandManager {
     }
   }
 
-  protected processChatEvent(event: ChatSendBeforeEvent) {
+  protected async processChatEvent(event: ChatSendBeforeEvent) {
     if (!event.message.startsWith(this.prefix!)) return;
 
     event.cancel = true;
@@ -81,9 +81,7 @@ export class CommandManager {
     const [invocation, args] = this.getInvocation(event);
 
     try {
-      invocation.command.beforeExecute?.(invocation, args);
       invocation.overload.execute?.(invocation, args);
-      invocation.command.afterExecute?.(invocation, args);
     } catch (err) {
       console.error(err);
       throw new ChatCommandError(
@@ -94,13 +92,13 @@ export class CommandManager {
 
   private getInvocation(event: ChatSendBeforeEvent): [Invocation, Record<string, any>] {
     const stream = new TokenStream(event.message.slice(this.prefix!.length));
-    const command = this.getInvokedCommand(stream);
+    const command = this.getInvokedCommand(stream, event.sender);
     const { overload, args } = this.getInvokedOverload(command, stream, event);
     return [new Invocation(this, event.sender, event.message, overload, command), args];
   }
 
-  private getInvokedCommand(stream: TokenStream): Command {
-    const name = stream.pop(parsers.literal(...this.commands.aliases()));
+  private getInvokedCommand(stream: TokenStream, player: Player): Command {
+    const name = stream.pop(parsers.literal(...this.commands.usable(player).aliases()));
     const command = name !== undefined ? this.commands.get(name) : undefined;
 
     if (command === undefined) {
@@ -122,8 +120,11 @@ export class CommandManager {
     command: Command,
     stream: TokenStream,
     event: ChatSendBeforeEvent,
-  ): { command: Command; overload: Overload; args: Record<string, any> } {
-    let candidates = [...command.overloads];
+  ): { overload: Overload; args: Record<string, any> } {
+    // TODO optimise so that
+    let candidates = [command, ...command.getDescendantOverloads()].filter(
+      (overload) => overload.execute !== undefined && (overload.canPlayerUse?.(event.sender) ?? true),
+    );
 
     const overloadErrors = new Map<Overload, ChatCommandError>();
     const overloadArgs = new Map<Overload, Record<string, unknown>>(candidates.map((o) => [o, {}]));
@@ -135,7 +136,7 @@ export class CommandManager {
 
     if (emptyOverload) {
       if (stream.isEmpty()) {
-        return { command, overload: emptyOverload, args: {} };
+        return { overload: emptyOverload, args: {} };
       } else {
         candidates.splice(candidates.indexOf(emptyOverload), 1);
       }
@@ -154,13 +155,13 @@ export class CommandManager {
       for (const overload of candidates) {
         const stream = overloadStreams.get(overload)!;
         const args = overloadArgs.get(overload)!;
-
         const param: Parameter | undefined = Object.values(overload.parameters)[paramIdx];
-        const parseCtx = new ParameterParseTokenContext(event.sender, event.message, overload.parameters, stream);
 
         if (param) {
           try {
-            args[param.id!] = param.parse(parseCtx);
+            args[param.id!] = param.parse(
+              new ParameterParseTokenContext(event.sender, event.message, overload.parameters, stream),
+            );
             nextCandidates.push(overload);
           } catch (err) {
             if (!(err instanceof ChatCommandError)) throw err;
@@ -187,7 +188,7 @@ export class CommandManager {
 
     if (matchedOverloads.length > 0) {
       const overload = matchedOverloads[0];
-      return { command, overload, args: overloadArgs.get(overload)! };
+      return { overload, args: overloadArgs.get(overload)! };
     }
 
     throw this.overloadError(command, overloadErrors);
@@ -197,10 +198,11 @@ export class CommandManager {
     return new ParseError(
       joinTruthy("\n", [
         "Oops! The command had the following errors:",
-        ...[...errors.entries()].flatMap(([overload, error]) => [
-          gray(`${this.prefix + command.name} ${overload.getSignature()}`),
-          `  > ${italic(error.message)}`,
-        ]),
+        ...[...errors.entries()].flatMap(([overload, error]) =>
+          overload
+            .getSignatures()
+            .map((signature) => [gray(`${this.prefix + command.name} ${signature}`), `  > ${italic(error.message)}`]),
+        ),
         `\nType ${white(`${this.prefix}help ${command.name}`)} for help with this command!`,
       ]),
     );

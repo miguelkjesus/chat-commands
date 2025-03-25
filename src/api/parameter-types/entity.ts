@@ -10,7 +10,7 @@ import { EntityParameter } from "~/parameters";
  * - `!smite \@e[type=!player]` (ignore the "\\")
  *
  * @example
- * overload({ victim: entity() });
+ * smite.createOverload({ victim: entity() });
  *
  * @param name
  *    An optional display name for the parameter. \

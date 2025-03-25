@@ -5,7 +5,7 @@ import { Command, manager, Overload } from "~/commands";
  * Creates a new command with a specified name and optional aliases.
  *
  * @example
- * command("teleport", "tp", "warp", "goto")
+ * const teleport = command("teleport", ["tp", "warp", "goto"])
  *   .setDescription("Teleport entities to a specified location or another entity.");
  *
  * @param name
@@ -15,7 +15,7 @@ import { Command, manager, Overload } from "~/commands";
  * @returns
  *    A builder instance for configuring the command.
  */
-export function command(name: string, ...aliases: string[]) {
+export function command(name: string, aliases: string[]) {
   const builder = new CommandBuilder(new Command(name, aliases, [] as Overload[]));
   manager.commands.add(builder.state);
   return builder;

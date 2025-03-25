@@ -10,7 +10,7 @@ import { NumberParameter } from "~/parameters/types";
  * - `!help 3`
  *
  * @example
- * overload({ amount: number().gt(0) });
+ * giveMoney.createOverload({ amount: number().gt(0) });
  * // Restricts input to numbers greater than 0
  *
  * @param name

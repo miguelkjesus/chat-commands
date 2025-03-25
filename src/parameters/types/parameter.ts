@@ -1,4 +1,3 @@
-import { isCallable } from "~/utils/types";
 import { ParseError, ValueError } from "~/errors";
 
 import {
@@ -26,9 +25,7 @@ export abstract class Parameter<Value = any, Token = any> {
   validate(context: ParameterValidateContext<Value>) {}
 
   performChecks(value: Value) {
-    for (const check of this.checks) {
-      check.assert(value);
-    }
+    this.checks.forEach((check) => check.assert(value));
   }
 
   parse(context: ParameterParseTokenContext): Value | undefined {
@@ -56,6 +53,10 @@ export abstract class Parameter<Value = any, Token = any> {
     if (!this.optional) return `<${this.name}: ${this.typeName}>`;
 
     return `[${this.name}: ${this.typeName}]`;
+  }
+
+  toString() {
+    return this.getSignature();
   }
 }
 
