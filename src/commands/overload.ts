@@ -4,6 +4,8 @@ import type { Arguments, Parameter } from "~/parameters";
 
 import type { Invocation } from "./invocation";
 
+// TODO cooldowns
+
 export class Overload<Params extends Record<string, Parameter> = Record<string, Parameter>> {
   readonly parameters: Params;
   overloads: Overload[]; // Making this a generic type results in: Type instantiation is excessively deep and possibly infinite

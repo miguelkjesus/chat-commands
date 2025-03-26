@@ -7,7 +7,7 @@ import { Vector3Parameter } from "~/parameters/types";
  *
  * **Example Inputs:**
  * - `!teleport 100 64 -200`
- * - `!setspawn ~ ~ ~`
+ * - `!spawn set ~ ~ ~`
  *
  * @example
  * overload({ location: vector3() });

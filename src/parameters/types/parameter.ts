@@ -1,4 +1,4 @@
-import { ParseError, ValueError } from "~/errors";
+import { ParseError } from "~/errors";
 
 import {
   ParameterParseTokenContext,
@@ -57,28 +57,8 @@ export abstract class Parameter<Value = any, Token = any> {
   }
 }
 
-export class Check<T> {
-  test: (value: T) => boolean;
-  errorMessage: string;
-
-  constructor(callback: (value: T) => boolean, errorMessage: string) {
-    this.test = callback;
-    this.errorMessage = errorMessage;
-  }
-
-  assert(value: T) {
-    if (!this.test(value)) {
-      throw new ValueError(this.errorMessage);
-    }
-  }
-}
-
 export type ParameterType<T extends Parameter> =
-  T extends Parameter<infer Type, any>
-    ? T["optional"] extends { defaultValue: undefined }
-      ? Type | undefined
-      : Type
-    : never;
+  T extends Parameter<infer Type, any> ? (T["optional"] extends true ? Type | undefined : Type) : never;
 
 export type Arguments<T extends Record<string, Parameter>> = {
   [K in keyof T]: ParameterType<T[K]>;

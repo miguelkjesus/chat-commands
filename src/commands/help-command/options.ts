@@ -1,12 +1,14 @@
 import { Style } from "@mhesus/mcbe-colors";
 
 export interface HelpCommandOptions {
-  colors?: Partial<HelpCommandColors>;
+  colors?: Partial<HelpCommandColorScheme>;
   description?: string;
   aliases?: string[];
 }
 
-export interface HelpCommandColors {
+// TODO redo color scheme. this is kinda shit. add more flexibility somehow
+
+export interface HelpCommandColorScheme {
   mute: Style;
   dim: Style;
 
