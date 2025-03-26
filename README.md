@@ -2,10 +2,19 @@
 
 `chat-commands` is an easy way to add commands into your MCBE add-ons!
 
-`✏️` [Documentation](#) \
+`📖` Documentation (TODO) <!-- TODO --> \
 `🗞️` [Changelog](./CHANGELOG.md)
 
-<!-- TODO docs website -->
+## ⭐ Features
+
+- Overloads!
+- Better error messages!
+- Built-in customisable help command!
+- Complex parameter types! e.g.:
+  - Entities - `@e[type=!player]`
+  - Vectors - `~ ~10 ~`
+- Parameter validation! e.g. `string().maxLength(10)`
+- ... and more!
 
 ## ⚙️ Installation
 
@@ -26,7 +35,7 @@ Otherwise, you can download a pre-bundled version of the package by going to the
 ## ℹ️ How do I use this library?
 
 This only covers a small portion of what this library is capable of! \
-For more information, read the [documentation](#).
+For more information, read the documentation. <!-- TODO -->
 
 ### `!repeat` Example
 
@@ -109,3 +118,5 @@ manager.start("!");
 ```
 
 </details>
+
+<!-- TODO add another example. !kick to show permissions? -->
