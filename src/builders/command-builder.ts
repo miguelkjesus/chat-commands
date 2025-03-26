@@ -33,7 +33,3 @@ export class CommandBuilder extends OverloadBuilder<Command> {
     return this;
   }
 }
-
-export type OverloadsFromBuilders<T> = {
-  [K in keyof T]: T[K] extends OverloadBuilder<infer U> ? U : never;
-};

@@ -13,10 +13,13 @@ export class StringParameter extends Parameter<string, string> {
   notEmpty = false;
   minLength = 0;
   maxLength = Infinity;
+
   pattern?: {
     value: RegExp;
     failMessage?: string;
   };
+
+  // TODO choices
 
   parseToken({ tokens, parsers, params }: ParameterParseTokenContext) {
     const paramArray = Object.values(params);

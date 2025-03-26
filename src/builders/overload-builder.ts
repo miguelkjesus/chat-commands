@@ -1,9 +1,9 @@
 import { resolve, type Resolvable } from "~/utils/resolvers";
-import { params, type ParameterTypes } from "~/api";
+import { Parameters } from "~/api";
 import { Overload, OverloadParameters } from "~/commands";
 import { LiteralParameter } from "~/parameters";
 
-import type { ParameterBuilder, ParametersFromBuilders } from "./parameter-types";
+import type { ParameterBuilder, ParametersFrom } from "./parameter-types";
 import { Builder } from "./builder";
 
 /**
@@ -47,16 +47,14 @@ export class OverloadBuilder<State extends Overload> extends Builder<State> {
    *    A builder for further configuring the overload.
    */
   createOverload<ParamBuilders extends Record<string, ParameterBuilder>>(
-    parameters: ParamBuilders extends Record<any, never>
-      ? never
-      : Resolvable<(params: ParameterTypes) => ParamBuilders>,
-  ): CreateOverloadBuilder<State, ParamBuilders> {
+    parameters: ParamBuilders extends Record<any, never> ? never : Resolvable<(params: Parameters) => ParamBuilders>,
+  ): ChildOverloadBuilder<State, ParamBuilders> {
     // TODO refactor how builders work such that either
     //  - they are constructed and readonly
     //  - keep them dynamic like now but without the typing (kinda shit)
 
     const builtParams = {};
-    for (const [id, { state }] of Object.entries(resolve(parameters, [params]))) {
+    for (const [id, { state }] of Object.entries(resolve(parameters, [Parameters]))) {
       state.id = id;
 
       if (state instanceof LiteralParameter && state.choices.length === 0) {
@@ -70,7 +68,7 @@ export class OverloadBuilder<State extends Overload> extends Builder<State> {
 
     const builder = new OverloadBuilder(new Overload({ ...this.state.parameters, ...builtParams }, []));
     (this.state.overloads as any).push(builder.state);
-    return builder as CreateOverloadBuilder<State, ParamBuilders>;
+    return builder as ChildOverloadBuilder<State, ParamBuilders>;
   }
 
   /**
@@ -116,7 +114,10 @@ export class OverloadBuilder<State extends Overload> extends Builder<State> {
   }
 }
 
-export type CreateOverloadBuilder<
-  ParentOverload extends Overload = Overload,
+/**
+ * Evaluates the type of a child overload when created from a parent.
+ */
+export type ChildOverloadBuilder<
+  Parent extends Overload,
   ParamBuilders extends Record<string, ParameterBuilder> = Record<string, ParameterBuilder>,
-> = OverloadBuilder<Overload<OverloadParameters<ParentOverload> & ParametersFromBuilders<ParamBuilders>>>;
+> = OverloadBuilder<Overload<OverloadParameters<Parent> & ParametersFrom<ParamBuilders>>>;

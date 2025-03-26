@@ -12,8 +12,8 @@ export class StringParameterBuilder extends ParameterBuilder<StringParameter> {
    * Disallows empty strings as valid input.
    *
    * @example
-   * overload({ text: string().notEmpty() });
-   * // !kick Notch "" -> ❌ Not allowed
+   * shout.createOverload({ message: string().notEmpty() });
+   * // !shout "" -> ❌ Must not be an empty string.
    *
    * @param notEmpty
    *    A brief explanation of the parameter.
@@ -29,8 +29,8 @@ export class StringParameterBuilder extends ParameterBuilder<StringParameter> {
    * Sets the minimum accepted length of the input.
    *
    * @example
-   * overload({ text: string().minLength(10) })
-   * // Input must be at least 10 characters.
+   * rename.createOverload({ name: string().minLength(5) })
+   * // !rename abc -> ❌ Must be at least 5 characters.
    *
    * @param minLength
    *    The minimum length of the input.
@@ -46,8 +46,8 @@ export class StringParameterBuilder extends ParameterBuilder<StringParameter> {
    * Sets the maximum accepted length of the input.
    *
    * @example
-   * overload({ text: string().maxLength(200) })
-   * // Input must be at most 200 characters.
+   * setBio.createOverload({ bio: string().maxLength(200) })
+   * // !bio set ... (201 characters) -> ❌ Must be at most 200 characters.
    *
    * @param maxLength
    *    The maximum length of the input.
@@ -63,8 +63,8 @@ export class StringParameterBuilder extends ParameterBuilder<StringParameter> {
    * Restricts the length of the input to some value or a range of values.
    *
    * @example
-   * overload({ text: string().setLength(10) })
-   * // Input must be 10 characters.
+   * setCode.createOverload({ code: string().setLength(6) })
+   * // !code set 12345 -> ❌ Input must be 6 characters.
    *
    * @param length
    *    The length of the input.
@@ -77,8 +77,8 @@ export class StringParameterBuilder extends ParameterBuilder<StringParameter> {
    * Restricts the length of the input to a range of values.
    *
    * @example
-   * overload({ text: string().setLength([10, 200]) })
-   * // Input must be at least 10 and at most 200 characters.
+   * nickname.createOverload({ name: string().setLength([5, 20]) })
+   * // !nickname foo -> ❌ Input must between 5 and 20 characters.
    *
    * overload({ text: string().setLength([5, null]) })
    * // The same as `.minLength(5)` and vice versa.
@@ -103,7 +103,21 @@ export class StringParameterBuilder extends ParameterBuilder<StringParameter> {
     return this;
   }
 
-  pattern(pattern: RegExp, failMessage?: string) {
+  /**
+   * Applies a regular expression pattern to the input, validating it against the pattern.
+   *
+   * @example
+   * setCode.createOverload({ code: string().setPattern(/^[0-9]+$/, "Code must contain only digits.") });
+   * // !code set hunter2 -> ❌ Code must contain only digits.
+   *
+   * @param pattern
+   *    The regular expression pattern to validate against.
+   * @param failMessage
+   *    A message to display when the input fails the pattern validation.
+   * @returns
+   *    The current builder instance.
+   */
+  setPattern(pattern: RegExp, failMessage?: string) {
     this.state.pattern = { value: pattern, failMessage };
     return this;
   }

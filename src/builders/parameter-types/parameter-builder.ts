@@ -95,20 +95,18 @@ export abstract class ParameterBuilder<State extends Parameter = Parameter> exte
     this.state.optional = optional;
     return this;
   }
-
-  // TODO jsdoc
-  addCheck(callback: (value: ParameterType<State>) => boolean, errorMessage: string) {
-    this.state.checks.push(new Check(callback, errorMessage));
-    return this;
-  }
 }
 
-export type ParametersFromBuilders<T> = {
+/**
+ * Converts a record of parameter builders to a record of its states.
+ *
+ * This should be used, rather than `StatesFrom<>`, for a record of parameter builders. \
+ * This is because `LiteralParameters` need to
+ */
+export type ParametersFrom<T extends Record<string, ParameterBuilder>> = {
   [K in Extract<keyof T, string>]: T[K] extends ParameterBuilder<infer T>
     ? T extends LiteralParameter<[]>
       ? LiteralParameter<[K]>
       : T
     : never;
 };
-
-let a: ParametersFromBuilders<{ foo: LiteralParameterBuilder<readonly []> }>;

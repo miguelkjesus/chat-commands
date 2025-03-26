@@ -13,8 +13,7 @@ makeHelpCommand();
  *
  * @example
  * // Customizing the built-in help command
- * helpCommand()
- *   .setColors({
+ * helpCommand().setColors({
  *     // TODO
  *   })
  *

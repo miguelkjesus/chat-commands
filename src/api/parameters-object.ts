@@ -1,6 +1,19 @@
 import type { Simplify } from "~/utils/types";
 import * as parameterTypes from "./parameter-types";
 
-export type ParameterTypes = Simplify<typeof parameterTypes>;
-export const params = Object.freeze({ ...parameterTypes }) as ParameterTypes;
-export const p = params; // Alias for `params`
+/**
+ * An object containing all the parameter types.
+ */
+export type Parameters = Simplify<typeof parameterTypes>;
+
+/**
+ * An object containing all the parameter types.
+ */
+export const Parameters = { ...parameterTypes } as Parameters;
+
+/**
+ * An object containing all the parameter types.
+ *
+ * Alias for `Parameters`.
+ */
+export const p = Parameters;

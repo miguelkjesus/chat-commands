@@ -6,6 +6,10 @@ import {
   ParameterValidateContext,
 } from "../parameter-parse-context";
 
+// TODO introduce system for users to raise custom parameter errors
+//      revamp parameter error system to show where the error happened in the input
+//      (research how token parsers already do this cos idfk lol)
+
 export abstract class Parameter<Value = any, Token = any> {
   typeName: string;
 
@@ -14,8 +18,6 @@ export abstract class Parameter<Value = any, Token = any> {
   description?: string;
   optional = false;
 
-  checks: Check<Value>[] = [];
-
   constructor(name?: string) {
     this.name = name;
   }
@@ -23,10 +25,6 @@ export abstract class Parameter<Value = any, Token = any> {
   abstract parseToken(context: ParameterParseTokenContext): Token | undefined;
   abstract parseValue(context: ParameterParseValueContext<Token>): Value;
   validate(context: ParameterValidateContext<Value>) {}
-
-  performChecks(value: Value) {
-    this.checks.forEach((check) => check.assert(value));
-  }
 
   parse(context: ParameterParseTokenContext): Value | undefined {
     const token = this.parseToken(context);
@@ -40,7 +38,6 @@ export abstract class Parameter<Value = any, Token = any> {
       new ParameterParseValueContext(context.player, context.message, context.params, token),
     );
     this.validate(new ParameterValidateContext(context.player, context.message, context.params, value));
-    this.performChecks(value);
 
     return value;
   }

@@ -26,6 +26,8 @@ export function removeHelpCommandIfExists() {
 }
 
 // TODO add option to see parameter descriptions
+// TODO add header
+// TODO add footer
 
 export function makeHelpCommand(options?: HelpCommandOptions) {
   removeHelpCommandIfExists();
