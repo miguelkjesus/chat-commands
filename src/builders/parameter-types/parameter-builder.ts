@@ -1,6 +1,5 @@
-import { Check, LiteralParameter, type Parameter, type ParameterType } from "~/parameters";
+import type { LiteralParameter, Parameter } from "~/parameters";
 import { Builder } from "../builder";
-import { LiteralParameterBuilder } from "./literal-builder";
 
 /**
  * A base class for building and configuring command parameters. \

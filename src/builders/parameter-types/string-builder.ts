@@ -1,4 +1,4 @@
-import { StringParameter } from "~/parameters/types";
+import type { StringParameter } from "~/parameters/types";
 import { ParameterBuilder } from "./parameter-builder";
 
 /**

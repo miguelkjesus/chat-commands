@@ -1,7 +1,7 @@
 import { resolve, type Resolvable } from "~/utils/resolvers";
-import { Parameters } from "~/api";
 import { Overload, OverloadParameters } from "~/commands";
 import { LiteralParameter } from "~/parameters";
+import { Parameters } from "~/api";
 
 import type { ParameterBuilder, ParametersFrom } from "./parameter-types";
 import { Builder } from "./builder";

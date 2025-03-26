@@ -1,4 +1,4 @@
-import { LiteralParameter } from "~/parameters/types";
+import type { LiteralParameter } from "~/parameters/types";
 import { ParameterBuilder } from "./parameter-builder";
 
 /**
