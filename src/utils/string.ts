@@ -47,10 +47,3 @@ export function fuzzyPrefixSearch(str: string, prefixes: readonly string[], thre
 
   return bestMatch;
 }
-
-export function joinTruthy(seperator: string, arr: readonly any[]) {
-  return arr
-    .filter((v) => v)
-    .map((v) => `${v}`)
-    .join(seperator);
-}

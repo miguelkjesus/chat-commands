@@ -1,6 +1,5 @@
 import { darkGray, darkRed, gold, gray, minecoin, red } from "@mhesus/mcbe-colors";
 
-import { joinTruthy } from "~/utils/string";
 import { command } from "~/api/command";
 import { number, string } from "~/api/parameter-types";
 
@@ -36,7 +35,7 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
   const aliases = options?.aliases ?? ["commands", "?"];
   const description = options?.description ?? "Get help on different commands";
 
-  const help = command("help", aliases).setDescription(description);
+  const help = command("help", ...aliases).setDescription(description);
 
   help
     .createOverload({ page: number().gte(1).setOptional() })
@@ -48,11 +47,13 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
         .values()
         .sort((a, b) => a.name.localeCompare(b.name))
         .flatMap((cmd) =>
-          joinTruthy(" ", [
+          [
             c.highlight(ctx.manager.prefix + cmd.name),
             cmd.aliases.length > 0 && c.dim(`(${cmd.aliases.join(", ")})`),
             cmd.description,
-          ]),
+          ]
+            .filter((v) => v)
+            .join(" "),
         )
         .slice(pageSize * (page - 1), pageSize * page);
 
@@ -62,12 +63,14 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
         "-".repeat(10);
 
       ctx.player.sendMessage(
-        joinTruthy("\n", [
+        [
           c.mute(banner),
           `Type ${c.highlight("!help")} ${c.mute("<command>")} to learn how to use a command!`,
           " ",
           ...commands,
-        ]),
+        ]
+          .filter((v) => v)
+          .join("\n"),
       );
     });
 
@@ -84,21 +87,25 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
       const banner = `${"-".repeat(10)}[${c.highlight(`${ctx.manager.prefix}help ${c.mute(command.name)}`)}]${"-".repeat(10)}`;
 
       const signatures = command.overloads.map((overload) =>
-        joinTruthy(" ", [
+        [
           `${c.highlight(ctx.manager.prefix + command.name)}`,
           ...[...Object.values(overload.parameters)].map((param) => c.mute(param.getSignature())),
           overload.description,
-        ]),
+        ]
+          .filter((v) => v)
+          .join(" "),
       );
 
       ctx.player.sendMessage(
-        joinTruthy("\n", [
+        [
           banner,
           [command.name, ...command.aliases].map((s) => c.highlight(ctx.manager.prefix + s)).join(c.mute(", ")),
           command.description,
           " ",
           ...signatures,
-        ]),
+        ]
+          .filter((v) => v)
+          .join("\n"),
       );
     });
 }

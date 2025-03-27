@@ -1,7 +1,6 @@
 import { ChatSendBeforeEvent, Player, world } from "@minecraft/server";
 import { darkGray, gray, italic, red, white } from "@mhesus/mcbe-colors";
 
-import { joinTruthy } from "~/utils/string";
 import { type Parameter, ParameterParseTokenContext } from "~/parameters";
 import { ChatCommandError, ParseError } from "~/errors";
 import { TokenStream, parsers } from "~/tokens";
@@ -105,11 +104,13 @@ export class CommandManager {
       const bestMatch = stream.pop(parsers.fuzzy(...this.commands.aliases()));
 
       throw new ParseError(
-        joinTruthy(" ", [
+        [
           `Unknown command.`,
           bestMatch && `Did you mean ${white(this.prefix + bestMatch)}?`,
           `\nType ${white(this.prefix + "help")} for a list of commands!`,
-        ]),
+        ]
+          .filter((v) => v)
+          .join(" "),
       );
     }
 
@@ -196,7 +197,7 @@ export class CommandManager {
 
   private overloadError(command: Command, errors: Map<Overload, Error>) {
     return new ParseError(
-      joinTruthy("\n", [
+      [
         "Oops! The command had the following errors:",
         ...[...errors.entries()].flatMap(([overload, error]) =>
           overload
@@ -204,7 +205,9 @@ export class CommandManager {
             .map((signature) => [gray(`${this.prefix + command.name} ${signature}`), `  > ${italic(error.message)}`]),
         ),
         `\nType ${white(`${this.prefix}help ${command.name}`)} for help with this command!`,
-      ]),
+      ]
+        .filter((v) => v)
+        .join("\n"),
     );
   }
 }
