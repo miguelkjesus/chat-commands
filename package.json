@@ -23,6 +23,7 @@
     "watch:package": "tsc && (concurrently \"tsc -w\" \"tsc-alias -w\")",
     "watch:bundle": "tsup --watch",
     "watch": "npm run clean && concurrently \"npm run watch:package\" \"npm run watch:bundle\"",
+    "typecheck": "tsc --noEmit",
     "report": "api-extractor run --local --verbose",
     "prepack": "npmignore --auto && npm run build"
   },

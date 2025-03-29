@@ -2,10 +2,10 @@ import { Overload } from "./overload";
 
 export class Command extends Overload<{}> {
   name: string;
-  aliases: string[] = [];
+  aliases: string[];
 
-  constructor(name: string, aliases: string[], overloads: Overload[]) {
-    super({}, overloads);
+  constructor(name: string, aliases: string[] = []) {
+    super({});
     this.name = name;
     this.aliases = aliases;
   }

@@ -66,8 +66,8 @@ export class OverloadBuilder<State extends Overload> extends Builder<State> {
       builtParams[id] = state;
     }
 
-    const builder = new OverloadBuilder(new Overload({ ...this.state.parameters, ...builtParams }, []));
-    (this.state.overloads as any).push(builder.state);
+    const builder = new OverloadBuilder(new Overload({ ...this.state.parameters, ...builtParams }, this.state));
+    this.state.overloads.push(builder.state);
     return builder as ChildOverloadBuilder<State, ParamBuilders>;
   }
 
@@ -86,8 +86,8 @@ export class OverloadBuilder<State extends Overload> extends Builder<State> {
    * @returns
    *    The overload builder instance.
    */
-  onExecute(execute: State["execute"]) {
-    this.state.execute = execute;
+  onExecute(execute: State["executeCallback"]) {
+    this.state.executeCallback = execute;
     return this;
   }
 
@@ -108,8 +108,8 @@ export class OverloadBuilder<State extends Overload> extends Builder<State> {
    * @returns
    *    The overload builder instance.
    */
-  canPlayerUse(callback: State["canPlayerUse"]) {
-    this.state.canPlayerUse = callback;
+  canPlayerUse(callback: State["canPlayerUseCallback"]) {
+    this.state.canPlayerUseCallback = callback;
     return this;
   }
 }

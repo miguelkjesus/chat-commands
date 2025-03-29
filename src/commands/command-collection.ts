@@ -29,12 +29,12 @@ export class CommandCollection {
     return [...this.commands];
   }
 
-  get(alias: string): Command | undefined {
-    return this.aliasMap.get(alias);
+  get(alias?: string): Command | undefined {
+    return alias !== undefined ? this.aliasMap.get(alias) : undefined;
   }
 
-  has(alias: string): boolean {
-    return this.aliasMap.has(alias);
+  has(alias?: string): boolean {
+    return alias !== undefined ? this.aliasMap.has(alias) : false;
   }
 
   add(...commands: Command[]) {
@@ -70,6 +70,6 @@ export class CommandCollection {
   }
 
   usable(player: Player): CommandCollection {
-    return new CommandCollection(...[...this].filter((command) => command.canPlayerUse?.(player) ?? true));
+    return new CommandCollection(...[...this].filter((command) => command.canPlayerUseCallback?.(player) ?? true));
   }
 }

@@ -1,7 +1,7 @@
 import { TokenParser } from "./parser";
 import { fuzzyPrefixSearch } from "~/utils/string";
 
-export function fuzzy(...choices: string[]): TokenParser<string | undefined> {
+export function fuzzy(choices: readonly string[] = []): TokenParser<string | undefined> {
   return (unparsed: string) => {
     const bestMatch = fuzzyPrefixSearch(unparsed, choices);
 

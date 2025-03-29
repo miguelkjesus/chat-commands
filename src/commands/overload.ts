@@ -8,33 +8,39 @@ import type { Invocation } from "./invocation";
 
 export class Overload<Params extends Record<string, Parameter> = Record<string, Parameter>> {
   readonly parameters: Params;
-  overloads: Overload[]; // Making this a generic type results in: Type instantiation is excessively deep and possibly infinite
+  readonly parent?: Overload;
+  overloads: Overload[] = [];
   description?: string;
 
-  canPlayerUse?: (player: Player) => boolean;
-  execute?: ExecuteCallback<this>;
+  canPlayerUseCallback?: (player: Player) => boolean;
+  executeCallback?: ExecuteCallback<this>;
 
-  constructor(parameters: Params, overloads: Overload[]) {
+  constructor(parameters: Params, parent?: Overload) {
     this.parameters = parameters;
-    this.overloads = overloads;
+    this.parent = parent;
+  }
+
+  execute(...params: Parameters<ExecuteCallback<this>>) {
+    return this.executeCallback?.(...params);
+  }
+
+  canPlayerUse(player: Player) {
+    return this.canPlayerUseCallback?.(player) ?? true;
   }
 
   getSignatures(): string[] {
     const signatures = this.overloads.flatMap((overload) => overload.getSignatures());
 
-    if (this.execute !== undefined) {
+    if (this.executeCallback !== undefined) {
       signatures.push([...Object.values(this.parameters)].map((param) => param.getSignature()).join(" "));
     }
 
     return signatures;
   }
-
-  getDescendantOverloads(): Overload[] {
-    return [...this.overloads, ...this.overloads.flatMap((overload) => overload.getDescendantOverloads())];
-  }
 }
 
-export type OverloadParameters<T extends Overload> = T extends Overload<infer TParams> ? TParams : never;
+// I would just infer Params, but TS throws a hissy fit with inferring the parameters of commands if you do lol.
+export type OverloadParameters<T extends Overload> = T["parameters"];
 
 export type OverloadArguments<T extends Overload> = Arguments<OverloadParameters<T>>;
 

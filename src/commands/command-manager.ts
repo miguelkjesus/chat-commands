@@ -1,4 +1,4 @@
-import { ChatSendBeforeEvent, Player, world } from "@minecraft/server";
+import { type ChatSendBeforeEvent, type Player, world } from "@minecraft/server";
 import { darkGray, gray, italic, red, white } from "@mhesus/mcbe-colors";
 
 import { type Parameter, ParameterParseTokenContext } from "~/parameters";
@@ -77,10 +77,10 @@ export class CommandManager {
     event.cancel = true;
     event.sender.sendMessage(darkGray(`You executed: ${event.message}`));
 
-    const [invocation, args] = this.getInvocation(event);
+    const { invocation, args } = this.getInvocation(event);
 
     try {
-      invocation.overload.execute?.(invocation, args);
+      invocation.overload.execute(invocation, args);
     } catch (err) {
       console.error(err);
       throw new ChatCommandError(
@@ -89,19 +89,30 @@ export class CommandManager {
     }
   }
 
-  private getInvocation(event: ChatSendBeforeEvent): [Invocation, Record<string, any>] {
-    const stream = new TokenStream(event.message.slice(this.prefix!.length));
+  private getInvocation(event: ChatSendBeforeEvent): InvocationResult {
+    const stream = this.createTokenStream(event.message);
     const command = this.getInvokedCommand(stream, event.sender);
-    const { overload, args } = this.getInvokedOverload(command, stream, event);
-    return [new Invocation(this, event.sender, event.message, overload, command), args];
+    const result = this.getInvokedOverload(command, stream, event);
+
+    return {
+      invocation: new Invocation(this, event.sender, event.message, result.overload, command),
+      args: result.args,
+    };
+  }
+
+  createTokenStream(message: string) {
+    return new TokenStream(message.slice(this.prefix!.length));
   }
 
   private getInvokedCommand(stream: TokenStream, player: Player): Command {
-    const name = stream.pop(parsers.literal(...this.commands.usable(player).aliases()));
-    const command = name !== undefined ? this.commands.get(name) : undefined;
+    // Get the invoked command
+    const usableAliases = this.commands.usable(player).aliases();
+    const alias = stream.pop(parsers.literal(usableAliases));
+    const command = this.commands.get(alias);
 
+    // Error if command not recognised
     if (command === undefined) {
-      const bestMatch = stream.pop(parsers.fuzzy(...this.commands.aliases()));
+      const bestMatch = stream.pop(parsers.fuzzy(usableAliases));
 
       throw new ParseError(
         [
@@ -114,93 +125,58 @@ export class CommandManager {
       );
     }
 
-    return command!;
+    return command;
   }
 
   private getInvokedOverload(
     command: Command,
     stream: TokenStream,
     event: ChatSendBeforeEvent,
-  ): { overload: Overload; args: Record<string, any> } {
-    // TODO optimise so that
-    let candidates = [command, ...command.getDescendantOverloads()].filter(
-      (overload) => overload.execute !== undefined && (overload.canPlayerUse?.(event.sender) ?? true),
-    );
-
-    const overloadErrors = new Map<Overload, ChatCommandError>();
-    const overloadArgs = new Map<Overload, Record<string, unknown>>(candidates.map((o) => [o, {}]));
-    const overloadStreams = new Map<Overload, TokenStream>(candidates.map((o) => [o, stream.clone()]));
-
-    // test for empty overload
-
-    const emptyOverload = candidates.find((o) => Object.keys(o.parameters).length === 0);
-
-    if (emptyOverload) {
-      if (stream.isEmpty()) {
-        return { overload: emptyOverload, args: {} };
-      } else {
-        candidates.splice(candidates.indexOf(emptyOverload), 1);
-      }
-    }
-
-    // test for other overloads
-
-    let paramIdx = 0;
-    let matchedOverloads: Overload[] = [];
+  ): OverloadSelectionResult {
+    let candidates = [new OverloadSelectionCandidate(command, stream)];
+    const errors = new Map<OverloadSelectionCandidate, ChatCommandError>();
 
     while (candidates.length !== 0) {
-      overloadErrors.clear();
-      const nextCandidates: Overload[] = [];
-      const nextMatchedOverloads: Overload[] = [];
+      const nextCandidates: OverloadSelectionCandidate[] = [];
 
-      for (const overload of candidates) {
-        const stream = overloadStreams.get(overload)!;
-        const args = overloadArgs.get(overload)!;
-        const param: Parameter | undefined = Object.values(overload.parameters)[paramIdx];
+      for (const candidate of candidates) {
+        const param = candidate.remainingParameters.pop();
 
         if (param) {
           try {
-            args[param.id!] = param.parse(
-              new ParameterParseTokenContext(event.sender, event.message, overload.parameters, stream),
+            candidate.args[param.id!] = param.parse(
+              new ParameterParseTokenContext(event.sender, event.message, candidate.overload.parameters, stream),
             );
-            nextCandidates.push(overload);
+            nextCandidates.push(candidate);
           } catch (err) {
             if (!(err instanceof ChatCommandError)) throw err;
-            overloadErrors.set(overload, err);
-            args.length = 0;
+            errors.set(candidate, err);
           }
-        } else if (!stream.isEmpty()) {
-          // no param and theres more tokens to be collected: too many args
-          overloadErrors.set(overload, new ParseError("Too many arguments!"));
+        } else if (!candidate.stream.isEmpty()) {
+          const candidateOverloads = candidate.overload.overloads;
+
+          if (candidateOverloads) {
+            nextCandidates.push(...candidateOverloads.map((overload) => candidate.createChild(overload)));
+          } else {
+            errors.set(candidate, new ParseError("Too many arguments!"));
+          }
         } else {
-          // no param and no more tokens: successfully matched
-          nextMatchedOverloads.push(overload);
-          candidates.slice(candidates.indexOf(overload), 1);
+          // currently, the first matched candidate is returned.
+          // should parameters have a precedence?
+          return candidate.toResult();
         }
       }
-
-      if (nextMatchedOverloads.length > 0) {
-        matchedOverloads = nextMatchedOverloads;
-      }
-
-      candidates = nextCandidates;
-      paramIdx++;
     }
 
-    if (matchedOverloads.length > 0) {
-      const overload = matchedOverloads[0];
-      return { overload, args: overloadArgs.get(overload)! };
-    }
-
-    throw this.overloadError(command, overloadErrors);
+    throw this.candidateSelectionError(command, errors);
   }
 
-  private overloadError(command: Command, errors: Map<Overload, Error>) {
+  private candidateSelectionError(command: Command, errors: Map<OverloadSelectionCandidate, Error>) {
     return new ParseError(
       [
-        "Oops! The command had the following errors:",
-        ...[...errors.entries()].flatMap(([overload, error]) =>
-          overload
+        "Oops! The command couldn't be executed due to the following errors:",
+        ...[...errors.entries()].flatMap(([candidate, error]) =>
+          candidate.overload
             .getSignatures()
             .map((signature) => [gray(`${this.prefix + command.name} ${signature}`), `  > ${italic(error.message)}`]),
         ),
@@ -210,6 +186,43 @@ export class CommandManager {
         .join("\n"),
     );
   }
+}
+
+class OverloadSelectionCandidate {
+  stream: TokenStream;
+  overload: Overload;
+  remainingParameters: Parameter[];
+  args: Record<string, unknown>;
+
+  constructor(overload: Overload, stream: TokenStream) {
+    this.stream = stream;
+    this.overload = overload;
+    this.remainingParameters = Object.values(overload.parameters);
+    this.args = {};
+  }
+
+  createChild(overload: Overload): OverloadSelectionCandidate {
+    const child = new OverloadSelectionCandidate(overload, this.stream);
+    child.args = { ...this.args };
+    return child;
+  }
+
+  toResult(): OverloadSelectionResult {
+    return {
+      overload: this.overload,
+      args: this.args,
+    };
+  }
+}
+
+interface OverloadSelectionResult {
+  overload: Overload;
+  args: Record<string, unknown>;
+}
+
+interface InvocationResult {
+  invocation: Invocation;
+  args: Record<string, unknown>;
 }
 
 export const manager = new CommandManager();

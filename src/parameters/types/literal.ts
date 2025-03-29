@@ -15,7 +15,7 @@ export class LiteralParameter<const Choices extends readonly string[] = readonly
   }
 
   parseToken({ tokens, parsers }: ParameterParseTokenContext) {
-    return tokens.pop(parsers.literal(...this.choices));
+    return tokens.pop(parsers.literal(this.choices));
   }
 
   parseValue({ token }: ParameterParseValueContext<string>) {
