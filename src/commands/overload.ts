@@ -47,10 +47,6 @@ export class Overload<Params extends Record<string, Parameter> = Record<string, 
   getAllOverloads(): Overload[] {
     return [...this.overloads, ...this.overloads.flatMap((overload) => overload.getAllOverloads())];
   }
-
-  getExecutableOverloads(): Overload[] {
-    return this.getAllOverloads().filter((overload) => overload.executeCallback);
-  }
 }
 
 // I would just infer Params, but TS throws a hissy fit with inferring the parameters of commands if you do lol.

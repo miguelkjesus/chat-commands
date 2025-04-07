@@ -86,15 +86,18 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
 
       const banner = `${"-".repeat(10)}[${c.highlight(`${ctx.manager.prefix}help ${c.mute(command.name)}`)}]${"-".repeat(10)}`;
 
-      const signatures = command.overloads.map((overload) =>
-        [
-          `${c.highlight(ctx.manager.prefix + command.name)}`,
-          ...Object.values(overload.parameters).map((param) => c.mute(param.getSignature())),
-          overload.description,
-        ]
-          .filter((v) => v)
-          .join(" "),
-      );
+      const signatures = command
+        .getAllOverloads()
+        .filter((overload) => overload.executeCallback)
+        .map((overload) =>
+          [
+            `${c.highlight(ctx.manager.prefix + command.name)}`,
+            ...Object.values(overload.parameters).map((param) => c.mute(param.getSignature())),
+            overload.description,
+          ]
+            .filter((v) => v)
+            .join(" "),
+        );
 
       ctx.player.sendMessage(
         [
