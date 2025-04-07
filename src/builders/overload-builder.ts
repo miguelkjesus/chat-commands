@@ -1,10 +1,11 @@
 import { resolve, type Resolvable } from "~/utils/resolvers";
-import { Overload, OverloadParameters } from "~/commands";
+import { Overload, type OverloadParameters } from "~/commands";
 import { LiteralParameter } from "~/parameters";
 import { Parameters } from "~/api";
 
 import type { ParameterBuilder, ParametersFrom } from "./parameter-types";
 import { Builder } from "./builder";
+import { Simplify } from "~/utils/types";
 
 /**
  * A builder for creating and configuring command overloads. \
@@ -48,7 +49,7 @@ export class OverloadBuilder<State extends Overload> extends Builder<State> {
    */
   createOverload<ParamBuilders extends Record<string, ParameterBuilder>>(
     parameters: ParamBuilders extends Record<any, never> ? never : Resolvable<(params: Parameters) => ParamBuilders>,
-  ): ChildOverloadBuilder<State, ParamBuilders> {
+  ): OverloadBuilderFromParent<State, ParamBuilders> {
     // TODO refactor how builders work such that either
     //  - they are constructed and readonly
     //  - keep them dynamic like now but without the typing (kinda shit)
@@ -68,7 +69,7 @@ export class OverloadBuilder<State extends Overload> extends Builder<State> {
 
     const builder = new OverloadBuilder(new Overload({ ...this.state.parameters, ...builtParams }, this.state));
     this.state.overloads.push(builder.state);
-    return builder as ChildOverloadBuilder<State, ParamBuilders>;
+    return builder as OverloadBuilderFromParent<State, ParamBuilders>;
   }
 
   /**
@@ -117,7 +118,7 @@ export class OverloadBuilder<State extends Overload> extends Builder<State> {
 /**
  * Evaluates the type of a child overload when created from a parent.
  */
-export type ChildOverloadBuilder<
+export type OverloadBuilderFromParent<
   Parent extends Overload,
   ParamBuilders extends Record<string, ParameterBuilder> = Record<string, ParameterBuilder>,
-> = OverloadBuilder<Overload<OverloadParameters<Parent> & ParametersFrom<ParamBuilders>>>;
+> = OverloadBuilder<Overload<Simplify<OverloadParameters<Parent> & ParametersFrom<ParamBuilders>>>>;

@@ -3,6 +3,7 @@ import type { Player } from "@minecraft/server";
 import type { Arguments, Parameter } from "~/parameters";
 
 import type { Invocation } from "./invocation";
+import { Command } from "./command";
 
 // TODO cooldowns
 
@@ -20,6 +21,15 @@ export class Overload<Params extends Record<string, Parameter> = Record<string, 
     this.parent = parent;
   }
 
+  get command(): Command | undefined {
+    if (this.parent === undefined) {
+      if (this instanceof Command) return this;
+      return undefined;
+    }
+
+    return this.parent.command;
+  }
+
   execute(...params: Parameters<ExecuteCallback<this>>) {
     return this.executeCallback?.(...params);
   }
@@ -28,14 +38,18 @@ export class Overload<Params extends Record<string, Parameter> = Record<string, 
     return this.canPlayerUseCallback?.(player) ?? true;
   }
 
-  getSignatures(): string[] {
-    const signatures = this.overloads.flatMap((overload) => overload.getSignatures());
+  getSignature(): string {
+    return [this.command?.name, ...Object.values(this.parameters).map((param) => param.getSignature())]
+      .filter((v) => v !== undefined)
+      .join(" ");
+  }
 
-    if (this.executeCallback !== undefined) {
-      signatures.push([...Object.values(this.parameters)].map((param) => param.getSignature()).join(" "));
-    }
+  getAllOverloads(): Overload[] {
+    return [...this.overloads, ...this.overloads.flatMap((overload) => overload.getAllOverloads())];
+  }
 
-    return signatures;
+  getExecutableOverloads(): Overload[] {
+    return this.getAllOverloads().filter((overload) => overload.executeCallback);
   }
 }
 

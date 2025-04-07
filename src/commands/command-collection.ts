@@ -69,7 +69,7 @@ export class CommandCollection {
     this.commands.forEach((command) => callback(command, this));
   }
 
-  usable(player: Player): CommandCollection {
+  usableBy(player: Player): CommandCollection {
     return new CommandCollection(...[...this].filter((command) => command.canPlayerUseCallback?.(player) ?? true));
   }
 }

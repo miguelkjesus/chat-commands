@@ -1,23 +1,33 @@
-import { type ChatSendBeforeEvent, type Player, world } from "@minecraft/server";
-import { darkGray, gray, italic, red, white } from "@mhesus/mcbe-colors";
+import { type ChatSendBeforeEvent, world } from "@minecraft/server";
+import { Style as s } from "@mhesus/mcbe-colors";
 
-import { type Parameter, ParameterParseTokenContext } from "~/parameters";
-import { ChatCommandError, ParseError } from "~/errors";
-import { TokenStream, parsers } from "~/tokens";
-
-import type { Command } from "./command";
+import { ChatCommandError } from "~/errors";
 import { CommandCollection } from "./command-collection";
-import { Invocation } from "./invocation";
-import { Overload } from "./overload";
+import { CommandParser } from "./command-parser";
 
 export class CommandManager {
-  prefix!: string;
   commands = new CommandCollection();
 
+  private parser = new CommandParser(this);
   private _isStarted = false;
+  private _prefix!: string;
 
   get isStarted() {
     return this._isStarted;
+  }
+
+  get prefix() {
+    return this._prefix;
+  }
+
+  set prefix(prefix: string) {
+    this.assertValidPrefix(prefix);
+    this._prefix = prefix;
+  }
+
+  assertValidPrefix(prefix: string) {
+    if (!prefix) throw new Error("Prefix cannot be undefined or empty.");
+    if (prefix.startsWith("/")) throw new Error('Prefix cannot start with "/"');
   }
 
   /**
@@ -41,46 +51,30 @@ export class CommandManager {
    */
   start(prefix: string): void {
     if (this.isStarted) return;
-
-    this.assertValidPrefix(prefix);
     this.prefix = prefix;
 
-    world.beforeEvents.chatSend.subscribe((event) => {
+    world.beforeEvents.chatSend.subscribe(async (event) => {
       try {
-        this.processChatEvent(event);
+        await this.processChatEvent(event);
       } catch (err) {
-        if (!(err instanceof ChatCommandError)) throw err;
-        event.sender.sendMessage(red(err.message));
+        this.handleCommandError(err, event);
       }
     });
 
     this._isStarted = true;
   }
 
-  assertValidPrefix(prefix: string) {
-    if (prefix === undefined) {
-      throw new Error("Prefix cannot be undefined.");
-    }
-
-    if (prefix === "") {
-      throw new Error("Prefix cannot be an empty string.");
-    }
-
-    if (prefix.startsWith("/")) {
-      throw new Error('Prefix cannot start with "/"');
-    }
-  }
-
-  protected async processChatEvent(event: ChatSendBeforeEvent) {
-    if (!event.message.startsWith(this.prefix!)) return;
+  private async processChatEvent(event: ChatSendBeforeEvent) {
+    const params = this.parser.getExecuteParameters(event);
+    if (!params) return;
 
     event.cancel = true;
-    event.sender.sendMessage(darkGray(`You executed: ${event.message}`));
+    event.sender.sendMessage(s.darkGray(`You executed: ${event.message}`));
 
-    const { invocation, args } = this.getInvocation(event);
+    const [invocation] = params;
 
     try {
-      invocation.overload.execute(invocation, args);
+      invocation.overload.execute(...params);
     } catch (err) {
       console.error(err);
       throw new ChatCommandError(
@@ -89,140 +83,10 @@ export class CommandManager {
     }
   }
 
-  private getInvocation(event: ChatSendBeforeEvent): InvocationResult {
-    const stream = this.createTokenStream(event.message);
-    const command = this.getInvokedCommand(stream, event.sender);
-    const result = this.getInvokedOverload(command, stream, event);
-
-    return {
-      invocation: new Invocation(this, event.sender, event.message, result.overload, command),
-      args: result.args,
-    };
+  private handleCommandError(error: Error, event: ChatSendBeforeEvent) {
+    if (!(error instanceof ChatCommandError)) throw error;
+    event.sender.sendMessage(s.red(error.message));
   }
-
-  createTokenStream(message: string) {
-    return new TokenStream(message.slice(this.prefix!.length));
-  }
-
-  private getInvokedCommand(stream: TokenStream, player: Player): Command {
-    // Get the invoked command
-    const usableAliases = this.commands.usable(player).aliases();
-    const alias = stream.pop(parsers.literal(usableAliases));
-    const command = this.commands.get(alias);
-
-    // Error if command not recognised
-    if (command === undefined) {
-      const bestMatch = stream.pop(parsers.fuzzy(usableAliases));
-
-      throw new ParseError(
-        [
-          `Unknown command.`,
-          bestMatch && `Did you mean ${white(this.prefix + bestMatch)}?`,
-          `\nType ${white(this.prefix + "help")} for a list of commands!`,
-        ]
-          .filter((v) => v)
-          .join(" "),
-      );
-    }
-
-    return command;
-  }
-
-  private getInvokedOverload(
-    command: Command,
-    stream: TokenStream,
-    event: ChatSendBeforeEvent,
-  ): OverloadSelectionResult {
-    let candidates = [new OverloadSelectionCandidate(command, stream)];
-    const errors = new Map<OverloadSelectionCandidate, ChatCommandError>();
-
-    while (candidates.length !== 0) {
-      const nextCandidates: OverloadSelectionCandidate[] = [];
-
-      for (const candidate of candidates) {
-        const param = candidate.remainingParameters.pop();
-
-        if (param) {
-          try {
-            candidate.args[param.id!] = param.parse(
-              new ParameterParseTokenContext(event.sender, event.message, candidate.overload.parameters, stream),
-            );
-            nextCandidates.push(candidate);
-          } catch (err) {
-            if (!(err instanceof ChatCommandError)) throw err;
-            errors.set(candidate, err);
-          }
-        } else if (!candidate.stream.isEmpty()) {
-          const candidateOverloads = candidate.overload.overloads;
-
-          if (candidateOverloads) {
-            nextCandidates.push(...candidateOverloads.map((overload) => candidate.createChild(overload)));
-          } else {
-            errors.set(candidate, new ParseError("Too many arguments!"));
-          }
-        } else {
-          // currently, the first matched candidate is returned.
-          // should parameters have a precedence?
-          return candidate.toResult();
-        }
-      }
-    }
-
-    throw this.candidateSelectionError(command, errors);
-  }
-
-  private candidateSelectionError(command: Command, errors: Map<OverloadSelectionCandidate, Error>) {
-    return new ParseError(
-      [
-        "Oops! The command couldn't be executed due to the following errors:",
-        ...[...errors.entries()].flatMap(([candidate, error]) =>
-          candidate.overload
-            .getSignatures()
-            .map((signature) => [gray(`${this.prefix + command.name} ${signature}`), `  > ${italic(error.message)}`]),
-        ),
-        `\nType ${white(`${this.prefix}help ${command.name}`)} for help with this command!`,
-      ]
-        .filter((v) => v)
-        .join("\n"),
-    );
-  }
-}
-
-class OverloadSelectionCandidate {
-  stream: TokenStream;
-  overload: Overload;
-  remainingParameters: Parameter[];
-  args: Record<string, unknown>;
-
-  constructor(overload: Overload, stream: TokenStream) {
-    this.stream = stream;
-    this.overload = overload;
-    this.remainingParameters = Object.values(overload.parameters);
-    this.args = {};
-  }
-
-  createChild(overload: Overload): OverloadSelectionCandidate {
-    const child = new OverloadSelectionCandidate(overload, this.stream);
-    child.args = { ...this.args };
-    return child;
-  }
-
-  toResult(): OverloadSelectionResult {
-    return {
-      overload: this.overload,
-      args: this.args,
-    };
-  }
-}
-
-interface OverloadSelectionResult {
-  overload: Overload;
-  args: Record<string, unknown>;
-}
-
-interface InvocationResult {
-  invocation: Invocation;
-  args: Record<string, unknown>;
 }
 
 export const manager = new CommandManager();

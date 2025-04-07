@@ -9,8 +9,4 @@ export class Command extends Overload<{}> {
     this.name = name;
     this.aliases = aliases;
   }
-
-  getSignatures(): string[] {
-    return super.getSignatures().map((signature) => `${this.name} ${signature}`);
-  }
 }

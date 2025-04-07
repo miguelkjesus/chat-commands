@@ -40,7 +40,7 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
   help
     .createOverload({ page: number().gte(1).setOptional() })
     .setDescription("View a list of commands")
-    .onExecute((ctx, { page }) => {
+    .onExecute((ctx, { page = 1 }) => {
       const pageSize = 10;
 
       const commands = ctx.manager.commands
@@ -89,7 +89,7 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
       const signatures = command.overloads.map((overload) =>
         [
           `${c.highlight(ctx.manager.prefix + command.name)}`,
-          ...[...Object.values(overload.parameters)].map((param) => c.mute(param.getSignature())),
+          ...Object.values(overload.parameters).map((param) => c.mute(param.getSignature())),
           overload.description,
         ]
           .filter((v) => v)

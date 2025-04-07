@@ -50,7 +50,7 @@ export class TokenStream {
   }
 
   isEmpty() {
-    return /^\w*$/.test(this.unparsed);
+    return /^\s*$/.test(this.unparsed);
   }
 
   clone() {
