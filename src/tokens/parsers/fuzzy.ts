@@ -1,17 +1,24 @@
-import { TokenParser } from "./parser";
 import { fuzzyPrefixSearch } from "~/utils/string";
 
-export function fuzzy(choices: readonly string[] = []): TokenParser<string | undefined> {
-  return (unparsed: string) => {
-    const bestMatch = fuzzyPrefixSearch(unparsed, choices);
+import { TokenParser, TokenParserResult } from "../parser";
+import { TokenSubstream } from "../stream";
+
+export class FuzzyParser<Choices extends readonly string[] = readonly string[]>
+  implements TokenParser<Choices[number] | undefined>
+{
+  readonly choices: Choices;
+
+  constructor(choices: Choices) {
+    this.choices = choices;
+  }
+
+  parse(stream: TokenSubstream): TokenParserResult<Choices[number] | undefined> {
+    const bestMatch = fuzzyPrefixSearch(stream.unparsed, this.choices);
 
     if (bestMatch) {
-      return {
-        unparsed: unparsed.slice(bestMatch.length + 1),
-        token: bestMatch,
-      };
+      return stream.result(bestMatch).length(bestMatch.length);
     }
 
-    return { unparsed, token: undefined };
-  };
+    return stream.result(undefined);
+  }
 }

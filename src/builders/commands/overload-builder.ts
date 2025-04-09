@@ -3,8 +3,8 @@ import { Overload, type OverloadParameters } from "~/commands";
 import { LiteralParameter } from "~/parameters";
 import { Parameters } from "~/api";
 
-import type { ParameterBuilder, ParametersFrom } from "./parameter-types";
-import { Builder } from "./builder";
+import type { ParameterBuilder, ParametersFrom } from "../parameter-types";
+import { Builder } from "../builder";
 import { Simplify } from "~/utils/types";
 
 /**

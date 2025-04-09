@@ -4,8 +4,8 @@ import { type TargetSelectorType, TargetSelector } from "~/utils/target-selector
 import { NumberRange } from "~/utils/range";
 import { ParseError } from "~/errors";
 
-import type { TokenParser } from "./parser";
-import { argument as parseArgument } from "./argument";
+import type { TokenParser } from "../parser";
+import { argument as parseArgument } from "./string";
 import { filter as parseFilter } from "./filter";
 
 export const targetSelector = function (unparsed: string) {

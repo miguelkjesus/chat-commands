@@ -1,4 +1,4 @@
-export * as parsers from "./parsers";
+export * from "./parsers";
 export * from "./parser";
 export * from "./stream";
-export * from "./substream";
+export * from "./char-ref";

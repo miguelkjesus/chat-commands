@@ -1,5 +1,7 @@
 import { TokenParserResult, type TokenParser } from "./parser";
-import { TokenSubstream } from "./substream";
+import { CharRef } from "./char-ref";
+import { TokenParseErrorBuilder } from "~/builders";
+import { TokenParseError } from "~/errors";
 
 export class TokenStream {
   readonly input: string;
@@ -25,7 +27,7 @@ export class TokenStream {
 
   pop<T>(parser: TokenParser<T>): T {
     const result = this.parse(parser);
-    this.position = result.nextPosition;
+    this.position = result.nextStreamPosition;
     return result.value;
   }
 
@@ -50,5 +52,36 @@ export class TokenStream {
 
   clone() {
     return new TokenStream(this.unparsed);
+  }
+}
+
+export class TokenSubstream extends TokenStream {
+  readonly parent: TokenStream;
+  readonly initialPosition: number;
+
+  constructor(parent: TokenStream, relativePosition = 0) {
+    super(parent.input, parent.position + relativePosition);
+    this.initialPosition = this.position;
+    this.parent = parent;
+  }
+
+  get relativePosition() {
+    return this.position - this.parent.position;
+  }
+
+  get error() {
+    return new TokenParseErrorBuilder(new TokenParseError(this));
+  }
+
+  result<T>(value: T) {
+    return new TokenParserResult<T>(this, value);
+  }
+
+  getCharRef(relativePosition = 0) {
+    return new CharRef(this, relativePosition);
+  }
+
+  clone() {
+    return new TokenSubstream(this.parent, this.relativePosition);
   }
 }

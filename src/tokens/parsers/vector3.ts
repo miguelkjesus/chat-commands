@@ -1,5 +1,5 @@
 import { ParseError } from "~/errors";
-import { TokenParserResult } from "./parser";
+import { TokenParserResult } from "../parser";
 import { parseNumber, parseOptionalNumber } from "~/utils/number";
 
 export interface VectorComponentToken {

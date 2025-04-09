@@ -1,7 +1,7 @@
 import { FilterCriteria, type Filter } from "~/utils/filter";
 
-import { argument as parseArgument } from "./argument";
-import { TokenParser } from "./parser";
+import { argument as parseArgument } from "./string";
+import { TokenParser } from "../parser";
 
 export const filter = (brackets = "{}") => {
   return function (unparsed: string) {

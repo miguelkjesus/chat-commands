@@ -4,7 +4,7 @@ import * as parameterTypes from "./parameter-types";
 /**
  * An object containing all the parameter types.
  */
-export type Parameters = Simplify<typeof parameterTypes>;
+export type Parameters = Readonly<Simplify<typeof parameterTypes>>;
 
 /**
  * An object containing all the parameter types.

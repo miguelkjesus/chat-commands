@@ -2,7 +2,7 @@ import type { ChatSendBeforeEvent, Player } from "@minecraft/server";
 import { Style as s } from "@mhesus/mcbe-colors";
 
 import { ParameterParseTokenContext, type Parameter } from "~/parameters";
-import { parsers, TokenStream } from "~/tokens";
+import { FuzzyParser, LiteralParser, TokenStream } from "~/tokens";
 import { ChatCommandError, ParseError } from "~/errors";
 
 import type { CommandManager } from "./command-manager";
@@ -41,11 +41,11 @@ export class CommandParser {
     const { commands, prefix } = this.manager;
 
     const usableAliases = commands.usableBy(player).aliases();
-    const alias = stream.pop(parsers.literal(usableAliases));
+    const alias = stream.pop(new LiteralParser(usableAliases));
     const command = commands.get(alias);
 
     if (command === undefined) {
-      const bestMatch = stream.pop(parsers.fuzzy(usableAliases));
+      const bestMatch = stream.pop(new FuzzyParser(usableAliases));
       const suggestion = bestMatch ? ` Did you mean ${s.white(prefix + bestMatch)}?` : "";
       throw new ParseError(`Unknown command.${suggestion}\nType ${s.white(prefix + "help")} for a list of commands!`);
     }
