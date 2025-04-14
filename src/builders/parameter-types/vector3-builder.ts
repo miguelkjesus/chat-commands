@@ -1,4 +1,4 @@
-import type { Vector3Parameter } from "~/parameters/types";
+import type { LocationParameter } from "~/parameters/types";
 import { ParameterBuilder } from "./parameter-builder";
 
 /**
@@ -7,4 +7,4 @@ import { ParameterBuilder } from "./parameter-builder";
  *
  * **Note:** Vector3 parameters **should not** be created this way. Instead use `vector3()`
  */
-export class Vector3ParameterBuilder extends ParameterBuilder<Vector3Parameter> {}
+export class Vector3ParameterBuilder extends ParameterBuilder<LocationParameter> {}

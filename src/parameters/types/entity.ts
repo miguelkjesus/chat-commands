@@ -19,6 +19,7 @@ import type {
   ParameterValidateContext,
 } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
+import { TargetSelectorParser } from "~/tokens";
 
 export class EntityParameter extends Parameter<Entity[], TargetSelector> {
   typeName = "entity";
@@ -26,16 +27,18 @@ export class EntityParameter extends Parameter<Entity[], TargetSelector> {
   maxCount = Infinity;
   minCount = 0;
 
-  parseToken({ tokens, parsers }: ParameterParseTokenContext) {
-    return tokens.pop(parsers.targetSelector);
+  parseToken({ stream }: ParameterParseTokenContext) {
+    return stream.pop(new TargetSelectorParser());
   }
 
   parseValue({ token, player }: ParameterParseValueContext<TargetSelector>): Entity[] {
-    if (token === undefined) {
+    const targetSelector = token.value;
+
+    if (targetSelector === undefined) {
       return [];
     }
 
-    return token.execute(player);
+    return targetSelector.execute(player);
   }
 
   validate({ value }: ParameterValidateContext<Entity[]>) {

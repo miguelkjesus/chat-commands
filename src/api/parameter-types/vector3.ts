@@ -1,5 +1,5 @@
 import { Vector3ParameterBuilder } from "~/builders";
-import { Vector3Parameter } from "~/parameters/types";
+import { LocationParameter } from "~/parameters/types";
 
 /**
  * Creates a 3D vector parameter for use in overload definitions. \
@@ -21,5 +21,5 @@ import { Vector3Parameter } from "~/parameters/types";
  *    A builder instance for configuring the parameter.
  */
 export function vector3(name?: string) {
-  return new Vector3ParameterBuilder(new Vector3Parameter(name));
+  return new Vector3ParameterBuilder(new LocationParameter(name));
 }

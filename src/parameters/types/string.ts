@@ -1,3 +1,4 @@
+import { RemainingParser, StringParser } from "~/tokens";
 import { ValueError } from "~/errors";
 
 import type {
@@ -6,6 +7,7 @@ import type {
   ParameterValidateContext,
 } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
+import debug from "~/utils/debug";
 
 export class StringParameter extends Parameter<string, string> {
   typeName = "string";
@@ -21,14 +23,17 @@ export class StringParameter extends Parameter<string, string> {
 
   // TODO choices
 
-  parseToken({ tokens, parsers, params }: ParameterParseTokenContext) {
+  parseToken({ stream, params }: ParameterParseTokenContext) {
     const paramArray = Object.values(params);
     const isLast = paramArray.indexOf(this) === paramArray.length - 1;
-    return isLast ? tokens.pop(parsers.all) : tokens.pop();
+
+    const parser = isLast ? new RemainingParser() : new StringParser();
+    const token = stream.pop(parser);
+    return token;
   }
 
-  parseValue({ token }: ParameterParseValueContext<string>): string {
-    return token;
+  parseValue({ token }: ParameterParseValueContext<string>) {
+    return token.value;
   }
 
   validate({ value }: ParameterValidateContext<string>) {

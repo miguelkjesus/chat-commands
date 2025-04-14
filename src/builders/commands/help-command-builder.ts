@@ -1,11 +1,6 @@
-import {
-  type HelpCommandColorScheme,
-  type HelpCommandOptions,
-  makeHelpCommand,
-  removeHelpCommandIfExists,
-} from "~/commands";
+import { type HelpCommandOptions, makeHelpCommand, removeHelpCommandIfExists } from "~/commands";
 
-import { Builder } from "./builder";
+import { Builder } from "../builder";
 
 /**
  * A builder for configuring and managing the help command.

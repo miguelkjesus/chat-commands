@@ -1,10 +1,15 @@
+import { Style } from "@mhesus/mcbe-colors";
 import { TokenSubstream } from "./stream";
 
-export interface TokenParser<T> {
-  parse(stream: TokenSubstream): TokenParserResult<T>;
+export abstract class TokenParser<T> {
+  abstract parse(stream: TokenSubstream): Token<T>;
+
+  toString() {
+    return this.constructor.name;
+  }
 }
 
-export class TokenParserResult<T> {
+export class Token<T> {
   readonly stream: TokenSubstream;
   readonly value: T;
 
@@ -21,6 +26,10 @@ export class TokenParserResult<T> {
     this.startPosition = stream.initialPosition;
     this.endPosition = stream.position;
     this.nextStreamPosition = stream.position;
+  }
+
+  get text() {
+    return this.stream.input.slice(this.startPosition, this.endPosition);
   }
 
   from(relativeStartPosition: number) {
@@ -42,8 +51,12 @@ export class TokenParserResult<T> {
     return this.from(relativeStartPosition).to(relativeEndPosition);
   }
 
+  resultSpan(result: Token<any>) {
+    return this.span(result.startPosition - this.stream.position, result.endPosition - this.stream.position);
+  }
+
   length(length: number) {
-    this.endPosition = this.startPosition + length - 1;
+    this.endPosition = this.startPosition + length;
 
     if (!this.isNextStreamPositionExplicitlySet) {
       this.nextStreamPosition = this.endPosition;
@@ -57,4 +70,26 @@ export class TokenParserResult<T> {
     this.isNextStreamPositionExplicitlySet = true;
     return this;
   }
+
+  map<U>(func: (value: T) => U) {
+    const result = new Token(this.stream, func(this.value));
+    result.startPosition = this.startPosition;
+    result.endPosition = this.endPosition;
+    result.nextStreamPosition = this.nextStreamPosition;
+    return result;
+  }
+
+  error(message: string) {
+    return this.stream.error(message).tokenSpan(this);
+  }
+
+  substream() {
+    return this.stream.substream(this.startPosition - this.stream.position, this.endPosition - this.stream.position);
+  }
+
+  toString() {
+    return `${this.stream.input.slice(0, this.startPosition)}${Style.white.bold("[")}${this.text}${Style.white.bold("]")}${this.stream.input.slice(this.endPosition)}`;
+  }
 }
+
+export type TokenValueType<T> = T extends Token<infer U> ? U : never;

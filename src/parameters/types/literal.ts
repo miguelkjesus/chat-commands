@@ -1,10 +1,9 @@
-import { ValueError } from "~/errors";
-
 import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
+import { LiteralParser } from "~/tokens";
 
 export class LiteralParameter<const Choices extends readonly string[] = readonly string[]> extends Parameter<
-  Choices extends readonly [] ? unknown : Choices[number],
+  Choices extends readonly [] ? string : Choices[number],
   string
 > {
   choices: Choices;
@@ -14,20 +13,12 @@ export class LiteralParameter<const Choices extends readonly string[] = readonly
     this.choices = choices;
   }
 
-  parseToken({ tokens, parsers }: ParameterParseTokenContext) {
-    return tokens.pop(parsers.literal(this.choices));
+  parseToken({ stream }: ParameterParseTokenContext) {
+    return stream.pop(new LiteralParser(this.choices as readonly string[]));
   }
 
   parseValue({ token }: ParameterParseValueContext<string>) {
-    if (!this.choices.includes(token)) {
-      if (this.choices.length > 1) {
-        throw new ValueError(`Expected one of the following: ${this.choices.join(", ")}`);
-      } else {
-        throw new ValueError(`Expected: ${this.choices[0]}`);
-      }
-    }
-
-    return token as Choices extends readonly [] ? unknown : Choices[number];
+    return token.value as Choices extends readonly [] ? string : Choices[number];
   }
 
   getSignature(): string {

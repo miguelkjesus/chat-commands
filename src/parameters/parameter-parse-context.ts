@@ -1,5 +1,5 @@
 import type { Player } from "@minecraft/server";
-import { parsers, type TokenStream } from "~/tokens";
+import { Token, type TokenSubstream } from "~/tokens";
 import type { Parameter } from "./types/parameter";
 
 export abstract class ParameterParseContext {
@@ -14,22 +14,21 @@ export abstract class ParameterParseContext {
   }
 }
 
-export class ParameterParseValueContext<Token> extends ParameterParseContext {
-  readonly token: Token;
+export class ParameterParseValueContext<T> extends ParameterParseContext {
+  readonly token: Token<T>;
 
-  constructor(player: Player, message: string, params: Record<string, Parameter>, token: Token) {
+  constructor(player: Player, message: string, params: Record<string, Parameter>, tokenResult: Token<T>) {
     super(player, message, params);
-    this.token = token;
+    this.token = tokenResult;
   }
 }
 
 export class ParameterParseTokenContext extends ParameterParseContext {
-  readonly tokens: TokenStream;
-  readonly parsers = parsers;
+  readonly stream: TokenSubstream;
 
-  constructor(player: Player, message: string, params: Record<string, Parameter>, tokens: TokenStream) {
+  constructor(player: Player, message: string, params: Record<string, Parameter>, stream: TokenSubstream) {
     super(player, message, params);
-    this.tokens = tokens;
+    this.stream = stream;
   }
 }
 

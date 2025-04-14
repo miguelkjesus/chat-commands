@@ -3,12 +3,12 @@ import { Style as s } from "@mhesus/mcbe-colors";
 
 import { ChatCommandError } from "~/errors";
 import { CommandCollection } from "./command-collection";
-import { CommandParser } from "./command-parser";
+import { CommandParser, TokenStream } from "~/tokens";
+import debug from "~/utils/debug";
 
 export class CommandManager {
   commands = new CommandCollection();
 
-  private parser = new CommandParser(this);
   private _isStarted = false;
   private _prefix!: string;
 
@@ -65,21 +65,36 @@ export class CommandManager {
   }
 
   private async processChatEvent(event: ChatSendBeforeEvent) {
-    const params = this.parser.getExecuteParameters(event);
+    const params = this.getCommandExecuteParams(event);
     if (!params) return;
 
-    event.cancel = true;
-    event.sender.sendMessage(s.darkGray(`You executed: ${event.message}`));
-
-    const [invocation] = params;
+    const { invocation, args } = params;
 
     try {
-      invocation.overload.execute(...params);
+      invocation.overload.execute(invocation, args);
     } catch (err) {
       console.error(err);
       throw new ChatCommandError(
         "Uh oh! There was an unexpected error while running this command!\nPlease contact the behaviour pack owner",
       );
+    }
+  }
+
+  private getCommandExecuteParams(event: ChatSendBeforeEvent) {
+    const stream = new TokenStream(event.message);
+
+    try {
+      const params = stream.pop(new CommandParser(this, event)).value;
+      if (!params) return;
+
+      event.cancel = true;
+      event.sender.sendMessage(s.gray(`You executed: ${event.message}`));
+
+      return params;
+    } catch (e) {
+      event.cancel = true;
+      event.sender.sendMessage(s.gray(`You executed: ${event.message}`));
+      throw e;
     }
   }
 

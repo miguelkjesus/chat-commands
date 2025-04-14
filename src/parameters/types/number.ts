@@ -1,5 +1,7 @@
-import { NumberRange } from "~/utils/range";
+import { NumberRange } from "~/utils/number-range";
 import { ValueError } from "~/errors";
+
+import { IntegerParser, NumberParser } from "~/tokens";
 
 import type {
   ParameterParseTokenContext,
@@ -8,19 +10,22 @@ import type {
 } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
 
-export class NumberParameter extends Parameter<number, string> {
+export class NumberParameter extends Parameter<number, number> {
   typeName = "number";
+
+  onlyIntegers = false;
 
   allowNaN = false;
   allowInf = false;
   range = new NumberRange({});
 
-  parseToken({ tokens }: ParameterParseTokenContext) {
-    return tokens.pop();
+  parseToken({ stream }: ParameterParseTokenContext) {
+    const parser = this.onlyIntegers ? new IntegerParser() : new NumberParser();
+    return stream.pop(parser);
   }
 
-  parseValue({ token }: ParameterParseValueContext<string>) {
-    return parseFloat(token);
+  parseValue({ token }: ParameterParseValueContext<number>) {
+    return token.value;
   }
 
   validate({ value }: ParameterValidateContext<number>): void {

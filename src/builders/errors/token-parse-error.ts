@@ -1,4 +1,7 @@
-import { TokenParseError } from "~/errors";
+import type { Token, TokenStream } from "~/tokens";
+import type { TokenParseError } from "~/errors";
+import { getWordEndIndex } from "~/utils/string";
+
 import { Builder } from "../builder";
 
 export class TokenParseErrorBuilder extends Builder<TokenParseError> {
@@ -18,24 +21,18 @@ export class TokenParseErrorBuilder extends Builder<TokenParseError> {
     return this;
   }
 
+  toWordEnd() {
+    return this.to(getWordEndIndex(this.state.stream.unparsed));
+  }
+
   span(relativeStartPosition: number, relativeEndPosition: number) {
     return this.from(relativeStartPosition).to(relativeEndPosition);
   }
 
-  withMessage(message: string) {
-    this.state.errorMessage = message;
-    return this;
-  }
-
-  expected(message: string) {
-    return this.withMessage(`Expected ${message}`);
-  }
-
-  unexpected(message: string) {
-    return this.withMessage(`Unexpected ${message}`);
-  }
-
-  invalid(message: string) {
-    return this.withMessage(`Invalid ${message}`);
+  tokenSpan(result: Token<any>) {
+    return this.span(
+      result.startPosition - this.state.stream.position,
+      result.endPosition - this.state.stream.position,
+    );
   }
 }

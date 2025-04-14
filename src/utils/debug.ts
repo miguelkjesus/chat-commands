@@ -1,21 +1,21 @@
 import { gray } from "@mhesus/mcbe-colors";
 import { world } from "@minecraft/server";
 
-/** @internal */
+const enabled = true;
+
 export function log(...args: any[]) {
+  if (!enabled) return;
   world.sendMessage(gray(args.map((arg) => `${arg}`).join(" ")));
 }
 
-/** @internal */
 export interface DirOptions {
   maxDepth?: number;
 }
 
-/** @internal */
 export function dir(object: any) {
+  if (!enabled) return;
   log(JSON.stringify(object, null, 2));
 }
 
-/** @internal */
-export const debug = Object.freeze({ log, dir });
+export const debug = { log, dir, enabled };
 export default debug;

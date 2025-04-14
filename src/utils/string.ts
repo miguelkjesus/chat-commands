@@ -1,4 +1,5 @@
 import { distance } from "fastest-levenshtein";
+import debug from "./debug";
 
 function closestWithDistance(str: string, arr: readonly string[]) {
   // Code modified from https://github.com/ka-weihe/fastest-levenshtein/blob/29f25a1409e09d703caf6746fa9b3a3230607d91/mod.ts#L129
@@ -17,7 +18,7 @@ function closestWithDistance(str: string, arr: readonly string[]) {
   return { closest: arr[minIndex], distance: minDistance };
 }
 
-export function fuzzySearch(str: string, arr: readonly string[], threshold?: number) {
+export function getBestMatch(str: string, arr: readonly string[], threshold?: number) {
   const { closest, distance } = closestWithDistance(str, arr);
 
   if (distance <= (threshold ?? Math.ceil(str.length * 0.3))) {
@@ -25,7 +26,7 @@ export function fuzzySearch(str: string, arr: readonly string[], threshold?: num
   }
 }
 
-export function fuzzyPrefixSearch(str: string, prefixes: readonly string[], threshold?: number): string | undefined {
+export function getBestPrefixMatch(str: string, prefixes: readonly string[], threshold?: number): string | undefined {
   if (!str || !prefixes.length) return undefined;
 
   let bestScore = -Infinity;
@@ -46,4 +47,13 @@ export function fuzzyPrefixSearch(str: string, prefixes: readonly string[], thre
   }
 
   return bestMatch;
+}
+
+export function getWordEndIndex(str: string) {
+  for (let i = 0; i < str.length; i++) {
+    if (/\s/.test(str[i])) {
+      return i;
+    }
+  }
+  return str.length;
 }
