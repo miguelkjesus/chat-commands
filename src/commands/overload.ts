@@ -4,8 +4,8 @@ import type { Arguments, Parameter } from "~/parameters";
 
 import type { Invocation } from "./invocation";
 import { Command } from "./command";
-
-// TODO cooldowns
+import { CooldownManager } from "./cooldown-manager";
+import { Style } from "@mhesus/mcbe-colors";
 
 export class Overload<Params extends Record<string, Parameter> = Record<string, Parameter>> {
   readonly parameters: Params;
@@ -15,6 +15,8 @@ export class Overload<Params extends Record<string, Parameter> = Record<string, 
 
   canPlayerUseCallback?: (player: Player) => boolean;
   executeCallback?: ExecuteCallback<this>;
+
+  private ownCooldownManager?: CooldownManager;
 
   constructor(parameters: Params, parent?: Overload) {
     this.parameters = parameters;
@@ -30,7 +32,27 @@ export class Overload<Params extends Record<string, Parameter> = Record<string, 
     return this.parent.command;
   }
 
+  get cooldownManager(): CooldownManager | undefined {
+    if (this.ownCooldownManager) return this.ownCooldownManager;
+    if (this.parent) return this.parent.cooldownManager;
+  }
+
+  set cooldownManager(cooldownManager: CooldownManager) {
+    this.ownCooldownManager = cooldownManager;
+  }
+
   execute(...params: Parameters<ExecuteCallback<this>>) {
+    const ctx = params[0];
+    const cooldown = Math.ceil((this.cooldownManager?.getRemainingTicks(ctx.player.id) ?? 0) / 20);
+
+    if (cooldown > 0) {
+      ctx.player.sendMessage(
+        Style.red(`You must wait ${cooldown} second${cooldown == 1 ? "" : "s"} before using this command again.`),
+      );
+      return;
+    }
+
+    this.cooldownManager?.trigger(ctx.player.id);
     return this.executeCallback?.(...params);
   }
 

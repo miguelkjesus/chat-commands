@@ -1,11 +1,11 @@
+import type { Simplify } from "~/utils/types";
 import { resolve, type Resolvable } from "~/utils/resolvers";
-import { Overload, type OverloadParameters } from "~/commands";
+import { CooldownManager, Overload, type OverloadParameters } from "~/commands";
 import { LiteralParameter } from "~/parameters";
 import { Parameters } from "~/api";
 
 import type { ParameterBuilder, ParametersFrom } from "../parameter-types";
 import { Builder } from "../builder";
-import { Simplify } from "~/utils/types";
 
 /**
  * A builder for creating and configuring command overloads. \
@@ -111,6 +111,29 @@ export class OverloadBuilder<State extends Overload> extends Builder<State> {
    */
   canPlayerUse(callback: State["canPlayerUseCallback"]) {
     this.state.canPlayerUseCallback = callback;
+    return this;
+  }
+
+  /**
+   * Sets a cooldown for an overload.
+   *
+   * @example
+   * home
+   *  .createOverload({ location: string() })
+   *  .setCooldownTicks(5 * 20); // 5 * 20 ticks = 5 seconds
+   *
+   * @param cooldownTicks
+   *    The cooldown for the command in ticks.
+   * @returns
+   *    The command builder instance.
+   */
+  setCooldownTicks(cooldownTicks: number) {
+    if (!this.state.cooldownManager) {
+      this.state.cooldownManager = new CooldownManager(cooldownTicks);
+    } else {
+      this.state.cooldownManager.cooldownTicks = cooldownTicks;
+    }
+
     return this;
   }
 }
