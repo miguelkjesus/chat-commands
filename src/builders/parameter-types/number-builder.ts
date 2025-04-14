@@ -9,31 +9,7 @@ import { ParameterBuilder } from "./parameter-builder";
  */
 export class NumberParameterBuilder extends ParameterBuilder<NumberParameter> {
   /**
-   * By default, the parameter will produce an error if the player inputs a non-numeric value, e.g.:
-   * - `!give money banana` → ❌ Invalid input
-   *
-   * Enabling this option allows the parameter to return `NaN` instead of throwing an error.
-   *
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/parseFloat#parsefloat_returning_nan | When does parseFloat() return NaN?}
-   *
-   * @example
-   * overload({ amount: number().allowNaN() })
-   * // "banana" will not error and instead return NaN.
-   *
-   * @param allowNaN
-   *    Whether to allow `NaN` as a valid value.
-   * @returns
-   *    A builder instance for configuring the parameter.
-   */
-  allowNaN(allowNaN = true) {
-    this.state.allowNaN = allowNaN;
-    return this;
-  }
-
-  /**
    * Allows or disallows infinity as a valid input.
-   *
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/parseFloat#returning_infinity | When does parseFloat() return Infinity?}
    *
    * @example
    * overload({ amount: number().allowInf() })

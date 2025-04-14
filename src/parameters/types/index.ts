@@ -5,3 +5,4 @@ export * from "./entity";
 export * from "./vector3";
 export * from "./literal";
 export * from "./parameter";
+export * from "./integer";

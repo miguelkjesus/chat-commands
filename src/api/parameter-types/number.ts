@@ -6,8 +6,8 @@ import { NumberParameter } from "~/parameters/types";
  * Number parameters allow the player to input any number: e.g.,
  *
  * **Example inputs:**
- * - `!money give 2.50`
- * - `!help 3`
+ * - `!deposit 10.50`
+ * - `!withdraw 3.25`
  *
  * @example
  * giveMoney.createOverload({ amount: number().gt(0) });
