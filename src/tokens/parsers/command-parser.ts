@@ -1,5 +1,4 @@
 import type { ChatSendAfterEvent } from "@minecraft/server";
-import { Style as s, Style } from "@mhesus/mcbe-colors";
 
 import { Command, CommandManager, Invocation, Overload } from "~/commands";
 import { Parameter, ParameterParseTokenContext } from "~/parameters";
@@ -10,7 +9,7 @@ import type { TokenSubstream } from "../stream";
 
 import { LiteralParser } from "./literal-parser";
 import { FuzzyParser } from "./fuzzy-parser";
-import debug from "~/utils/debug";
+import { Style } from "@mhesus/mcbe-colors";
 
 export interface ParsedCommand {
   invocation: Invocation;
@@ -76,9 +75,9 @@ export class CommandParser extends TokenParser<ParsedCommand | undefined> {
       if (!(e instanceof ChatCommandError)) throw e;
 
       const bestMatchToken = stream.pop(new FuzzyParser(usableAliases));
-      const suggestion = bestMatchToken.value ? ` Did you mean ${s.white(prefix + bestMatchToken.value)}?` : "";
+      const suggestion = bestMatchToken.value ? ` Did you mean ${Style.white(prefix + bestMatchToken.value)}?` : "";
       throw bestMatchToken.error(
-        `Unknown command.${suggestion}\nType ${s.white(prefix + "help")} for a list of commands!`,
+        `Unknown command.${suggestion}\nType ${Style.white(prefix + "help")} for a list of commands!`,
       ).state;
     }
   }
@@ -142,15 +141,6 @@ export class CommandParser extends TokenParser<ParsedCommand | undefined> {
 
   private parseParameter({ candidate, nextCandidates, candidateErrors }: ProcessCandidateContext, param: Parameter) {
     try {
-      debug.log(
-        Style.darkAqua(
-          `======== ${getOverloadSignatureSlice(candidate.overload, [
-            0,
-            Object.values(candidate.overload.parameters).indexOf(param) - 1,
-          ])} ${Style.aqua(param.getSignature())} =========`,
-        ),
-      );
-
       candidate.argumentTokens[param.id!] = param.parse(
         new ParameterParseTokenContext(
           this.event.sender,
@@ -179,8 +169,8 @@ export class CommandParser extends TokenParser<ParsedCommand | undefined> {
     const errorMessages = [...candidateErrors].flatMap(([candidate, { paramIdx, error }]) => {
       return [
         // s.gray(`${prefix}${candidate.overload.getSignature()}`),
-        error instanceof TokenParseError ? s.white(error.errorLocationString) : "TODO PARSE ERROR!",
-        `  - ${s.italic(error.message)}`,
+        error instanceof TokenParseError ? Style.white(error.errorLocationString) : "TODO PARSE ERROR!",
+        `  - ${Style.italic(error.message)}`,
       ].filter((v) => v !== undefined);
     });
 
@@ -189,7 +179,7 @@ export class CommandParser extends TokenParser<ParsedCommand | undefined> {
         "Oops! The command couldn't be executed due to the following errors:",
         ...errorMessages,
         "",
-        `Type ${s.white(`${prefix}help ${command.name}`)} for help with this command!`,
+        `Type ${Style.white(`${prefix}help ${command.name}`)} for help with this command!`,
       ].join("\n"),
     );
   }

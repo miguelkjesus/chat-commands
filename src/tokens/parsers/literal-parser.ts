@@ -1,6 +1,5 @@
 import { TokenParser, Token } from "../token";
 import type { TokenSubstream } from "../stream";
-import debug from "~/utils/debug";
 
 export class LiteralParser<Choices extends readonly string[] = readonly string[]> extends TokenParser<Choices[number]> {
   readonly choices: Choices;

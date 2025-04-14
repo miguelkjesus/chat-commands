@@ -1,10 +1,8 @@
 import { TokenParseErrorBuilder } from "~/builders";
-import { ParseError, TokenParseError } from "~/errors";
+import { TokenParseError } from "~/errors";
 
 import { Token, type TokenParser } from "./token";
 import { CharRef } from "./char-ref";
-import debug from "~/utils/debug";
-import { Style } from "@mhesus/mcbe-colors";
 
 export class TokenStream {
   readonly input: string;
@@ -19,28 +17,9 @@ export class TokenStream {
     return this.input.slice(this.position);
   }
 
-  static depth = 0;
-
   peek<T>(parser: TokenParser<T>): Token<T> {
     this.skipWhitespace();
-
-    const prefix = "  ".repeat(TokenStream.depth);
-
-    TokenStream.depth++;
-    debug.log(Style.orange(`${prefix}> ${parser}`));
-
-    try {
-      const token = parser.parse(this.substream());
-      debug.log(Style.green(`${prefix}< ${token}`));
-
-      return token;
-    } catch (e) {
-      if (!(e instanceof ParseError)) throw e;
-      debug.log(Style.red(`${prefix}!! ${e.name}: ${e.message}`));
-      throw e;
-    } finally {
-      TokenStream.depth--;
-    }
+    return parser.parse(this.substream());
   }
 
   apply(result: Token<any>) {

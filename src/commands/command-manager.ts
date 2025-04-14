@@ -4,7 +4,6 @@ import { Style as s } from "@mhesus/mcbe-colors";
 import { ChatCommandError } from "~/errors";
 import { CommandCollection } from "./command-collection";
 import { CommandParser, TokenStream } from "~/tokens";
-import debug from "~/utils/debug";
 
 export class CommandManager {
   commands = new CommandCollection();

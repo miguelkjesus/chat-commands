@@ -7,7 +7,6 @@ import type {
   ParameterValidateContext,
 } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
-import debug from "~/utils/debug";
 
 export class StringParameter extends Parameter<string, string> {
   typeName = "string";

@@ -6,7 +6,6 @@ import { type SchemaType, type SchemaTypeTokenType, Schema } from "~/utils/schem
 
 import { StringParser } from "./string-parser";
 import { LiteralParser } from "./literal-parser";
-import debug from "~/utils/debug";
 
 export class FilterParser<const S extends FilterSchema = FilterSchema> extends TokenParser<FilterFromSchema<S>> {
   readonly openingBracket: string;

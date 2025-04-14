@@ -1,5 +1,4 @@
 import { distance } from "fastest-levenshtein";
-import debug from "./debug";
 
 function closestWithDistance(str: string, arr: readonly string[]) {
   // Code modified from https://github.com/ka-weihe/fastest-levenshtein/blob/29f25a1409e09d703caf6746fa9b3a3230607d91/mod.ts#L129
