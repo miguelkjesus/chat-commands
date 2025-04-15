@@ -1,3 +1,4 @@
+import type { Style } from "@mhesus/mcbe-colors";
 import { distance } from "fastest-levenshtein";
 
 function closestWithDistance(str: string, arr: readonly string[]) {
@@ -48,17 +49,17 @@ export function getBestPrefixMatch(str: string, prefixes: readonly string[], thr
   return bestMatch;
 }
 
-export function getWordEndIndex(str: string) {
+export function getWordEndIndex(str: string, terminator = /\s/) {
   for (let i = 0; i < str.length; i++) {
-    if (/\s/.test(str[i])) {
+    if (terminator.test(str[i])) {
       return i;
     }
   }
   return str.length;
 }
 
-export function formatOr(choices: readonly string[]): string {
-  let formatted = choices.map((choice) => `"${choice}"`);
+export function formatOr(choices: readonly string[], highlight?: Style): string {
+  let formatted = choices.map((choice) => highlight?.(choice) ?? choice);
 
   if (!formatted || formatted.length === 0) {
     return "";
@@ -74,4 +75,28 @@ export function formatOr(choices: readonly string[]): string {
 
   const lastItem = formatted.pop()!;
   return `${formatted.join(", ")}, or ${lastItem}`;
+}
+
+export function formatAnd(choices: readonly string[], highlight?: Style): string {
+  let formatted = choices.map((choice) => highlight?.(choice) ?? choice);
+
+  if (!formatted || formatted.length === 0) {
+    return "";
+  }
+
+  if (formatted.length === 1) {
+    return formatted[0];
+  }
+
+  if (formatted.length === 2) {
+    return formatted[0] + " and " + formatted[1];
+  }
+
+  const lastItem = formatted.pop()!;
+  return `${formatted.join(", ")}, and ${lastItem}`;
+}
+
+export function didYouMean(invalidOption: string, options: readonly string[], highlight?: Style) {
+  const bestMatch = getBestMatch(invalidOption, options);
+  return bestMatch ? ` Did you mean ${highlight?.(bestMatch) ?? bestMatch}?` : "";
 }

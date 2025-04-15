@@ -3,17 +3,17 @@ import { EntityQueryOptions, GameMode, Vector3 } from "@minecraft/server";
 import { type TargetSelectorType, TargetSelector } from "~/utils/target-selector";
 import { NumberRange } from "~/utils/number-range";
 import { Schema } from "~/utils/schema";
-import { ParseError } from "~/errors";
 
 import { Token, TokenParser } from "../token";
 import type { TokenSubstream } from "../stream";
 
-import { Filter, FilterCriteria, FilterFromSchema, FilterParser, SchemaFromFilterParser } from "./filter-parser";
+import { Filter, FilterCriteria, FilterFromSchema, FilterParser, FilterSchema } from "./filter-parser";
 import { StringParser } from "./string-parser";
 import { TupleParser } from "./tuple-parser";
+import { Style } from "@mhesus/mcbe-colors";
 
 type TargetSelectorFilterParser = typeof TargetSelectorParser.targetSelectorFilterParser;
-type TargetSelectorFilter = FilterFromSchema<SchemaFromFilterParser<TargetSelectorFilterParser>>;
+type TargetSelectorFilter = FilterFromSchema<TargetSelectorFilterParser["schema"]>;
 
 export class TargetSelectorParser extends TokenParser<TargetSelector> {
   // keep up to date: https://wiki.bedrock.dev/commands/selectors#selector-arguments
@@ -45,11 +45,22 @@ export class TargetSelectorParser extends TokenParser<TargetSelector> {
       [Schema.defaultType]: new FilterParser("{", "}", {
         item: "string",
         location: "string",
-        quantity: "integer",
+        quantity: "integer-range",
         data: "integer",
         slot: "integer",
+        [FilterSchema.dependencies]: {
+          slot: ["location"],
+        },
       }),
     }),
+    [FilterSchema.dependencies]: {
+      x: ["y", "z"],
+      y: ["x", "z"],
+      z: ["x", "y"],
+      dx: ["dy", "dz"],
+      dy: ["dx", "dz"],
+      dz: ["dx", "dy"],
+    },
   });
 
   parse(stream: TokenSubstream): Token<TargetSelector> {
@@ -60,14 +71,14 @@ export class TargetSelectorParser extends TokenParser<TargetSelector> {
 
     const selectorTypeToken = this.parseTargetSelectorType(stream);
     const filterToken = this.parseTargetSelectorFilter(stream);
-    const entityQueryOptionsToken = filterToken.map((filter) => this.filterToEntityQueryOptions(filter));
+    const entityQueryOptionsToken = filterToken.map(() => this.mapFilterToEntityQueryOptions(filterToken));
 
     return stream.token(new TargetSelector(selectorTypeToken.value, entityQueryOptionsToken.value));
   }
 
   parseTargetSelectorType(stream: TokenSubstream): Token<TargetSelectorType> {
     if (stream.popChar() !== "@") {
-      throw stream.error("Expected '@' at the start of target selector type.").at(0).state;
+      throw stream.error(`Expected ${Style.white("@")} at the start of target selector type.`).at(0).state;
     }
 
     const typeCode = stream.popChar();
@@ -83,7 +94,7 @@ export class TargetSelectorParser extends TokenParser<TargetSelector> {
     const type = typeCode ? selectorTypeMap[typeCode] : (undefined as TargetSelectorType | undefined);
 
     if (type === undefined) {
-      throw stream.error(`Unknown entity selector type: @${typeCode}`).at(0).state;
+      throw stream.error(`Unknown entity selector type ${Style.white(`@${typeCode}`)}`).at(0).state;
     }
 
     return stream.token(type);
@@ -97,12 +108,12 @@ export class TargetSelectorParser extends TokenParser<TargetSelector> {
     return stream.pop(TargetSelectorParser.targetSelectorFilterParser);
   }
 
-  filterToEntityQueryOptions(filter: Filter): EntityQueryOptions {
+  mapFilterToEntityQueryOptions(filterToken: Token<Filter>): EntityQueryOptions {
     let query: EntityQueryOptions = {};
     let location: Partial<Vector3> = {};
     let volume: Partial<Vector3> = {};
 
-    this.switchFilterCriteria(filter, {
+    this.switchFilterCriteria(filterToken.value, {
       m: (criteria) => {
         const gamemodeMap = {
           "0": GameMode.survival,
@@ -132,7 +143,7 @@ export class TargetSelectorParser extends TokenParser<TargetSelector> {
               ? criteria.lastInclude!
               : criteria.exclude[excludeGamemodes.indexOf(undefined)]!;
 
-          throw badGamemode.error(`Unknown gamemode "${badGamemode.value}"`).state;
+          throw badGamemode.error(`Unknown gamemode ${Style.white(badGamemode.value)}`).state;
         }
 
         if ([includeGamemode, ...excludeGamemodes].includes("default")) {
@@ -143,7 +154,7 @@ export class TargetSelectorParser extends TokenParser<TargetSelector> {
               ? criteria.lastInclude!
               : criteria.exclude[excludeGamemodes.indexOf("default")]!;
 
-          throw badGamemode.error(`"default" gamemode is not yet supported!`).state;
+          throw badGamemode.error(`${Style.white("default")} gamemode is not yet supported!`).state;
         }
 
         query.gameMode = includeGamemode;
@@ -182,7 +193,7 @@ export class TargetSelectorParser extends TokenParser<TargetSelector> {
 
         // hasitem not supported by entity query options. Need to implement this manually.
 
-        throw criteria.lastInclude.error("hasitem is not supported yet!").state;
+        throw criteria.lastInclude.error(`${Style.white("hasitem")} is not supported yet!`).state;
       },
 
       type: (criteria) => {
@@ -266,16 +277,18 @@ export class TargetSelectorParser extends TokenParser<TargetSelector> {
       },
     });
 
+    // These should be caught in the schema.
+
     if (location.x && location.y && location.z) {
       query.location = location as Vector3;
     } else if (location.x || location.y || location.z) {
-      throw new ParseError("Location must have all x, y and z coordinates.");
+      throw new Error("Location must have all x, y and z coordinates.");
     }
 
     if (volume.x && volume.y && volume.z) {
       query.volume = volume as Vector3;
     } else if (volume.x || volume.y || volume.z) {
-      throw new ParseError("Volume must have all x, y and z coordinates.");
+      throw new Error("Volume must have all x, y and z coordinates.");
     }
 
     return query;

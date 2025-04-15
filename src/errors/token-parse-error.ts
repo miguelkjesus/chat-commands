@@ -1,4 +1,4 @@
-import { TokenStream, type Token } from "~/tokens";
+import { TokenStream } from "~/tokens";
 
 import { ParseError } from "./parse-error";
 import { Style } from "@mhesus/mcbe-colors";
@@ -22,6 +22,6 @@ export class TokenParseError extends ParseError {
     const end = this.stream.input.slice(this.endPosition);
     const token = this.stream.input.slice(this.startPosition, this.endPosition);
 
-    return `${start}${Style.red.bold(">>")} ${token} ${Style.red.bold("<<")}${end}`;
+    return `${start}${Style.red.bold(">>")}${token}${Style.red.bold("<<")}${end}`;
   }
 }

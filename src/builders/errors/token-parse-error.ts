@@ -21,8 +21,8 @@ export class TokenParseErrorBuilder extends Builder<TokenParseError> {
     return this;
   }
 
-  toWordEnd() {
-    return this.to(getWordEndIndex(this.state.stream.unparsed));
+  toWordEnd(terminator?: RegExp) {
+    return this.to(getWordEndIndex(this.state.stream.unparsed, terminator));
   }
 
   span(relativeStartPosition: number, relativeEndPosition: number) {

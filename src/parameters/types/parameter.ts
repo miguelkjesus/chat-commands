@@ -25,7 +25,9 @@ export abstract class Parameter<Value = any, TokenType = any> {
   parse(context: ParameterParseTokenContext): Token<Value | undefined> {
     if (context.stream.isEmpty()) {
       if (this.optional) return context.stream.token(undefined).from(0).length(0);
-      throw new ParseError(`"${this.name}" is a required parameter!`);
+      throw context.stream
+        .error(`Expected a${"aeiou".includes(this.typeName[0]) ? "n" : ""} ${this.typeName} parameter!`)
+        .at(0).state;
     }
 
     const result = this.parseToken(context);

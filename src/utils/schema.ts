@@ -28,7 +28,7 @@ export interface Schema {
 }
 
 // prettier-ignore
-export type ResolvedSchemaType<T extends SchemaType> =
+export type ResolvedSchemaType<T extends SchemaType = SchemaType> =
   T extends "string" ? string :
   T extends "number" ? number :
   T extends "integer" ? number :
@@ -38,10 +38,10 @@ export type ResolvedSchemaType<T extends SchemaType> =
   T extends TupleParser<infer ListParserSchema> ? ListFromTupleSchema<ListParserSchema> :
   never;
 
-export type SchemaTypeTokenType<T extends SchemaType> = Token<ResolvedSchemaType<T>>;
+export type SchemaTypeTokenType<T extends SchemaType = SchemaType> = Token<ResolvedSchemaType<T>>;
 
 // prettier-ignore
-export type SchemaTypeParserType<T extends SchemaType> =
+export type SchemaTypeParserType<T extends SchemaType = SchemaType> =
   T extends "string" ? StringParser :
   T extends "number" ? NumberParser :
   T extends "integer" ? IntegerParser :

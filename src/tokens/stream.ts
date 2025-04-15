@@ -33,7 +33,7 @@ export class TokenStream {
   }
 
   error(message: string) {
-    return new TokenParseErrorBuilder(new TokenParseError(message, this.position, this.input.length - 1, this));
+    return new TokenParseErrorBuilder(new TokenParseError(message, this.position, this.input.length, this));
   }
 
   isEmpty() {

@@ -6,6 +6,8 @@ import { type SchemaType, type SchemaTypeTokenType, Schema } from "~/utils/schem
 
 import { StringParser } from "./string-parser";
 import { LiteralParser } from "./literal-parser";
+import { didYouMean, formatAnd } from "~/utils/string";
+import { Style } from "@mhesus/mcbe-colors";
 
 export class FilterParser<const S extends FilterSchema = FilterSchema> extends TokenParser<FilterFromSchema<S>> {
   readonly openingBracket: string;
@@ -54,7 +56,7 @@ export class FilterParser<const S extends FilterSchema = FilterSchema> extends T
 
       if (next === this.closingBracket) {
         stream.popChar();
-        return stream.token(filter as FilterFromSchema<S>);
+        break;
       } else if (next === ",") {
         stream.popChar();
         continue;
@@ -62,37 +64,60 @@ export class FilterParser<const S extends FilterSchema = FilterSchema> extends T
         throw new Error(`Expected ${this.closingBracket} or "," but got "${next}".`);
       }
     }
+
+    const filterToken = stream.token(filter as FilterFromSchema<S>);
+
+    for (const [key, dependencies] of Object.entries(this.schema[FilterSchema.dependencies] ?? {})) {
+      if (!filterToken.value[key]) continue;
+
+      const missingDependencies = dependencies.filter((dependency) => !filterToken.value[dependency]);
+      if (missingDependencies.length === 0) continue;
+
+      throw filterToken.error(
+        `Filter variable ${Style.white(key)} also requires ${formatAnd(dependencies, Style.white)} to be defined.`,
+      ).state;
+    }
+
+    return filterToken;
+  }
+
+  private isFilterEnded(stream: TokenSubstream): boolean {
+    stream.skipWhitespace();
+    const next = stream.peekChar();
+
+    return !next || next === this.closingBracket || next === ",";
   }
 
   private parseKey(stream: TokenSubstream): Token<string> {
-    if (stream.isEmpty()) {
-      throw stream.error("Expected a key.").state;
+    if (this.isFilterEnded(stream)) {
+      throw stream.error("Expected a filter variable.").at(0).state;
     }
 
     let keyToken = stream.pop(new StringParser({ terminator: /[=!\s]/ })); // Get the name of the key: e.g., "gamemode=..." -> "gamemode"
 
     if (keyToken.value.length === 0) {
-      throw stream.error("Missing key.").state;
+      throw keyToken.error("Expected a filter variable.").state;
     }
 
     if (this.schema[keyToken.value] === undefined && this.schema[Schema.defaultType] === undefined) {
-      throw stream.error(`Unknown key "${keyToken.value}".`).state;
+      const suggestion = didYouMean(keyToken.value, Object.keys(this.schema), Style.white);
+      throw keyToken.error(`Unknown filter variable.${suggestion}`).state;
     }
 
     return keyToken;
   }
 
   private parseComparisonOperator(stream: TokenSubstream): Token<string> {
-    if (stream.isEmpty()) {
-      throw stream.error("Expected a comparison operator (= or =!).").state;
+    if (this.isFilterEnded(stream)) {
+      throw stream.error("Expected a comparison operator (= or =!).").at(0).state;
     }
 
     return stream.pop(new LiteralParser(["=", "=!"]));
   }
 
   private parseValue<Key extends string>(stream: TokenSubstream, key: Key) {
-    if (stream.isEmpty()) {
-      throw stream.error("Expected a value.").state;
+    if (this.isFilterEnded(stream)) {
+      throw stream.error("Expected a value.").at(0).state;
     }
 
     let schemaType = this.schema[key] ?? this.schema[Schema.defaultType];
@@ -110,7 +135,7 @@ export class FilterParser<const S extends FilterSchema = FilterSchema> extends T
 // Filter
 
 export interface Filter {
-  [key: string]: FilterCriteria<SchemaTypeTokenType<SchemaType>> | undefined;
+  [key: string]: FilterCriteria<SchemaTypeTokenType> | undefined;
 }
 
 export class FilterCriteria<T> {
@@ -134,14 +159,19 @@ export class FilterCriteria<T> {
 // Schema
 
 export interface FilterSchema extends Schema {
+  [FilterSchema.dependencies]?: { [key: string]: string[] };
   [key: string]: SchemaType;
 }
 
-// prettier-ignore
-export type FilterFromSchema<Schema extends FilterSchema> = Simplify<{
-  [Key in keyof Schema as Key extends typeof Schema.defaultType 
-    ? Exclude<string, keyof Schema> 
-    : Key]?: FilterCriteria<SchemaTypeTokenType<Schema[Key]>>;
-}>;
+export namespace FilterSchema {
+  export const dependencies = Symbol("Schema.dependencies");
+}
 
-export type SchemaFromFilterParser<Parser extends FilterParser> = Parser extends FilterParser<infer S> ? S : never;
+// prettier-ignore
+export type FilterFromSchema<S extends FilterSchema> = Simplify<{
+  [Key in keyof S as Key extends symbol 
+    ? Key extends typeof Schema.defaultType 
+      ? Exclude<string, keyof S> 
+      : never
+    : Key]?: FilterCriteria<SchemaTypeTokenType<S[Key]>>;
+}>;

@@ -176,7 +176,7 @@ export class CommandParser extends TokenParser<ParsedCommand | undefined> {
 
     throw new ParseError(
       [
-        "Oops! The command couldn't be executed due to the following errors:",
+        "Oops! The command failed with the following errors:",
         ...errorMessages,
         "",
         `Type ${Style.white(`${prefix}help ${command.name}`)} for help with this command!`,

@@ -56,7 +56,9 @@ export interface TupleSchema extends Schema {
 
 // prettier-ignore
 export type ListFromTupleSchema<S extends TupleSchema> = Simplify<{
-  [Index in keyof S as Index extends typeof Schema.defaultType
-    ? Exclude<number, keyof S>
+  [Index in keyof S as Index extends symbol
+    ? Index extends typeof Schema.defaultType
+      ? Exclude<string, keyof S>
+      : never
     : Index]?: SchemaTypeTokenType<S[Index] extends SchemaType ? S[Index] : never>;
 }>;

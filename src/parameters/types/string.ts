@@ -3,6 +3,7 @@ import { RemainingParser, StringParser } from "~/tokens";
 import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
 import { formatOr } from "~/utils/string";
+import { Style } from "@mhesus/mcbe-colors";
 
 export class StringParameter extends Parameter<string, string> {
   typeName = "string";
@@ -57,7 +58,7 @@ export class StringParameter extends Parameter<string, string> {
 
     if (this.choices && !this.choices.values.includes(value)) {
       throw token.error(
-        this.choices.failMessage ?? `Expected one of the following values: ${formatOr(this.choices.values)}`,
+        this.choices.failMessage ?? `Expected one of the following values: ${formatOr(this.choices.values, Style.white)}`,
       ).state;
     }
 
