@@ -169,7 +169,7 @@ export class CommandParser extends TokenParser<ParsedCommand | undefined> {
     const errorMessages = [...candidateErrors].flatMap(([candidate, { paramIdx, error }]) => {
       return [
         // s.gray(`${prefix}${candidate.overload.getSignature()}`),
-        error instanceof TokenParseError ? Style.white(error.errorLocationString) : "TODO PARSE ERROR!",
+        error instanceof TokenParseError ? Style.white(error.errorLocationString) : error.name,
         `  - ${Style.italic(error.message)}`,
       ].filter((v) => v !== undefined);
     });

@@ -1,12 +1,8 @@
 import { RemainingParser, StringParser } from "~/tokens";
-import { ValueError } from "~/errors";
 
-import type {
-  ParameterParseTokenContext,
-  ParameterParseValueContext,
-  ParameterValidateContext,
-} from "../parameter-parse-context";
+import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
+import { formatOr } from "~/utils/string";
 
 export class StringParameter extends Parameter<string, string> {
   typeName = "string";
@@ -20,7 +16,10 @@ export class StringParameter extends Parameter<string, string> {
     failMessage?: string;
   };
 
-  // TODO choices
+  choices?: {
+    values: readonly string[];
+    failMessage?: string;
+  };
 
   parseToken({ stream, params }: ParameterParseTokenContext) {
     const paramArray = Object.values(params);
@@ -32,31 +31,37 @@ export class StringParameter extends Parameter<string, string> {
   }
 
   parseValue({ token }: ParameterParseValueContext<string>) {
-    return token.value;
-  }
+    const { value } = token;
 
-  validate({ value }: ParameterValidateContext<string>) {
     if (this.notEmpty && value === "") {
-      throw new ValueError(`Expected a non-empty string`);
+      throw token.error(`Expected a non-empty string`).state;
     }
 
     if (this.minLength === this.maxLength && value.length !== this.minLength) {
-      throw new ValueError(`Expected a string with a length of ${this.minLength}`);
+      throw token.error(`Expected a string with a length of ${this.minLength}`).state;
     }
 
     if (value.length < this.minLength) {
-      throw new ValueError(`String too short! Expected a length of at least ${this.minLength}`);
+      throw token.error(`String too short! Expected a length of at least ${this.minLength}`).state;
     }
 
     if (value.length > this.maxLength) {
-      throw new ValueError(`String too long! Expected a length of at most ${this.maxLength}`);
+      throw token.error(`String too long! Expected a length of at most ${this.maxLength}`).state;
     }
 
     if (this.pattern && !this.pattern.value.test(value)) {
-      throw new ValueError(
+      throw token.error(
         this.pattern.failMessage ?? `Expected a string matching the pattern ${regexToString(this.pattern.value)}`,
-      );
+      ).state;
     }
+
+    if (this.choices && !this.choices.values.includes(value)) {
+      throw token.error(
+        this.choices.failMessage ?? `Expected one of the following values: ${formatOr(this.choices.values)}`,
+      ).state;
+    }
+
+    return value;
   }
 }
 

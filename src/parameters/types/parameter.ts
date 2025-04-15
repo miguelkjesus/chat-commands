@@ -1,10 +1,6 @@
 import { ParseError } from "~/errors";
 
-import {
-  ParameterParseTokenContext,
-  ParameterParseValueContext,
-  ParameterValidateContext,
-} from "../parameter-parse-context";
+import { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Token } from "~/tokens";
 
 // TODO introduce system for users to raise custom parameter errors
@@ -25,7 +21,6 @@ export abstract class Parameter<Value = any, TokenType = any> {
 
   abstract parseToken(context: ParameterParseTokenContext): Token<TokenType>;
   abstract parseValue(context: ParameterParseValueContext<TokenType>): Value;
-  validate(context: ParameterValidateContext<Value>) {}
 
   parse(context: ParameterParseTokenContext): Token<Value | undefined> {
     if (context.stream.isEmpty()) {
@@ -37,7 +32,6 @@ export abstract class Parameter<Value = any, TokenType = any> {
     const value = this.parseValue(
       new ParameterParseValueContext(context.player, context.message, context.params, result),
     );
-    this.validate(new ParameterValidateContext(context.player, context.message, context.params, value));
 
     return result.map(() => value);
   }

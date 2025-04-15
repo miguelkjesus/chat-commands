@@ -31,12 +31,3 @@ export class ParameterParseTokenContext extends ParameterParseContext {
     this.stream = stream;
   }
 }
-
-export class ParameterValidateContext<Value> extends ParameterParseContext {
-  readonly value: Value;
-
-  constructor(player: Player, message: string, params: Record<string, Parameter>, value: Value) {
-    super(player, message, params);
-    this.value = value;
-  }
-}

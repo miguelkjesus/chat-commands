@@ -1,3 +1,5 @@
+import { formatOr } from "~/utils/string";
+
 import { TokenParser, Token } from "../token";
 import type { TokenSubstream } from "../stream";
 
@@ -26,30 +28,11 @@ export class LiteralParser<Choices extends readonly string[] = readonly string[]
     if (this.choices.length === 1) {
       throw stream.error(`Expected "${this.choices[0]}"`).toWordEnd().state;
     } else {
-      throw stream.error(`Expected either: ${formatChoices(this.choices)}.`).toWordEnd().state;
+      throw stream.error(`Expected either: ${formatOr(this.choices)}.`).toWordEnd().state;
     }
   }
 
   toString(): string {
     return `LiteralParser (${this.choices.map((choice) => `"${choice}"`).join(", ")})`;
   }
-}
-
-function formatChoices(choices: readonly string[]): string {
-  let formatted = choices.map((choice) => `"${choice}"`);
-
-  if (!formatted || formatted.length === 0) {
-    return "";
-  }
-
-  if (formatted.length === 1) {
-    return formatted[0];
-  }
-
-  if (formatted.length === 2) {
-    return formatted[0] + " or " + formatted[1];
-  }
-
-  const lastItem = formatted.pop()!;
-  return `${formatted.join(", ")}, or ${lastItem}`;
 }

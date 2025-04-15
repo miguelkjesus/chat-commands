@@ -75,15 +75,10 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
     });
 
   help
-    .createOverload({ commandName: string("command") })
+    .createOverload({ commandName: string("command").setChoices(manager.commands.aliases(), "Unknown command.") })
     .setDescription("Get help on a specific command")
     .onExecute((ctx, { commandName }) => {
-      const command = ctx.manager.commands.get(commandName);
-      if (command === undefined) {
-        ctx.player.sendMessage(c.error("Unknown command."));
-        return;
-      }
-
+      const command = ctx.manager.commands.get(commandName)!;
       const banner = `${"-".repeat(10)}[${c.highlight(`${ctx.manager.prefix}help ${c.mute(command.name)}`)}]${"-".repeat(10)}`;
 
       const signatures = command

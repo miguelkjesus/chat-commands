@@ -22,7 +22,7 @@ export class PlayerParameter extends Parameter<Player, string> {
       const bestMatch = getBestMatch(name, playerNames);
       const suggestion = bestMatch ? ` Did you mean ${bestMatch}?` : "";
 
-      throw token.error(`${name} is not a valid player.${suggestion}`);
+      throw token.error(`${name} is not a valid player.${suggestion}`).state;
     }
 
     return target;

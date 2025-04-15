@@ -121,4 +121,23 @@ export class StringParameterBuilder extends ParameterBuilder<StringParameter> {
     this.state.pattern = { value: pattern, failMessage };
     return this;
   }
+
+  /**
+   * Restricts the input to the given choices.
+   *
+   * @example
+   * help.createOverload({
+   *   command: string().setChoices(manager.commands.aliases(), "Invalid command name.")
+   * });
+   * // !setMode insane -> ❌ Input must be one of: easy, medium, hard.
+   *
+   * @param choices
+   *    The list of valid choices for the input.
+   * @returns
+   *    The current builder instance.
+   */
+  setChoices(choices: readonly string[], failMessage?: string) {
+    this.state.choices = { values: choices, failMessage };
+    return this;
+  }
 }

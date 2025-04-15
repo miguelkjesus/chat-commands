@@ -56,3 +56,22 @@ export function getWordEndIndex(str: string) {
   }
   return str.length;
 }
+
+export function formatOr(choices: readonly string[]): string {
+  let formatted = choices.map((choice) => `"${choice}"`);
+
+  if (!formatted || formatted.length === 0) {
+    return "";
+  }
+
+  if (formatted.length === 1) {
+    return formatted[0];
+  }
+
+  if (formatted.length === 2) {
+    return formatted[0] + " or " + formatted[1];
+  }
+
+  const lastItem = formatted.pop()!;
+  return `${formatted.join(", ")}, or ${lastItem}`;
+}

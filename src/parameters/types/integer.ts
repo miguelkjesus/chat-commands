@@ -1,15 +1,8 @@
-import { NumberRange } from "~/utils/number-range";
-import { ValueError } from "~/errors";
-
+import { IntegerRange } from "~/utils/integer-range";
 import { IntegerParser } from "~/tokens";
 
-import type {
-  ParameterParseTokenContext,
-  ParameterParseValueContext,
-  ParameterValidateContext,
-} from "../parameter-parse-context";
+import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
-import { IntegerRange } from "~/utils/integer-range";
 
 export class IntegerParameter extends Parameter<number, number> {
   typeName = "integer";
@@ -21,20 +14,20 @@ export class IntegerParameter extends Parameter<number, number> {
   }
 
   parseValue({ token }: ParameterParseValueContext<number>) {
-    return token.value;
-  }
+    const { value } = token;
 
-  validate({ value }: ParameterValidateContext<number>): void {
     if (Number.isNaN(value)) {
-      throw new ValueError(`Expected a number`);
+      throw token.error(`Expected a number`).state;
     }
 
     if (this.range.min && this.range.min > value) {
-      throw new ValueError(`Expected a number that is at least ${this.range.min}`);
+      throw token.error(`Expected a number that is at least ${this.range.min}`).state;
     }
 
     if (this.range.max && this.range.max < value) {
-      throw new ValueError(`Expected a number that is at most ${this.range.max}`);
+      throw token.error(`Expected a number that is at most ${this.range.max}`).state;
     }
+
+    return value;
   }
 }
