@@ -34,14 +34,14 @@ export class TupleParser<const S extends TupleSchema = TupleSchema> extends Toke
 
   parseValue<Index extends number>(stream: TokenSubstream, index: Index) {
     if (stream.isEmpty()) {
-      throw stream.error("Expected a value.");
+      throw stream.error("Expected a value.").state;
     }
 
     let schemaType = this.schema[index] ?? this.schema[Schema.defaultType];
 
     if (schemaType === undefined) {
       const guessedToken = stream.pop(new StringParser({ terminator: /[\s,\]]/ }));
-      throw guessedToken.error(`No parser found for index ${index}.`);
+      throw guessedToken.error(`No parser found for index ${index}.`).state;
     }
 
     // FIXME any

@@ -74,7 +74,7 @@ export class TokenStream {
     }
 
     if (!foundWhitespace && this.position < this.unparsed.length - 1) {
-      throw this.error("Expected whitespace.");
+      throw this.error("Expected whitespace.").state;
     }
   }
 

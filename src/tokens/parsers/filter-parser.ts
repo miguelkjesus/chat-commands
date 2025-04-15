@@ -66,17 +66,17 @@ export class FilterParser<const S extends FilterSchema = FilterSchema> extends T
 
   private parseKey(stream: TokenSubstream): Token<string> {
     if (stream.isEmpty()) {
-      throw stream.error("Expected a key.");
+      throw stream.error("Expected a key.").state;
     }
 
     let keyToken = stream.pop(new StringParser({ terminator: /[=!\s]/ })); // Get the name of the key: e.g., "gamemode=..." -> "gamemode"
 
     if (keyToken.value.length === 0) {
-      throw stream.error("Missing key.");
+      throw stream.error("Missing key.").state;
     }
 
     if (this.schema[keyToken.value] === undefined && this.schema[Schema.defaultType] === undefined) {
-      throw stream.error(`Unknown key "${keyToken.value}".`);
+      throw stream.error(`Unknown key "${keyToken.value}".`).state;
     }
 
     return keyToken;
@@ -84,7 +84,7 @@ export class FilterParser<const S extends FilterSchema = FilterSchema> extends T
 
   private parseComparisonOperator(stream: TokenSubstream): Token<string> {
     if (stream.isEmpty()) {
-      throw stream.error("Expected a comparison operator (= or =!).");
+      throw stream.error("Expected a comparison operator (= or =!).").state;
     }
 
     return stream.pop(new LiteralParser(["=", "=!"]));
@@ -92,7 +92,7 @@ export class FilterParser<const S extends FilterSchema = FilterSchema> extends T
 
   private parseValue<Key extends string>(stream: TokenSubstream, key: Key) {
     if (stream.isEmpty()) {
-      throw stream.error("Expected a value.");
+      throw stream.error("Expected a value.").state;
     }
 
     let schemaType = this.schema[key] ?? this.schema[Schema.defaultType];

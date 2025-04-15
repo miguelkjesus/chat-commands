@@ -11,7 +11,7 @@ export class NumberParser extends TokenParser<number> {
 
     if (token.value === null) {
       const guessedToken = stream.pop(new WordParser());
-      throw guessedToken.error("Expected a valid number.").toWordEnd().state;
+      throw guessedToken.error("Expected a valid number.").state;
     }
 
     const num = parseFloat(token.value);
