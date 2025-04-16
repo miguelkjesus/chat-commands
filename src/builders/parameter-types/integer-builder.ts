@@ -12,15 +12,15 @@ export class IntegerParameterBuilder extends ParameterBuilder<IntegerParameter> 
    * Restricts the input to numbers at least some value.
    *
    * @example
-   * overload({ amount: integer().min(10) })
+   * overload({ amount: integer().setMin(10) })
    * // Restricts the input to any number >= 10.
    *
-   * @param gt
+   * @param min
    *    What the minimum input should be.
    * @returns
    *    The current builder instance.
    */
-  min(min: number) {
+  setMin(min: number) {
     this.state.range.min = min;
     return this;
   }
@@ -29,15 +29,15 @@ export class IntegerParameterBuilder extends ParameterBuilder<IntegerParameter> 
    * Restricts the input to numbers at most some value.
    *
    * @example
-   * overload({ amount: integer().max(50) })
+   * overload({ amount: integer().setMax(50) })
    * // Restricts the input to any number <= 50.
    *
-   * @param gt
+   * @param max
    *    What the maximum input should be.
    * @returns
    *    The current builder instance.
    */
-  max(max: number) {
+  setMax(max: number) {
     this.state.range.max = max;
     return this;
   }
