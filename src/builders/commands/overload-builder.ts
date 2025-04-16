@@ -1,5 +1,5 @@
 import type { Simplify } from "~/utils/types";
-import { resolve, type Resolvable } from "~/utils/resolvers";
+import { resolve, type CallbackOrValue } from "~/utils/resolvers";
 import { CooldownManager, Overload, type OverloadParameters } from "~/commands";
 import { LiteralParameter } from "~/parameters";
 import { Parameters } from "~/api";
@@ -48,7 +48,7 @@ export class OverloadBuilder<State extends Overload> extends Builder<State> {
    *    A builder for further configuring the overload.
    */
   createOverload<ParamBuilders extends Record<string, ParameterBuilder>>(
-    parameters: ParamBuilders extends Record<any, never> ? never : Resolvable<(params: Parameters) => ParamBuilders>,
+    parameters: ParamBuilders extends Record<any, never> ? never : CallbackOrValue<ParamBuilders, [params: Parameters]>,
   ): OverloadBuilderFromParent<State, ParamBuilders> {
     // TODO refactor how builders work such that either
     //  - they are constructed and readonly

@@ -1,7 +1,7 @@
-import { type Callable, isCallable } from "./types";
+import { isCallable } from "./types";
 
-export function resolve<Value, const Params extends any[]>(
-  resolvable: Resolvable<(...params: Params) => Value>,
+export function resolve<Value, Params extends readonly any[]>(
+  resolvable: CallbackOrValue<Value, [...Params]>,
   params: Params,
 ) {
   if (isCallable(resolvable)) {
@@ -10,8 +10,10 @@ export function resolve<Value, const Params extends any[]>(
   return resolvable;
 }
 
-export type Resolvable<Resolver extends Callable = Callable> = Resolver | ReturnType<Resolver>;
+export type CallbackOrValue<Value = any, CallbackParams extends readonly any[] = readonly any[]> =
+  | ((...args: CallbackParams) => Value)
+  | Value;
 
-export type Resolver<T extends Resolvable> = T extends Resolvable<infer R> ? R : never;
+export type CallbackOf<T extends CallbackOrValue> = T extends CallbackOrValue<any, infer C> ? C : never;
 
-export type Resolved<T extends Resolvable> = ReturnType<Resolver<T>>;
+export type ValueOf<T extends CallbackOrValue> = T extends CallbackOrValue<infer V> ? V : never;
