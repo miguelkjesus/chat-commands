@@ -16,11 +16,13 @@ import { TargetSelectorParser } from "~/tokens";
 import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
 
-export class EntityParameter extends Parameter<Entity[], TargetSelector> {
+export class TargetSelectorParameter extends Parameter<Entity[], TargetSelector> {
   typeName = "entity";
 
   maxCount = Infinity;
   minCount = 0;
+
+  // TODO add a selector which input must match
 
   parseToken({ stream }: ParameterParseTokenContext) {
     return stream.pop(new TargetSelectorParser());
