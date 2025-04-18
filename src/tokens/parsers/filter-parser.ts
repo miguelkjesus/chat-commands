@@ -1,13 +1,16 @@
-import { TokenParser, Token } from "../token";
-import type { TokenSubstream } from "../stream";
+import { Style } from "@mhesus/mcbe-colors";
 
 import type { Simplify } from "~/utils/types";
 import { type SchemaType, type SchemaTypeTokenType, Schema } from "~/utils/schema";
+import { didYouMean, formatAnd } from "~/utils/string";
+
+import type { TokenSubstream } from "../stream";
+import { TokenParser, Token } from "../token";
 
 import { StringParser } from "./string-parser";
 import { LiteralParser } from "./literal-parser";
-import { didYouMean, formatAnd } from "~/utils/string";
-import { Style } from "@mhesus/mcbe-colors";
+import { TupleParser } from "./tuple-parser";
+import { WordParser } from "./word-parser";
 
 export class FilterParser<const S extends FilterSchema = FilterSchema> extends TokenParser<FilterFromSchema<S>> {
   readonly openingBracket: string;
@@ -25,16 +28,12 @@ export class FilterParser<const S extends FilterSchema = FilterSchema> extends T
     const first = stream.popChar();
 
     if (first !== this.openingBracket) {
-      throw stream.error(`Expected an opening bracket: ${this.openingBracket}`).at(0);
+      throw stream.error(`Expected an opening bracket ${Style.white(this.openingBracket)}`).at(-1).state;
     }
 
     const filter: Filter = {};
 
     while (true) {
-      if (stream.isEmpty()) {
-        throw stream.error(`Expected a closing bracket: ${this.closingBracket}`).at(0);
-      }
-
       const keyToken = this.parseKey(stream);
       const operatorToken = this.parseComparisonOperator(stream);
       const valueToken = this.parseValue(stream, keyToken.value);
@@ -59,9 +58,8 @@ export class FilterParser<const S extends FilterSchema = FilterSchema> extends T
         break;
       } else if (next === ",") {
         stream.popChar();
-        continue;
       } else {
-        throw new Error(`Expected ${this.closingBracket} or "," but got "${next}".`);
+        throw stream.error(`Expected ${Style.white(this.closingBracket)} or ${Style.white(",")}.`).at(0).state;
       }
     }
 
@@ -93,7 +91,7 @@ export class FilterParser<const S extends FilterSchema = FilterSchema> extends T
       throw stream.error("Expected a filter variable.").at(0).state;
     }
 
-    let keyToken = stream.pop(new StringParser({ terminator: /[=!\s]/ })); // Get the name of the key: e.g., "gamemode=..." -> "gamemode"
+    let keyToken = stream.pop(new StringParser({ terminator: /[=!\s\]\,]/ })); // Get the name of the key: e.g., "gamemode=..." -> "gamemode"
 
     if (keyToken.value.length === 0) {
       throw keyToken.error("Expected a filter variable.").state;
@@ -109,7 +107,7 @@ export class FilterParser<const S extends FilterSchema = FilterSchema> extends T
 
   private parseComparisonOperator(stream: TokenSubstream): Token<string> {
     if (this.isFilterEnded(stream)) {
-      throw stream.error("Expected a comparison operator (= or =!).").at(0).state;
+      throw stream.error(`Expected a comparison operator ${Style.white("=")} or ${Style.white("=!")}.`).at(0).state;
     }
 
     return stream.pop(new LiteralParser(["=", "=!"]));
@@ -128,6 +126,12 @@ export class FilterParser<const S extends FilterSchema = FilterSchema> extends T
     }
 
     const parser = Schema.getParser(schemaType, new RegExp(`[\\s,\\${this.closingBracket}]`))!;
+    if (!(parser instanceof StringParser || parser instanceof FilterParser || parser instanceof TupleParser)) {
+      const substream = stream.pop(new WordParser(new RegExp(`[\\s,\\${this.closingBracket}]`))).substream();
+      const token = substream.peek(parser as any) as SchemaTypeTokenType<S[Key]>;
+      stream.apply(token);
+      return token;
+    }
     return stream.pop(parser as any) as SchemaTypeTokenType<S[Key]>;
   }
 }

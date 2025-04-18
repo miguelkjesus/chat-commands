@@ -12,9 +12,12 @@ export class TargetSelector {
   }
 
   execute(player: Player): Entity[] {
-    let { type, filter } = this;
+    let type = this.type;
+    let filter = { ...this.filter };
 
     // Selector filters & modifiers
+
+    filter.location ??= player.location;
 
     if (type === "self") {
       return [player];

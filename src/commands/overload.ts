@@ -6,6 +6,7 @@ import type { Invocation } from "./invocation";
 import { Command } from "./command";
 import { CooldownManager } from "./cooldown-manager";
 import { Style } from "@mhesus/mcbe-colors";
+import { ChatCommandError } from "~/errors";
 
 export class Overload<Params extends Record<string, Parameter> = Record<string, Parameter>> {
   readonly parameters: Params;
@@ -57,11 +58,26 @@ export class Overload<Params extends Record<string, Parameter> = Record<string, 
       return;
     }
 
-    this.cooldownManager?.trigger(ctx.player.id);
-    this.onExecuteReadOnlyCallback?.(...params);
+    try {
+      this.onExecuteReadOnlyCallback?.(...params);
+    } catch (e) {
+      this.handleChatCommandError(e, ctx.player);
+    }
+
     system.run(() => {
-      this.onExecuteCallback?.(...params);
+      try {
+        this.onExecuteCallback?.(...params);
+      } catch (e) {
+        this.handleChatCommandError(e, ctx.player);
+      }
     });
+
+    this.cooldownManager?.trigger(ctx.player.id);
+  }
+
+  private handleChatCommandError(error: Error, player: Player) {
+    if (!(error instanceof ChatCommandError)) throw error;
+    player.sendMessage(Style.red(error.message));
   }
 
   canPlayerUse(player: Player) {

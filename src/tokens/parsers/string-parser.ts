@@ -51,7 +51,7 @@ export class StringParser extends TokenParser<string> {
     }
 
     if (quote) {
-      throw stream.error("Expected a closing quotation mark.").from(quote.relativePosition).state;
+      throw stream.error("Expected a closing quotation mark.").span(quote.relativePosition, 0).state;
     }
 
     return stream.token(token);

@@ -80,7 +80,8 @@ export class TokenStream {
 
   *[Symbol.iterator](): IterableIterator<string> {
     let chr: string | undefined;
-    while ((chr = this.popChar())) {
+    while ((chr = this.peekChar())) {
+      this.position++;
       yield chr;
     }
   }
@@ -126,7 +127,7 @@ export class TokenSubstream extends TokenStream {
   }
 
   getCharRef(relativePosition = 0) {
-    return new CharRef(this, relativePosition);
+    return new CharRef(this, relativePosition - 1);
   }
 
   clone() {

@@ -79,7 +79,7 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
     .setDescription("Get help on a specific command")
     .onExecuteReadOnly((ctx, { commandName }) => {
       if (!ctx.manager.commands.usableBy(ctx.player).aliases().includes(commandName)) {
-        throw ctx.error("Unknown command.");
+        throw ctx.argumentTokens.commandName.error("Unknown command.").state;
       }
 
       const command = ctx.manager.commands.get(commandName)!;

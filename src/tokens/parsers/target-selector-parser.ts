@@ -11,6 +11,7 @@ import { Filter, FilterCriteria, FilterFromSchema, FilterParser, FilterSchema } 
 import { StringParser } from "./string-parser";
 import { TupleParser } from "./tuple-parser";
 import { Style } from "@mhesus/mcbe-colors";
+import debug from "~/utils/debug";
 
 type TargetSelectorFilterParser = typeof TargetSelectorParser.targetSelectorFilterParser;
 type TargetSelectorFilter = FilterFromSchema<TargetSelectorFilterParser["schema"]>;
@@ -18,6 +19,14 @@ type TargetSelectorFilter = FilterFromSchema<TargetSelectorFilterParser["schema"
 export class TargetSelectorParser extends TokenParser<TargetSelector> {
   // keep up to date: https://wiki.bedrock.dev/commands/selectors#selector-arguments
   static readonly targetSelectorFilterParser = new FilterParser("[", "]", {
+    [FilterSchema.dependencies]: {
+      x: ["y", "z"],
+      y: ["x", "z"],
+      z: ["x", "y"],
+      dx: ["dy", "dz"],
+      dy: ["dx", "dz"],
+      dz: ["dx", "dy"],
+    },
     type: "string",
     name: "string",
     family: "string",
@@ -43,24 +52,16 @@ export class TargetSelectorParser extends TokenParser<TargetSelector> {
     }),
     hasitem: new TupleParser({
       [Schema.defaultType]: new FilterParser("{", "}", {
+        [FilterSchema.dependencies]: {
+          slot: ["location"],
+        },
         item: "string",
         location: "string",
         quantity: "integer-range",
         data: "integer",
         slot: "integer",
-        [FilterSchema.dependencies]: {
-          slot: ["location"],
-        },
       }),
     }),
-    [FilterSchema.dependencies]: {
-      x: ["y", "z"],
-      y: ["x", "z"],
-      z: ["x", "y"],
-      dx: ["dy", "dz"],
-      dy: ["dx", "dz"],
-      dz: ["dx", "dy"],
-    },
   });
 
   parse(stream: TokenSubstream): Token<TargetSelector> {
@@ -78,10 +79,15 @@ export class TargetSelectorParser extends TokenParser<TargetSelector> {
 
   parseTargetSelectorType(stream: TokenSubstream): Token<TargetSelectorType> {
     if (stream.popChar() !== "@") {
-      throw stream.error(`Expected ${Style.white("@")} at the start of target selector type.`).at(0).state;
+      // This shouldnt throw due to previous checks
+      throw new Error(`Expected "@" at the start of target selector type.`);
     }
 
     const typeCode = stream.popChar();
+
+    if (typeCode === undefined) {
+      throw stream.error(`Expected an entity selector type.`).state;
+    }
 
     const selectorTypeMap = {
       e: "all",
@@ -91,10 +97,10 @@ export class TargetSelectorParser extends TokenParser<TargetSelector> {
       s: "self",
     } satisfies Record<string, TargetSelectorType>;
 
-    const type = typeCode ? selectorTypeMap[typeCode] : (undefined as TargetSelectorType | undefined);
+    const type = (typeCode ? selectorTypeMap[typeCode] : undefined) as TargetSelectorType | undefined;
 
     if (type === undefined) {
-      throw stream.error(`Unknown entity selector type ${Style.white(`@${typeCode}`)}`).at(0).state;
+      throw stream.error(`Unknown entity selector type ${Style.white(`@${typeCode}`)}`).span(-2, 0).state;
     }
 
     return stream.token(type);
@@ -217,7 +223,14 @@ export class TargetSelectorParser extends TokenParser<TargetSelector> {
       },
 
       c: (criteria) => {
-        query.closest = criteria.lastInclude?.value;
+        const token = criteria.lastInclude;
+        if (!token) return;
+
+        if (token.value <= 0) {
+          throw token.error(`${Style.white("c")} must be greater than 0.`).state;
+        }
+
+        query.closest = token.value;
       },
 
       x: (criteria) => {
@@ -245,11 +258,25 @@ export class TargetSelectorParser extends TokenParser<TargetSelector> {
       },
 
       r: (criteria) => {
-        query.maxDistance = criteria.lastInclude?.value;
+        const token = criteria.lastInclude;
+        if (!token) return;
+
+        if (token.value < 0) {
+          throw token.error(`${Style.white("r")} cannot be negative.`).state;
+        }
+
+        query.maxDistance = token.value;
       },
 
       rm: (criteria) => {
-        query.minDistance = criteria.lastInclude?.value;
+        const token = criteria.lastInclude;
+        if (!token) return;
+
+        if (token.value < 0) {
+          throw token.error(`${Style.white("rm")} cannot be negative.`).state;
+        }
+
+        query.minDistance = token.value;
       },
 
       rx: (criteria) => {
@@ -276,6 +303,8 @@ export class TargetSelectorParser extends TokenParser<TargetSelector> {
         query.minLevel = criteria.lastInclude?.value;
       },
     });
+
+    // TODO add range checks for max and min query variables.
 
     // These should be caught in the schema.
 

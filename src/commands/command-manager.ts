@@ -1,5 +1,5 @@
 import { type ChatSendBeforeEvent, world } from "@minecraft/server";
-import { Style as s } from "@mhesus/mcbe-colors";
+import { Style } from "@mhesus/mcbe-colors";
 
 import { ChatCommandError } from "~/errors";
 import { CommandCollection } from "./command-collection";
@@ -53,11 +53,7 @@ export class CommandManager {
     this.prefix = prefix;
 
     world.beforeEvents.chatSend.subscribe(async (event) => {
-      try {
-        await this.processChatEvent(event);
-      } catch (err) {
-        this.handleCommandError(err, event);
-      }
+      await this.processChatEvent(event);
     });
 
     this._isStarted = true;
@@ -87,19 +83,16 @@ export class CommandManager {
       if (!params) return;
 
       event.cancel = true;
-      event.sender.sendMessage(s.green(`You executed: ${event.message}`));
+      event.sender.sendMessage(Style.green(`You executed: ${event.message}`));
 
       return params;
     } catch (e) {
       event.cancel = true;
-      event.sender.sendMessage(s.green(`You executed: ${event.message}`));
-      throw e;
-    }
-  }
+      event.sender.sendMessage(Style.green(`You executed: ${event.message}`));
 
-  private handleCommandError(error: Error, event: ChatSendBeforeEvent) {
-    if (!(error instanceof ChatCommandError)) throw error;
-    event.sender.sendMessage(s.red(error.message));
+      if (!(e instanceof ChatCommandError)) throw e;
+      event.sender.sendMessage(Style.red(e.message));
+    }
   }
 }
 

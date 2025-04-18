@@ -68,7 +68,7 @@ export class CommandParser extends TokenParser<ParsedCommand | undefined> {
     const usableAliases = commands.usableBy(this.event.sender).aliases();
 
     try {
-      const aliasToken = stream.pop(new LiteralParser(usableAliases));
+      const aliasToken = stream.pop(new LiteralParser(usableAliases, "Unknown command."));
       const command = commands.get(aliasToken.value)!;
       return aliasToken.map(() => command);
     } catch (e) {
@@ -132,7 +132,7 @@ export class CommandParser extends TokenParser<ParsedCommand | undefined> {
       return;
     }
 
-    if (candidate.overload.executeCallback) {
+    if (candidate.overload.hasExecuteCallback) {
       return candidate.toResult();
     }
 
@@ -183,20 +183,6 @@ export class CommandParser extends TokenParser<ParsedCommand | undefined> {
       ].join("\n"),
     );
   }
-}
-
-function getOverloadSignatureSlice(overload: Overload, [start, end]: [(number | null)?, (number | null)?]): string {
-  start ??= 0;
-  end ??= Object.values(overload.parameters).length - 1;
-
-  return [
-    overload.command?.name,
-    ...Object.values(overload.parameters)
-      .slice(start, end + 1)
-      .map((param) => param.getSignature()),
-  ]
-    .filter((v) => v !== undefined)
-    .join(" ");
 }
 
 class OverloadSelectionCandidate {
