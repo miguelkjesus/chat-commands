@@ -1,14 +1,14 @@
 import { Style } from "@mhesus/mcbe-colors";
 
-import type { Simplify } from "~/utils/types";
 import { type SchemaType, type SchemaTypeTokenType, Schema } from "~/utils/schema";
 import { didYouMean, formatAnd } from "~/utils/string";
+import type { Simplify } from "~/utils/types";
 
 import type { TokenSubstream } from "../stream";
-import { TokenParser, Token } from "../token";
+import { Token, TokenParser } from "../token";
 
-import { StringParser } from "./string-parser";
 import { LiteralParser } from "./literal-parser";
+import { StringParser } from "./string-parser";
 import { TupleParser } from "./tuple-parser";
 import { WordParser } from "./word-parser";
 

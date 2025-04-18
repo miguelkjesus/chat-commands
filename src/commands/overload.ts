@@ -2,11 +2,11 @@ import { system, type Player } from "@minecraft/server";
 
 import type { Arguments, Parameter } from "~/parameters";
 
-import type { Invocation } from "./invocation";
-import { Command } from "./command";
-import { CooldownManager } from "./cooldown-manager";
 import { Style } from "@mhesus/mcbe-colors";
 import { ChatCommandError } from "~/errors";
+import { Command } from "./command";
+import { CooldownManager } from "./cooldown-manager";
+import type { Invocation } from "./invocation";
 
 export class Overload<Params extends Record<string, Parameter> = Record<string, Parameter>> {
   readonly parameters: Params;

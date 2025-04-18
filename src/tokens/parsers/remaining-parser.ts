@@ -1,5 +1,5 @@
 import type { TokenSubstream } from "../stream";
-import { TokenParser, Token } from "../token";
+import { Token, TokenParser } from "../token";
 
 export class RemainingParser extends TokenParser<string> {
   parse(stream: TokenSubstream): Token<string> {

@@ -2,17 +2,17 @@ import {
   FilterFromSchema,
   FilterParser,
   IntegerParser,
+  IntegerRangeParser,
   ListFromTupleSchema,
-  TupleParser,
   NumberParser,
+  NumberRangeParser,
   StringParser,
   Token,
   TokenParser,
-  NumberRangeParser,
-  IntegerRangeParser,
+  TupleParser,
 } from "~/tokens";
-import type { NumberRange } from "./number-range";
 import type { IntegerRange } from "./integer-range";
+import type { NumberRange } from "./number-range";
 
 export type SchemaType =
   | "string"

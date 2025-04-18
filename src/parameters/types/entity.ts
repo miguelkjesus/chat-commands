@@ -10,8 +10,8 @@ TODO:
 
 import type { Entity } from "@minecraft/server";
 
-import type { TargetSelector } from "~/utils/target-selector";
 import { TargetSelectorParser } from "~/tokens";
+import type { TargetSelector } from "~/utils/target-selector";
 
 import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Parameter } from "./parameter";

@@ -1,5 +1,5 @@
-import { IntegerRange } from "~/utils/integer-range";
 import { IntegerParser } from "~/tokens";
+import { IntegerRange } from "~/utils/integer-range";
 
 import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Parameter } from "./parameter";

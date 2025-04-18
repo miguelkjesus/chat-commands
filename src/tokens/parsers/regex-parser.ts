@@ -1,5 +1,5 @@
-import { TokenParser, Token } from "../token";
 import type { TokenSubstream } from "../stream";
+import { Token, TokenParser } from "../token";
 
 export class RegexParser extends TokenParser<string | null> {
   readonly regex: RegExp;

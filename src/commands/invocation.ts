@@ -1,11 +1,11 @@
 import type { Player } from "@minecraft/server";
 
-import type { ArgumentTokens } from "~/parameters";
 import { ChatCommandError } from "~/errors";
+import type { ArgumentTokens } from "~/parameters";
 
+import { Command } from "./command";
 import type { CommandManager } from "./command-manager";
 import { Overload, OverloadParameters } from "./overload";
-import { Command } from "./command";
 
 export class Invocation<InvokedOverload extends Overload = Overload> {
   /** The command manager that handled this invocation. */

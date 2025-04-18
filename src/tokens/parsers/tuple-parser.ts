@@ -1,8 +1,8 @@
 import { Schema, type SchemaType, type SchemaTypeTokenType } from "~/utils/schema";
 
-import { Token, TokenParser } from "../token";
-import type { TokenSubstream } from "../stream";
 import { Simplify } from "~/utils/types";
+import type { TokenSubstream } from "../stream";
+import { Token, TokenParser } from "../token";
 import { StringParser } from "./string-parser";
 
 export class TupleParser<const S extends TupleSchema = TupleSchema> extends TokenParser<S> {

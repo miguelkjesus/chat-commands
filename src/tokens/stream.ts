@@ -1,8 +1,8 @@
 import { TokenParseErrorBuilder } from "~/builders";
 import { TokenParseError } from "~/errors";
 
-import { Token, type TokenParser } from "./token";
 import { CharRef } from "./char-ref";
+import { Token, type TokenParser } from "./token";
 
 export class TokenStream {
   readonly input: string;

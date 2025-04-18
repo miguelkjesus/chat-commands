@@ -1,7 +1,7 @@
 import { getWordEndIndex } from "~/utils/string";
 
-import { TokenParser, Token } from "../token";
-import { TokenSubstream } from "../stream";
+import type { TokenSubstream } from "../stream";
+import { Token, TokenParser } from "../token";
 
 export class WordParser extends TokenParser<string> {
   readonly terminator?: RegExp;

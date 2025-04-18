@@ -1,7 +1,5 @@
-import { ParseError } from "~/errors";
-
-import { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Token } from "~/tokens";
+import { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 
 // TODO introduce system for users to raise custom parameter errors
 //      revamp parameter error system to show where the error happened in the input

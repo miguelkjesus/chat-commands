@@ -1,8 +1,9 @@
-import { didYouMean, formatOr } from "~/utils/string";
-
-import { TokenParser, Token } from "../token";
-import type { TokenSubstream } from "../stream";
 import { Style } from "@mhesus/mcbe-colors";
+
+import { formatOr } from "~/utils/string";
+
+import type { TokenSubstream } from "../stream";
+import { Token, TokenParser } from "../token";
 
 export class LiteralParser<Choices extends readonly string[] = readonly string[]> extends TokenParser<Choices[number]> {
   readonly choices: Choices;

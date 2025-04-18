@@ -1,6 +1,6 @@
-import { TokenParser, Token } from "../token";
-import type { TokenSubstream } from "../stream";
 import type { CharRef } from "../char-ref";
+import type { TokenSubstream } from "../stream";
+import { Token, TokenParser } from "../token";
 
 export interface StringParserOptions {
   terminator?: RegExp;

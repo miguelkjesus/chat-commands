@@ -1,11 +1,11 @@
-import { NumberRange } from "~/utils/number-range";
 import { ParseError } from "~/errors";
+import { NumberRange } from "~/utils/number-range";
 
-import { Token, TokenParser } from "../token";
 import type { TokenSubstream } from "../stream";
+import { Token, TokenParser } from "../token";
 
-import { NumberParser } from "./number-parser";
 import { LiteralParser } from "./literal-parser";
+import { NumberParser } from "./number-parser";
 
 export class NumberRangeParser extends TokenParser<NumberRange> {
   parse(stream: TokenSubstream): Token<NumberRange> {

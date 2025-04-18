@@ -2,8 +2,8 @@ import type { Player, Vector3 } from "@minecraft/server";
 
 import type { Entries } from "~/utils/types";
 
-import { TokenParser, Token } from "../token";
 import type { TokenSubstream } from "../stream";
+import { Token, TokenParser } from "../token";
 
 import { LocationComponentParser, LocationComponentToken } from "./location-component-parser";
 

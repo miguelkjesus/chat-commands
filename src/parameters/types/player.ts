@@ -1,7 +1,7 @@
 import { world, type Player } from "@minecraft/server";
 
-import { getBestMatch } from "~/utils/string";
 import { StringParser } from "~/tokens";
+import { getBestMatch } from "~/utils/string";
 
 import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Parameter } from "./parameter";

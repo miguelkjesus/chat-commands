@@ -1,9 +1,9 @@
-import { type ChatSendBeforeEvent, world } from "@minecraft/server";
 import { Style } from "@mhesus/mcbe-colors";
+import { type ChatSendBeforeEvent, world } from "@minecraft/server";
 
 import { ChatCommandError } from "~/errors";
-import { CommandCollection } from "./command-collection";
 import { CommandParser, TokenStream } from "~/tokens";
+import { CommandCollection } from "./command-collection";
 
 export class CommandManager {
   commands = new CommandCollection();

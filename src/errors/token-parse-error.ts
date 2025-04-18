@@ -1,7 +1,7 @@
 import { TokenStream } from "~/tokens";
 
-import { ParseError } from "./parse-error";
 import { Style } from "@mhesus/mcbe-colors";
+import { ParseError } from "./parse-error";
 
 export class TokenParseError extends ParseError {
   name = "TokenParseError";

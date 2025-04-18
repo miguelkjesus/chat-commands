@@ -1,17 +1,16 @@
+import { Style } from "@mhesus/mcbe-colors";
 import { EntityQueryOptions, GameMode, Vector3 } from "@minecraft/server";
 
-import { type TargetSelectorType, TargetSelector } from "~/utils/target-selector";
 import { NumberRange } from "~/utils/number-range";
 import { Schema } from "~/utils/schema";
+import { type TargetSelectorType, TargetSelector } from "~/utils/target-selector";
 
-import { Token, TokenParser } from "../token";
 import type { TokenSubstream } from "../stream";
+import { Token, TokenParser } from "../token";
 
 import { Filter, FilterCriteria, FilterFromSchema, FilterParser, FilterSchema } from "./filter-parser";
 import { StringParser } from "./string-parser";
 import { TupleParser } from "./tuple-parser";
-import { Style } from "@mhesus/mcbe-colors";
-import debug from "~/utils/debug";
 
 type TargetSelectorFilterParser = typeof TargetSelectorParser.targetSelectorFilterParser;
 type TargetSelectorFilter = FilterFromSchema<TargetSelectorFilterParser["schema"]>;

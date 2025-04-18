@@ -1,6 +1,6 @@
+import { LiteralParser } from "~/tokens";
 import type { ParameterParseTokenContext, ParameterParseValueContext } from "../parameter-parse-context";
 import { Parameter } from "./parameter";
-import { LiteralParser } from "~/tokens";
 
 export class LiteralParameter<const Choices extends readonly string[] = readonly string[]> extends Parameter<
   Choices extends readonly [] ? string : Choices[number],

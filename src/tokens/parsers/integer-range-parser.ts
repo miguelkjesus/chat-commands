@@ -1,8 +1,8 @@
-import { IntegerRange } from "~/utils/integer-range";
 import { ParseError } from "~/errors";
+import { IntegerRange } from "~/utils/integer-range";
 
-import { Token, TokenParser } from "../token";
 import type { TokenSubstream } from "../stream";
+import { Token, TokenParser } from "../token";
 
 import { IntegerParser } from "./integer-parser";
 import { LiteralParser } from "./literal-parser";

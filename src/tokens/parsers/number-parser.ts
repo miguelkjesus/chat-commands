@@ -1,5 +1,5 @@
-import { TokenParser, Token } from "../token";
 import type { TokenSubstream } from "../stream";
+import { Token, TokenParser } from "../token";
 
 import { RegexParser } from "./regex-parser";
 import { WordParser } from "./word-parser";

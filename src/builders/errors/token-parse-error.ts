@@ -1,5 +1,5 @@
-import type { Token, TokenStream } from "~/tokens";
 import type { TokenParseError } from "~/errors";
+import type { Token } from "~/tokens";
 import { getWordEndIndex } from "~/utils/string";
 
 import { Builder } from "../builder";

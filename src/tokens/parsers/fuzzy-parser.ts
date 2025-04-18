@@ -1,7 +1,7 @@
 import { getBestPrefixMatch } from "~/utils/string";
 
-import { TokenParser, Token } from "../token";
 import type { TokenSubstream } from "../stream";
+import { Token, TokenParser } from "../token";
 
 export class FuzzyParser<Choices extends readonly string[] = readonly string[]> extends TokenParser<
   Choices[number] | undefined

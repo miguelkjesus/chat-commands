@@ -1,15 +1,15 @@
 import type { ChatSendAfterEvent } from "@minecraft/server";
 
 import { Command, CommandManager, Invocation, Overload } from "~/commands";
-import { Parameter, ParameterParseTokenContext } from "~/parameters";
 import { ChatCommandError, ParseError, TokenParseError } from "~/errors";
+import { Parameter, ParameterParseTokenContext } from "~/parameters";
 
-import { Token, TokenParser } from "../token";
 import type { TokenSubstream } from "../stream";
+import { Token, TokenParser } from "../token";
 
-import { LiteralParser } from "./literal-parser";
-import { FuzzyParser } from "./fuzzy-parser";
 import { Style } from "@mhesus/mcbe-colors";
+import { FuzzyParser } from "./fuzzy-parser";
+import { LiteralParser } from "./literal-parser";
 
 export interface ParsedCommand {
   invocation: Invocation;
@@ -166,7 +166,7 @@ export class CommandParser extends TokenParser<ParsedCommand | undefined> {
   ): never {
     const { prefix } = this.commandManager;
 
-    const errorMessages = [...candidateErrors].flatMap(([candidate, { paramIdx, error }]) => {
+    const errorMessages = [...candidateErrors].flatMap(([, { error }]) => {
       return [
         // s.gray(`${prefix}${candidate.overload.getSignature()}`),
         error instanceof TokenParseError ? Style.white(error.errorLocationString) : error.name,
