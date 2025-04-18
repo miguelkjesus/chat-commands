@@ -1,4 +1,4 @@
-import type { Player } from "@minecraft/server";
+import { system, type Player } from "@minecraft/server";
 
 import type { Arguments, Parameter } from "~/parameters";
 
@@ -14,13 +14,18 @@ export class Overload<Params extends Record<string, Parameter> = Record<string, 
   description?: string;
 
   canPlayerUseCallback?: (player: Player) => boolean;
-  executeCallback?: ExecuteCallback<this>;
+  onExecuteReadOnlyCallback?: ExecuteCallback<this>;
+  onExecuteCallback?: ExecuteCallback<this>;
 
   private ownCooldownManager?: CooldownManager;
 
   constructor(parameters: Params, parent?: Overload) {
     this.parameters = parameters;
     this.parent = parent;
+  }
+
+  get hasExecuteCallback() {
+    return this.onExecuteReadOnlyCallback !== undefined || this.onExecuteCallback !== undefined;
   }
 
   get command(): Command | undefined {
@@ -53,7 +58,10 @@ export class Overload<Params extends Record<string, Parameter> = Record<string, 
     }
 
     this.cooldownManager?.trigger(ctx.player.id);
-    return this.executeCallback?.(...params);
+    this.onExecuteReadOnlyCallback?.(...params);
+    system.run(() => {
+      this.onExecuteCallback?.(...params);
+    });
   }
 
   canPlayerUse(player: Player) {

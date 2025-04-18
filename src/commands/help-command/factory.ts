@@ -1,7 +1,7 @@
 import { darkGray, darkRed, gold, gray, minecoin, red } from "@mhesus/mcbe-colors";
 
 import { command } from "~/api/command";
-import { number, string } from "~/api/parameter-types";
+import { integer, string } from "~/api/parameter-types";
 
 import { manager } from "../command-manager";
 import { HelpCommandOptions } from "./options";
@@ -38,52 +38,56 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
   const help = command("help", ...aliases).setDescription(description);
 
   help
-    .createOverload({ page: number().gte(1).setOptional() })
+    .createOverload({ page: integer().setMin(1).setOptional() })
     .setDescription("View a list of commands")
-    .onExecute((ctx, { page = 1 }) => {
+    .onExecuteReadOnly((ctx, { page = 1 }) => {
       const pageSize = 10;
+      const maxPages = Math.floor(ctx.manager.commands.size / pageSize + 0.5);
+      page = Math.max(1, Math.min(page, maxPages));
 
-      const commands = ctx.manager.commands
+      const pageStart = pageSize * (page - 1);
+      const pageEnd = pageStart + pageSize;
+
+      const commandMessages = ctx.manager.commands
         .values()
         .sort((a, b) => a.name.localeCompare(b.name))
         .flatMap((cmd) =>
           [
             c.highlight(ctx.manager.prefix + cmd.name),
-            cmd.aliases.length > 0 && c.dim(`(${cmd.aliases.join(", ")})`),
+            cmd.aliases.length > 0 ? c.dim(`(${cmd.aliases.join(", ")})`) : undefined,
             cmd.description,
           ]
-            .filter((v) => v)
+            .filter((v) => v !== undefined)
             .join(" "),
         )
-        .slice(pageSize * (page - 1), pageSize * page);
+        .slice(pageStart, pageEnd);
 
-      const banner =
-        "-".repeat(10) +
-        `[${c.highlight(ctx.manager.prefix + "help")} ${`page ${page}/${(commands.length / pageSize + 0.5).toFixed()}`}]` +
-        "-".repeat(10);
+      const banner = `${"-".repeat(10)}[${c.highlight(ctx.manager.prefix + "help")} ${`page ${page}/${maxPages}`}]${"-".repeat(10)}`;
 
       ctx.player.sendMessage(
         [
           c.mute(banner),
           `Type ${c.highlight("!help")} ${c.mute("<command>")} to learn how to use a command!`,
           " ",
-          ...commands,
-        ]
-          .filter((v) => v)
-          .join("\n"),
+          ...commandMessages,
+        ].join("\n"),
       );
     });
 
   help
-    .createOverload({ commandName: string("command").setChoices(manager.commands.aliases(), "Unknown command.") })
+    .createOverload({ commandName: string("command") })
     .setDescription("Get help on a specific command")
-    .onExecute((ctx, { commandName }) => {
+    .onExecuteReadOnly((ctx, { commandName }) => {
+      if (!ctx.manager.commands.usableBy(ctx.player).aliases().includes(commandName)) {
+        throw ctx.error("Unknown command.");
+      }
+
       const command = ctx.manager.commands.get(commandName)!;
       const banner = `${"-".repeat(10)}[${c.highlight(`${ctx.manager.prefix}help ${c.mute(command.name)}`)}]${"-".repeat(10)}`;
 
       const signatures = command
         .getAllOverloads()
-        .filter((overload) => overload.executeCallback)
+        .filter((overload) => overload.hasExecuteCallback)
         .map((overload) =>
           [
             `${c.highlight(ctx.manager.prefix + command.name)}`,
@@ -97,7 +101,8 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
       ctx.player.sendMessage(
         [
           banner,
-          [command.name, ...command.aliases].map((s) => c.highlight(ctx.manager.prefix + s)).join(c.mute(", ")),
+          c.mute("Aliases: ") +
+            [command.name, ...command.aliases].map((s) => c.highlight(ctx.manager.prefix + s)).join(c.mute(", ")),
           command.description,
           " ",
           ...signatures,

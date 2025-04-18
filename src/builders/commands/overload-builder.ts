@@ -73,7 +73,8 @@ export class OverloadBuilder<State extends Overload> extends Builder<State> {
   }
 
   /**
-   * Defines what this overload should do once it has been triggered.
+   * Defines what actions this overload should perform, when it is executed. \
+   * Mind that all code in here will be executed in read-only mode. Either use `onExecute` or `system.run` to escape read-only mode.
    *
    * @example
    * giveMoney
@@ -83,12 +84,34 @@ export class OverloadBuilder<State extends Overload> extends Builder<State> {
    *   });
    *
    * @param execute
-   *    The function that will be called when this overload matches.
+   *    The function that will be called when this overload is invoked.
    * @returns
    *    The overload builder instance.
    */
-  onExecute(execute: State["executeCallback"]) {
-    this.state.executeCallback = execute;
+  onExecuteReadOnly(execute: State["onExecuteReadOnlyCallback"]) {
+    this.state.onExecuteReadOnlyCallback = execute;
+    return this;
+  }
+
+  /**
+   * Defines what actions this overload should perform, when it is executed.
+   *
+   * @example
+   * smite
+   *   .createOverload({ victims: entities() })
+   *   .executeOnNextTick((ctx, { victims }) => {
+   *     for (const victim of victims) {
+   *       victim.dimension.spawnEntity("lightning_bolt", victim.location);
+   *     }
+   *   });
+   *
+   * @param execute
+   *    The function that will be called when this overload is invoked.
+   * @returns
+   *    The overload builder instance.
+   */
+  onExecute(execute: State["onExecuteCallback"]) {
+    this.state.onExecuteCallback = execute;
     return this;
   }
 

@@ -87,12 +87,12 @@ export class CommandManager {
       if (!params) return;
 
       event.cancel = true;
-      event.sender.sendMessage(s.gray(`You executed: ${event.message}`));
+      event.sender.sendMessage(s.green(`You executed: ${event.message}`));
 
       return params;
     } catch (e) {
       event.cancel = true;
-      event.sender.sendMessage(s.gray(`You executed: ${event.message}`));
+      event.sender.sendMessage(s.green(`You executed: ${event.message}`));
       throw e;
     }
   }
