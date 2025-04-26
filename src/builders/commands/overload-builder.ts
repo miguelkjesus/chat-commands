@@ -60,14 +60,20 @@ export class OverloadBuilder<State extends Overload> extends Builder<State> {
   }
 
   /**
-   * Defines what actions this overload should perform, when it is executed. \
-   * Mind that all code in here will be executed in read-only mode. Either use `onExecute` or `system.run` to escape read-only mode.
+   * Defines what actions this overload should perform when it is executed. \
+   * All code in here will be executed in read-only mode. Use `system.run` to escape read-only mode, or use `onExecute()` to run your code in a read-write context.
    *
    * @example
-   * giveMoney
-   *   .createOverload({ amount: number().gte(0) })
-   *   .onExecute((ctx, { amount }) => {
-   *     ctx.player.setDynamicProperty("money", amount);
+   * spawnPig
+   *   .createOverload({ location: vector3().setOptional() })
+   *   .onExecuteReadOnly((ctx, { location = ctx.player.location }) => {
+   *     // Only read-only code can be run!
+   *     ctx.player.sendMessage("Hello world!");
+   *
+   *     // Non-read-only code must be wrapped in system.run()
+   *     system.run(() => {
+   *       ctx.player.dimension.spawnEntity("pig", location);
+   *     });
    *   });
    *
    * @param execute
