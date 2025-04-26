@@ -16,8 +16,11 @@ export class Invocation<InvokedOverload extends Overload = Overload> {
   readonly message: string;
   /** The overload that was invoked. */
   readonly overload: InvokedOverload;
+  /** The parameters of the overload. */
   readonly parameters: OverloadParameters<InvokedOverload>;
+  /** TODO */
   readonly argumentTokens: ArgumentTokens<OverloadParameters<InvokedOverload>>;
+  /** TODO */
   readonly command: Command;
 
   constructor(
@@ -32,7 +35,7 @@ export class Invocation<InvokedOverload extends Overload = Overload> {
     this.player = player;
     this.message = message;
     this.overload = overload;
-    this.parameters = overload.parameters as OverloadParameters<InvokedOverload>;
+    this.parameters = overload.getParameters(player) as OverloadParameters<InvokedOverload>;
     this.argumentTokens = argumentTokens;
     this.command = command;
   }

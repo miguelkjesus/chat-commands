@@ -1,4 +1,4 @@
-import type { ChatSendAfterEvent } from "@minecraft/server";
+import type { ChatSendAfterEvent, Player } from "@minecraft/server";
 
 import { Command, CommandManager, Invocation, Overload } from "~/commands";
 import { ChatCommandError, ParseError, TokenParseError } from "~/errors";
@@ -83,7 +83,7 @@ export class CommandParser extends TokenParser<ParsedCommand | undefined> {
   }
 
   private parseOverload(stream: TokenSubstream, command: Command): OverloadSelectionResult {
-    let currentCandidates = [new OverloadSelectionCandidate(command, stream.clone())];
+    let currentCandidates = [new OverloadSelectionCandidate(this.event.sender, command, stream.clone())];
     let candidateErrors = new Map<OverloadSelectionCandidate, { paramIdx: number; error: ChatCommandError }>();
 
     let mostRecentResult: OverloadSelectionResult | undefined;
@@ -126,7 +126,7 @@ export class CommandParser extends TokenParser<ParsedCommand | undefined> {
     if (!candidate.stream.isEmpty() && !overloads.length) {
       candidate.stream.skipWhitespace();
       candidateErrors.set(candidate, {
-        paramIdx: Object.values(candidate.overload.parameters).length - 1,
+        paramIdx: Object.values(candidate.allParameters).length - 1,
         error: candidate.stream.error("Too many parameters!").state,
       });
       return;
@@ -145,7 +145,7 @@ export class CommandParser extends TokenParser<ParsedCommand | undefined> {
         new ParameterParseTokenContext(
           this.event.sender,
           this.event.message,
-          candidate.overload.parameters,
+          candidate.allParameters,
           candidate.stream,
         ),
       );
@@ -154,7 +154,7 @@ export class CommandParser extends TokenParser<ParsedCommand | undefined> {
       if (!(e instanceof ChatCommandError)) throw e;
 
       candidateErrors.set(candidate, {
-        paramIdx: Object.values(candidate.overload.parameters).indexOf(param),
+        paramIdx: Object.values(candidate.allParameters).indexOf(param),
         error: e,
       });
     }
@@ -186,20 +186,25 @@ export class CommandParser extends TokenParser<ParsedCommand | undefined> {
 }
 
 class OverloadSelectionCandidate {
+  player: Player;
   stream: TokenSubstream;
   overload: Overload;
   remainingParameters: Parameter[];
   argumentTokens: Record<string, Token<unknown>>;
 
-  constructor(overload: Overload, stream: TokenSubstream) {
+  readonly allParameters: Readonly<Record<string, Parameter>>;
+
+  constructor(player: Player, overload: Overload, stream: TokenSubstream) {
     this.stream = stream;
     this.overload = overload;
-    this.remainingParameters = Object.values(overload.parameters);
+    this.remainingParameters = Object.values(this.allParameters);
     this.argumentTokens = {};
+
+    this.allParameters = overload.getParameters(player);
   }
 
   createChild(overload: Overload): OverloadSelectionCandidate {
-    const child = new OverloadSelectionCandidate(overload, this.stream.clone());
+    const child = new OverloadSelectionCandidate(this.player, overload, this.stream.clone());
     child.argumentTokens = { ...this.argumentTokens };
     return child;
   }

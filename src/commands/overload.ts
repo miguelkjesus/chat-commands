@@ -4,12 +4,14 @@ import type { Arguments, Parameter } from "~/parameters";
 
 import { Style } from "@mhesus/mcbe-colors";
 import { ChatCommandError } from "~/errors";
+import { CallbackOrValue, getValue } from "~/utils/callback-or-value";
 import { Command } from "./command";
 import { CooldownManager } from "./cooldown-manager";
 import type { Invocation } from "./invocation";
 
 export class Overload<Params extends Record<string, Parameter> = Record<string, Parameter>> {
-  readonly parameters: Params;
+  private readonly parameters: CallbackOrValue<Params, [player: Player]>;
+
   readonly parent?: Overload;
   overloads: Overload[] = [];
   description?: string;
@@ -20,9 +22,13 @@ export class Overload<Params extends Record<string, Parameter> = Record<string, 
 
   private ownCooldownManager?: CooldownManager;
 
-  constructor(parameters: Params, parent?: Overload) {
+  constructor(parameters: CallbackOrValue<Params, [player: Player]>, parent?: Overload) {
     this.parameters = parameters;
     this.parent = parent;
+  }
+
+  getParameters(player: Player) {
+    return getValue(this.parameters, [player]);
   }
 
   get hasExecuteCallback() {
@@ -96,7 +102,8 @@ export class Overload<Params extends Record<string, Parameter> = Record<string, 
 }
 
 // I would just infer Params, but TS throws a hissy fit with inferring the parameters of commands if you do lol.
-export type OverloadParameters<T extends Overload> = T["parameters"];
+// prettier-ignore
+export type OverloadParameters<T extends Overload> = ReturnType<T["getParameters"]>;
 
 export type OverloadArguments<T extends Overload> = Arguments<OverloadParameters<T>>;
 

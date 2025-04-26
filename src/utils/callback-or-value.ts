@@ -1,6 +1,6 @@
 import { isCallable } from "./types";
 
-export function resolve<Value, Params extends readonly any[]>(
+export function getValue<Value, Params extends readonly any[]>(
   resolvable: CallbackOrValue<Value, [...Params]>,
   params: Params,
 ) {

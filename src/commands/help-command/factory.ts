@@ -75,13 +75,11 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
     });
 
   help
-    .createOverload({ commandName: string("command") })
+    .createOverload((player) => ({
+      commandName: string("command").setChoices(manager.commands.usableBy(player).aliases()),
+    }))
     .setDescription("Get help on a specific command")
     .onExecuteReadOnly((ctx, { commandName }) => {
-      if (!ctx.manager.commands.usableBy(ctx.player).aliases().includes(commandName)) {
-        throw ctx.argumentTokens.commandName.error("Unknown command.").state;
-      }
-
       const command = ctx.manager.commands.get(commandName)!;
       const banner = `${"-".repeat(10)}[${c.highlight(`${ctx.manager.prefix}help ${c.mute(command.name)}`)}]${"-".repeat(10)}`;
 
@@ -91,7 +89,7 @@ export function makeHelpCommand(options?: HelpCommandOptions) {
         .map((overload) =>
           [
             `${c.highlight(ctx.manager.prefix + command.name)}`,
-            ...Object.values(overload.parameters).map((param) => c.mute(param.getSignature())),
+            ...Object.values(overload.getParameters(ctx.player)).map((param) => c.mute(param.getSignature())),
             overload.description,
           ]
             .filter((v) => v)

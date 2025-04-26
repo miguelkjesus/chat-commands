@@ -1,9 +1,8 @@
-import { Parameters } from "~/api";
 import { CooldownManager, Overload, type OverloadParameters } from "~/commands";
-import { LiteralParameter } from "~/parameters";
-import { resolve, type CallbackOrValue } from "~/utils/resolvers";
+import { getValue, type CallbackOrValue } from "~/utils/callback-or-value";
 import type { Simplify } from "~/utils/types";
 
+import { Player } from "@minecraft/server";
 import { Builder } from "../builder";
 import type { ParameterBuilder, ParametersFrom } from "../parameter-types";
 
@@ -48,26 +47,14 @@ export class OverloadBuilder<State extends Overload> extends Builder<State> {
    *    A builder for further configuring the overload.
    */
   createOverload<ParamBuilders extends Record<string, ParameterBuilder>>(
-    parameters: ParamBuilders extends Record<any, never> ? never : CallbackOrValue<ParamBuilders, [params: Parameters]>,
+    parameters: ParamBuilders extends Record<any, never> ? never : CallbackOrValue<ParamBuilders, [player: Player]>,
   ): OverloadBuilderFromParent<State, ParamBuilders> {
-    // TODO refactor how builders work such that either
-    //  - they are constructed and readonly
-    //  - keep them dynamic like now but without the typing (kinda shit)
+    const resolved = (...args) =>
+      Object.fromEntries(Object.entries(getValue(parameters, args)).map(([k, v]) => [k, v.state]));
 
-    const builtParams = {};
-    for (const [id, { state }] of Object.entries(resolve(parameters, [Parameters]))) {
-      state.id = id;
-
-      if (state instanceof LiteralParameter && state.choices.length === 0) {
-        state.choices = [id];
-      } else if (state.name === undefined) {
-        state.name = id;
-      }
-
-      builtParams[id] = state;
-    }
-
-    const builder = new OverloadBuilder(new Overload({ ...this.state.parameters, ...builtParams }, this.state));
+    const builder = new OverloadBuilder(
+      new Overload((...args) => ({ ...this.state.getParameters(...args), ...getValue(resolved, args) }), this.state),
+    );
     this.state.overloads.push(builder.state);
     return builder as OverloadBuilderFromParent<State, ParamBuilders>;
   }

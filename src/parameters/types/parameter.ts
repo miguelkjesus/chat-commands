@@ -28,12 +28,12 @@ export abstract class Parameter<Value = any, TokenType = any> {
         .at(0).state;
     }
 
-    const result = this.parseToken(context);
+    const token = this.parseToken(context);
     const value = this.parseValue(
-      new ParameterParseValueContext(context.player, context.message, context.params, result),
+      new ParameterParseValueContext(context.player, context.message, context.params, token),
     );
 
-    return result.map(() => value);
+    return token.map(() => value);
   }
 
   getSignature() {
