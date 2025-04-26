@@ -52,14 +52,14 @@ export class CommandManager {
     if (this.isStarted) return;
     this.prefix = prefix;
 
-    world.beforeEvents.chatSend.subscribe(async (event) => {
-      await this.processChatEvent(event);
+    world.beforeEvents.chatSend.subscribe((event) => {
+      this.processChatEvent(event);
     });
 
     this._isStarted = true;
   }
 
-  private async processChatEvent(event: ChatSendBeforeEvent) {
+  private processChatEvent(event: ChatSendBeforeEvent) {
     const params = this.getCommandExecuteParams(event);
     if (!params) return;
 

@@ -66,6 +66,7 @@ export class Overload<Params extends Record<string, Parameter> = Record<string, 
 
     try {
       this.onExecuteReadOnlyCallback?.(...params);
+      this.cooldownManager?.trigger(ctx.player.id);
     } catch (e) {
       this.handleChatCommandError(e, ctx.player);
     }
@@ -73,12 +74,11 @@ export class Overload<Params extends Record<string, Parameter> = Record<string, 
     system.run(() => {
       try {
         this.onExecuteCallback?.(...params);
+        this.cooldownManager?.trigger(ctx.player.id);
       } catch (e) {
         this.handleChatCommandError(e, ctx.player);
       }
     });
-
-    this.cooldownManager?.trigger(ctx.player.id);
   }
 
   private handleChatCommandError(error: Error, player: Player) {
@@ -107,7 +107,4 @@ export type OverloadParameters<T extends Overload> = ReturnType<T["getParameters
 
 export type OverloadArguments<T extends Overload> = Arguments<OverloadParameters<T>>;
 
-export type ExecuteCallback<T extends Overload> = (
-  ctx: Invocation<T>,
-  args: OverloadArguments<T>,
-) => void | Promise<void>;
+export type ExecuteCallback<T extends Overload> = (ctx: Invocation<T>, args: OverloadArguments<T>) => void;
