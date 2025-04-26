@@ -5,4 +5,4 @@ export * from "./number";
 export * from "./parameter";
 export * from "./player";
 export * from "./string";
-export * from "./vector3";
+export * from "./location";

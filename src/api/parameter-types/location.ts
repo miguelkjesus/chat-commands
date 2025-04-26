@@ -1,16 +1,16 @@
-import { Vector3ParameterBuilder } from "~/builders";
+import { LocationParameterBuilder } from "~/builders";
 import { LocationParameter } from "~/parameters/types";
 
 /**
  * Creates a 3D vector parameter for use in overload definitions. \
- * Vector3 parameters allow the player to input a set of three coordinates (X, Y, Z), typically a location: e.g.,
+ * Location parameters allow the player to input a set of three coordinates (X, Y, Z), typically a location: e.g.,
  *
  * **Example Inputs:**
  * - `!teleport 100 64 -200`
  * - `!spawn set ~ ~ ~`
  *
  * @example
- * overload({ location: vector3() });
+ * overload({ location: location() });
  *
  * @param name
  *    An optional display name for the parameter. \
@@ -20,6 +20,6 @@ import { LocationParameter } from "~/parameters/types";
  * @returns
  *    A builder instance for configuring the parameter.
  */
-export function vector3(name?: string) {
-  return new Vector3ParameterBuilder(new LocationParameter(name));
+export function location(name?: string) {
+  return new LocationParameterBuilder(new LocationParameter(name));
 }

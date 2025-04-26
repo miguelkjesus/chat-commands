@@ -65,7 +65,7 @@ export class OverloadBuilder<State extends Overload> extends Builder<State> {
    *
    * @example
    * spawnPig
-   *   .createOverload({ location: vector3().setOptional() })
+   *   .createOverload({ location: location().setOptional() })
    *   .onExecuteReadOnly((ctx, { location = ctx.player.location }) => {
    *     // Only read-only code can be run!
    *     ctx.player.sendMessage("Hello world!");
